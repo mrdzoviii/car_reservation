@@ -13,6 +13,7 @@
 
 
 -- Dumping database structure for car_reservation
+DROP DATABASE IF EXISTS `car_reservation`;
 CREATE DATABASE IF NOT EXISTS `car_reservation` /*!40100 DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_croatian_ci */;
 USE `car_reservation`;
 
@@ -38,7 +39,7 @@ CREATE TABLE IF NOT EXISTS `company` (
   `logo` longblob NOT NULL,
   `deleted` tinyint(4) NOT NULL DEFAULT 0,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=5 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_croatian_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=8 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_croatian_ci;
 
 -- Data exporting was unselected.
 -- Dumping structure for table car_reservation.cost
@@ -46,7 +47,7 @@ CREATE TABLE IF NOT EXISTS `cost` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `name` varchar(50) COLLATE utf8mb4_croatian_ci NOT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_croatian_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=4 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_croatian_ci;
 
 -- Data exporting was unselected.
 -- Dumping structure for table car_reservation.location
@@ -87,17 +88,16 @@ CREATE TABLE IF NOT EXISTS `mail_option` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `option` varchar(100) COLLATE utf8mb4_croatian_ci NOT NULL DEFAULT '0',
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_croatian_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=4 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_croatian_ci;
 
 -- Data exporting was unselected.
 -- Dumping structure for table car_reservation.manufacturer
 CREATE TABLE IF NOT EXISTS `manufacturer` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `name` varchar(100) COLLATE utf8mb4_croatian_ci NOT NULL,
-  `logo` longblob NOT NULL,
   `deleted` tinyint(4) NOT NULL DEFAULT 0,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_croatian_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=11 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_croatian_ci;
 
 -- Data exporting was unselected.
 -- Dumping structure for table car_reservation.model
@@ -111,12 +111,12 @@ CREATE TABLE IF NOT EXISTS `model` (
   `transmission` varchar(100) COLLATE utf8mb4_croatian_ci NOT NULL,
   `year` char(4) COLLATE utf8mb4_croatian_ci NOT NULL,
   `fuel` varchar(50) COLLATE utf8mb4_croatian_ci NOT NULL,
-  `image` blob NOT NULL,
+  `image` longblob NOT NULL,
   `deleted` tinyint(4) NOT NULL DEFAULT 0,
   PRIMARY KEY (`id`),
   KEY `FK_MODEL_MANUFACTURER` (`manufacturer`),
   CONSTRAINT `FK_MODEL_MANUFACTURER` FOREIGN KEY (`manufacturer`) REFERENCES `manufacturer` (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_croatian_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=6 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_croatian_ci;
 
 -- Data exporting was unselected.
 -- Dumping structure for table car_reservation.reservation
@@ -145,7 +145,7 @@ CREATE TABLE IF NOT EXISTS `role` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `role` varchar(100) COLLATE utf8mb4_croatian_ci NOT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=4 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_croatian_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=7 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_croatian_ci;
 
 -- Data exporting was unselected.
 -- Dumping structure for table car_reservation.running_cost

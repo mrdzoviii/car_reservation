@@ -1,14 +1,14 @@
 package ba.telegroup.car_reservation.model;
 
-import javax.persistence.Basic;
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.Id;
+import ba.telegroup.car_reservation.common.interfaces.HasCompanyId;
+
+import javax.persistence.*;
 import java.sql.Timestamp;
 import java.util.Objects;
 
 @Entity
-public class Logger {
+@Inheritance(strategy = InheritanceType.JOINED)
+public class Logger implements HasCompanyId {
     private Integer id;
     private String actionType;
     private String actionDetails;
@@ -17,6 +17,18 @@ public class Logger {
     private Integer userId;
     private Byte atomic;
     private Integer companyId;
+
+    public Logger(Integer userId, String actionType, String actionDetails, String tableName, Byte atomic, Integer companyId) {
+        this.userId = userId;
+        this.actionType = actionType;
+        this.actionDetails = actionDetails;
+        this.tableName = tableName;
+        this.atomic = atomic;
+        this.companyId = companyId;
+    }
+
+    public Logger() {
+    }
 
     @Id
     @Column(name = "id")
@@ -117,5 +129,22 @@ public class Logger {
     public int hashCode() {
 
         return Objects.hash(id, actionType, actionDetails, tableName, created, userId, atomic, companyId);
+    }
+
+    public enum ActionType {
+        CREATE("create"),
+        UPDATE("update"),
+        READ("read"),
+        DELETE("delete");
+
+        private final String text;
+
+        ActionType(final String text) {
+            this.text = text;
+        }
+        @Override
+        public String toString() {
+            return text;
+        }
     }
 }
