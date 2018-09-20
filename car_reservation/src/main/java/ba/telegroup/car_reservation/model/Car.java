@@ -12,6 +12,7 @@ public class Car {
     private Integer modelId;
     private Integer locationId;
     private String plateNumber;
+    private Byte deleted;
 
     @Id
     @Column(name = "id")
@@ -68,5 +69,15 @@ public class Car {
     public int hashCode() {
 
         return Objects.hash(id, modelId, locationId, plateNumber);
+    }
+
+    @Basic
+    @Column(name = "deleted")
+    public Byte getDeleted() {
+        return deleted;
+    }
+
+    public void setDeleted(Byte deleted) {
+        this.deleted = deleted;
     }
 }

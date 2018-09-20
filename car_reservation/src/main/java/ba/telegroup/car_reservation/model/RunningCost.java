@@ -14,6 +14,7 @@ public class RunningCost {
     private Timestamp datetime;
     private BigDecimal price;
     private String description;
+    private Byte deleted;
 
     @Id
     @Column(name = "id")
@@ -92,5 +93,15 @@ public class RunningCost {
     public int hashCode() {
 
         return Objects.hash(id, costId, carId, datetime, price, description);
+    }
+
+    @Basic
+    @Column(name = "deleted")
+    public Byte getDeleted() {
+        return deleted;
+    }
+
+    public void setDeleted(Byte deleted) {
+        this.deleted = deleted;
     }
 }

@@ -4,6 +4,7 @@ import javax.persistence.Basic;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Id;
+import java.sql.Timestamp;
 import java.util.Objects;
 
 @Entity
@@ -16,6 +17,13 @@ public class User {
     private String email;
     private Integer companyId;
     private Integer roleId;
+    private Byte status;
+    private Byte deleted;
+    private Integer mailOptionId;
+    private Integer locationId;
+    private String token;
+    private Timestamp tokenValidUntil;
+    private byte[] avatar;
 
     @Id
     @Column(name = "id")
@@ -116,5 +124,75 @@ public class User {
     public int hashCode() {
 
         return Objects.hash(id, username, password, firstName, lastName, email, companyId, roleId);
+    }
+
+    @Basic
+    @Column(name = "status")
+    public Byte getStatus() {
+        return status;
+    }
+
+    public void setStatus(Byte status) {
+        this.status = status;
+    }
+
+    @Basic
+    @Column(name = "deleted")
+    public Byte getDeleted() {
+        return deleted;
+    }
+
+    public void setDeleted(Byte deleted) {
+        this.deleted = deleted;
+    }
+
+    @Basic
+    @Column(name = "mail_option_id")
+    public Integer getMailOptionId() {
+        return mailOptionId;
+    }
+
+    public void setMailOptionId(Integer mailOptionId) {
+        this.mailOptionId = mailOptionId;
+    }
+
+    @Basic
+    @Column(name = "location_id")
+    public Integer getLocationId() {
+        return locationId;
+    }
+
+    public void setLocationId(Integer locationId) {
+        this.locationId = locationId;
+    }
+
+    @Basic
+    @Column(name = "token")
+    public String getToken() {
+        return token;
+    }
+
+    public void setToken(String token) {
+        this.token = token;
+    }
+
+    @Basic
+    @Column(name = "token_valid_until")
+    public Timestamp getTokenValidUntil() {
+        return tokenValidUntil;
+    }
+
+    public void setTokenValidUntil(Timestamp tokenValidUntil) {
+        this.tokenValidUntil = tokenValidUntil;
+    }
+
+    @Basic
+    @Column(name = "avatar")
+    public byte[] getAvatar() {
+        return avatar;
+    }
+
+    public void setAvatar(byte[] avatar) {
+        this.avatar = avatar;
     }
 }

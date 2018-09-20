@@ -13,6 +13,9 @@ public class Location {
     private Integer companyId;
     private BigDecimal latitude;
     private BigDecimal longitude;
+    private String name;
+    private String address;
+    private Byte deleted;
 
     @Id
     @Column(name = "id")
@@ -69,5 +72,35 @@ public class Location {
     public int hashCode() {
 
         return Objects.hash(id, companyId, latitude, longitude);
+    }
+
+    @Basic
+    @Column(name = "name")
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    @Basic
+    @Column(name = "address")
+    public String getAddress() {
+        return address;
+    }
+
+    public void setAddress(String address) {
+        this.address = address;
+    }
+
+    @Basic
+    @Column(name = "deleted")
+    public Byte getDeleted() {
+        return deleted;
+    }
+
+    public void setDeleted(Byte deleted) {
+        this.deleted = deleted;
     }
 }

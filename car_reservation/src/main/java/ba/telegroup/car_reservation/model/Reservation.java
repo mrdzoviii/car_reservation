@@ -19,6 +19,8 @@ public class Reservation {
     private Timestamp startTime;
     private Timestamp endTime;
     private Byte status;
+    private String direction;
+    private Byte deleted;
 
     @Id
     @Column(name = "id")
@@ -141,5 +143,25 @@ public class Reservation {
     public int hashCode() {
 
         return Objects.hash(id, createdTime, userId, carId, startMileage, finishMileage, destination, startTime, endTime, status);
+    }
+
+    @Basic
+    @Column(name = "direction")
+    public String getDirection() {
+        return direction;
+    }
+
+    public void setDirection(String direction) {
+        this.direction = direction;
+    }
+
+    @Basic
+    @Column(name = "deleted")
+    public Byte getDeleted() {
+        return deleted;
+    }
+
+    public void setDeleted(Byte deleted) {
+        this.deleted = deleted;
     }
 }
