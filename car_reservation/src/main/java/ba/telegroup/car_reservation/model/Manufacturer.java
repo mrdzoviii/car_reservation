@@ -1,20 +1,18 @@
 package ba.telegroup.car_reservation.model;
 
-import javax.persistence.Basic;
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.Id;
-import java.util.Arrays;
+import ba.telegroup.car_reservation.common.interfaces.Deletable;
+
+import javax.persistence.*;
 import java.util.Objects;
 
 @Entity
-public class Manufacturer {
+public class Manufacturer implements Deletable {
     private Integer id;
     private String name;
-    private byte[] logo;
     private Byte deleted;
 
     @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id")
     public Integer getId() {
         return id;
@@ -35,16 +33,6 @@ public class Manufacturer {
     }
 
     @Basic
-    @Column(name = "logo")
-    public byte[] getLogo() {
-        return logo;
-    }
-
-    public void setLogo(byte[] logo) {
-        this.logo = logo;
-    }
-
-    @Basic
     @Column(name = "deleted")
     public Byte getDeleted() {
         return deleted;
@@ -61,15 +49,12 @@ public class Manufacturer {
         Manufacturer that = (Manufacturer) o;
         return Objects.equals(id, that.id) &&
                 Objects.equals(name, that.name) &&
-                Arrays.equals(logo, that.logo) &&
                 Objects.equals(deleted, that.deleted);
     }
 
     @Override
     public int hashCode() {
 
-        int result = Objects.hash(id, name, deleted);
-        result = 31 * result + Arrays.hashCode(logo);
-        return result;
+        return Objects.hash(id, name, deleted);
     }
 }

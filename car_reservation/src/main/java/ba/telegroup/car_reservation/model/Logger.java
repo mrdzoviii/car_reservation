@@ -32,6 +32,7 @@ public class Logger implements HasCompanyId {
 
     @Id
     @Column(name = "id")
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     public Integer getId() {
         return id;
     }

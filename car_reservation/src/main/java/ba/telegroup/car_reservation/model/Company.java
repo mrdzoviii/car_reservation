@@ -1,14 +1,13 @@
 package ba.telegroup.car_reservation.model;
 
-import javax.persistence.Basic;
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.Id;
+import ba.telegroup.car_reservation.common.interfaces.Deletable;
+
+import javax.persistence.*;
 import java.util.Arrays;
 import java.util.Objects;
 
 @Entity
-public class Company {
+public class Company implements Deletable {
     private Integer id;
     private String name;
     private byte[] logo;
@@ -16,6 +15,7 @@ public class Company {
 
     @Id
     @Column(name = "id")
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     public Integer getId() {
         return id;
     }
