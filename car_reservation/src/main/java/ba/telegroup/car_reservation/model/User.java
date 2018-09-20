@@ -5,22 +5,23 @@ import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Id;
 import java.sql.Timestamp;
+import java.util.Arrays;
 import java.util.Objects;
 
 @Entity
 public class User {
     private Integer id;
+    private String email;
     private String username;
     private String password;
     private String firstName;
     private String lastName;
-    private String email;
-    private Integer companyId;
-    private Integer roleId;
     private Byte status;
     private Byte deleted;
     private Integer mailOptionId;
     private Integer locationId;
+    private Integer companyId;
+    private Integer roleId;
     private String token;
     private Timestamp tokenValidUntil;
     private byte[] avatar;
@@ -33,6 +34,16 @@ public class User {
 
     public void setId(Integer id) {
         this.id = id;
+    }
+
+    @Basic
+    @Column(name = "email")
+    public String getEmail() {
+        return email;
+    }
+
+    public void setEmail(String email) {
+        this.email = email;
     }
 
     @Basic
@@ -76,57 +87,6 @@ public class User {
     }
 
     @Basic
-    @Column(name = "email")
-    public String getEmail() {
-        return email;
-    }
-
-    public void setEmail(String email) {
-        this.email = email;
-    }
-
-    @Basic
-    @Column(name = "company_id")
-    public Integer getCompanyId() {
-        return companyId;
-    }
-
-    public void setCompanyId(Integer companyId) {
-        this.companyId = companyId;
-    }
-
-    @Basic
-    @Column(name = "role_id")
-    public Integer getRoleId() {
-        return roleId;
-    }
-
-    public void setRoleId(Integer roleId) {
-        this.roleId = roleId;
-    }
-
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        User user = (User) o;
-        return Objects.equals(id, user.id) &&
-                Objects.equals(username, user.username) &&
-                Objects.equals(password, user.password) &&
-                Objects.equals(firstName, user.firstName) &&
-                Objects.equals(lastName, user.lastName) &&
-                Objects.equals(email, user.email) &&
-                Objects.equals(companyId, user.companyId) &&
-                Objects.equals(roleId, user.roleId);
-    }
-
-    @Override
-    public int hashCode() {
-
-        return Objects.hash(id, username, password, firstName, lastName, email, companyId, roleId);
-    }
-
-    @Basic
     @Column(name = "status")
     public Byte getStatus() {
         return status;
@@ -167,6 +127,26 @@ public class User {
     }
 
     @Basic
+    @Column(name = "company_id")
+    public Integer getCompanyId() {
+        return companyId;
+    }
+
+    public void setCompanyId(Integer companyId) {
+        this.companyId = companyId;
+    }
+
+    @Basic
+    @Column(name = "role_id")
+    public Integer getRoleId() {
+        return roleId;
+    }
+
+    public void setRoleId(Integer roleId) {
+        this.roleId = roleId;
+    }
+
+    @Basic
     @Column(name = "token")
     public String getToken() {
         return token;
@@ -194,5 +174,35 @@ public class User {
 
     public void setAvatar(byte[] avatar) {
         this.avatar = avatar;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        User user = (User) o;
+        return Objects.equals(id, user.id) &&
+                Objects.equals(email, user.email) &&
+                Objects.equals(username, user.username) &&
+                Objects.equals(password, user.password) &&
+                Objects.equals(firstName, user.firstName) &&
+                Objects.equals(lastName, user.lastName) &&
+                Objects.equals(status, user.status) &&
+                Objects.equals(deleted, user.deleted) &&
+                Objects.equals(mailOptionId, user.mailOptionId) &&
+                Objects.equals(locationId, user.locationId) &&
+                Objects.equals(companyId, user.companyId) &&
+                Objects.equals(roleId, user.roleId) &&
+                Objects.equals(token, user.token) &&
+                Objects.equals(tokenValidUntil, user.tokenValidUntil) &&
+                Arrays.equals(avatar, user.avatar);
+    }
+
+    @Override
+    public int hashCode() {
+
+        int result = Objects.hash(id, email, username, password, firstName, lastName, status, deleted, mailOptionId, locationId, companyId, roleId, token, tokenValidUntil);
+        result = 31 * result + Arrays.hashCode(avatar);
+        return result;
     }
 }

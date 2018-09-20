@@ -10,6 +10,7 @@ import java.util.Objects;
 @Entity
 public class Model {
     private Integer id;
+    private Integer manufacturer;
     private String model;
     private String type;
     private String bodyStyle;
@@ -28,6 +29,16 @@ public class Model {
 
     public void setId(Integer id) {
         this.id = id;
+    }
+
+    @Basic
+    @Column(name = "manufacturer")
+    public Integer getManufacturer() {
+        return manufacturer;
+    }
+
+    public void setManufacturer(Integer manufacturer) {
+        this.manufacturer = manufacturer;
     }
 
     @Basic
@@ -126,6 +137,7 @@ public class Model {
         if (o == null || getClass() != o.getClass()) return false;
         Model model1 = (Model) o;
         return Objects.equals(id, model1.id) &&
+                Objects.equals(manufacturer, model1.manufacturer) &&
                 Objects.equals(model, model1.model) &&
                 Objects.equals(type, model1.type) &&
                 Objects.equals(bodyStyle, model1.bodyStyle) &&
@@ -140,7 +152,7 @@ public class Model {
     @Override
     public int hashCode() {
 
-        int result = Objects.hash(id, model, type, bodyStyle, engine, transmission, year, fuel, deleted);
+        int result = Objects.hash(id, manufacturer, model, type, bodyStyle, engine, transmission, year, fuel, deleted);
         result = 31 * result + Arrays.hashCode(image);
         return result;
     }

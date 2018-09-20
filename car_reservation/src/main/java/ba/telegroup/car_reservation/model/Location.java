@@ -10,11 +10,11 @@ import java.util.Objects;
 @Entity
 public class Location {
     private Integer id;
+    private String name;
+    private String address;
     private Integer companyId;
     private BigDecimal latitude;
     private BigDecimal longitude;
-    private String name;
-    private String address;
     private Byte deleted;
 
     @Id
@@ -25,6 +25,26 @@ public class Location {
 
     public void setId(Integer id) {
         this.id = id;
+    }
+
+    @Basic
+    @Column(name = "name")
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    @Basic
+    @Column(name = "address")
+    public String getAddress() {
+        return address;
+    }
+
+    public void setAddress(String address) {
+        this.address = address;
     }
 
     @Basic
@@ -57,43 +77,6 @@ public class Location {
         this.longitude = longitude;
     }
 
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        Location location = (Location) o;
-        return Objects.equals(id, location.id) &&
-                Objects.equals(companyId, location.companyId) &&
-                Objects.equals(latitude, location.latitude) &&
-                Objects.equals(longitude, location.longitude);
-    }
-
-    @Override
-    public int hashCode() {
-
-        return Objects.hash(id, companyId, latitude, longitude);
-    }
-
-    @Basic
-    @Column(name = "name")
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    @Basic
-    @Column(name = "address")
-    public String getAddress() {
-        return address;
-    }
-
-    public void setAddress(String address) {
-        this.address = address;
-    }
-
     @Basic
     @Column(name = "deleted")
     public Byte getDeleted() {
@@ -102,5 +85,25 @@ public class Location {
 
     public void setDeleted(Byte deleted) {
         this.deleted = deleted;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Location location = (Location) o;
+        return Objects.equals(id, location.id) &&
+                Objects.equals(name, location.name) &&
+                Objects.equals(address, location.address) &&
+                Objects.equals(companyId, location.companyId) &&
+                Objects.equals(latitude, location.latitude) &&
+                Objects.equals(longitude, location.longitude) &&
+                Objects.equals(deleted, location.deleted);
+    }
+
+    @Override
+    public int hashCode() {
+
+        return Objects.hash(id, name, address, companyId, latitude, longitude, deleted);
     }
 }

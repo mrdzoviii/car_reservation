@@ -13,7 +13,6 @@
 
 
 -- Dumping database structure for car_reservation
-DROP DATABASE IF EXISTS `car_reservation`;
 CREATE DATABASE IF NOT EXISTS `car_reservation` /*!40100 DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_croatian_ci */;
 USE `car_reservation`;
 
@@ -37,6 +36,7 @@ CREATE TABLE IF NOT EXISTS `company` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `name` varchar(100) COLLATE utf8mb4_croatian_ci NOT NULL,
   `logo` longblob NOT NULL,
+  `deleted` tinyint(4) NOT NULL DEFAULT 0,
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=5 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_croatian_ci;
 
@@ -95,6 +95,7 @@ CREATE TABLE IF NOT EXISTS `manufacturer` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `name` varchar(100) COLLATE utf8mb4_croatian_ci NOT NULL,
   `logo` longblob NOT NULL,
+  `deleted` tinyint(4) NOT NULL DEFAULT 0,
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_croatian_ci;
 
@@ -104,7 +105,7 @@ CREATE TABLE IF NOT EXISTS `model` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `manufacturer` int(11) NOT NULL,
   `model` varchar(100) COLLATE utf8mb4_croatian_ci NOT NULL,
-  `class` varchar(100) COLLATE utf8mb4_croatian_ci NOT NULL,
+  `type` varchar(100) COLLATE utf8mb4_croatian_ci NOT NULL,
   `body_style` varchar(100) COLLATE utf8mb4_croatian_ci NOT NULL,
   `engine` varchar(100) COLLATE utf8mb4_croatian_ci NOT NULL,
   `transmission` varchar(100) COLLATE utf8mb4_croatian_ci NOT NULL,

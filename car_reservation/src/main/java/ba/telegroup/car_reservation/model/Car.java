@@ -54,23 +54,6 @@ public class Car {
         this.plateNumber = plateNumber;
     }
 
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        Car car = (Car) o;
-        return Objects.equals(id, car.id) &&
-                Objects.equals(modelId, car.modelId) &&
-                Objects.equals(locationId, car.locationId) &&
-                Objects.equals(plateNumber, car.plateNumber);
-    }
-
-    @Override
-    public int hashCode() {
-
-        return Objects.hash(id, modelId, locationId, plateNumber);
-    }
-
     @Basic
     @Column(name = "deleted")
     public Byte getDeleted() {
@@ -79,5 +62,23 @@ public class Car {
 
     public void setDeleted(Byte deleted) {
         this.deleted = deleted;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Car car = (Car) o;
+        return Objects.equals(id, car.id) &&
+                Objects.equals(modelId, car.modelId) &&
+                Objects.equals(locationId, car.locationId) &&
+                Objects.equals(plateNumber, car.plateNumber) &&
+                Objects.equals(deleted, car.deleted);
+    }
+
+    @Override
+    public int hashCode() {
+
+        return Objects.hash(id, modelId, locationId, plateNumber, deleted);
     }
 }

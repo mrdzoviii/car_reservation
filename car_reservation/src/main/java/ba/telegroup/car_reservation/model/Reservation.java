@@ -15,11 +15,10 @@ public class Reservation {
     private Integer carId;
     private Integer startMileage;
     private Integer finishMileage;
-    private String destination;
+    private String direction;
     private Timestamp startTime;
     private Timestamp endTime;
     private Byte status;
-    private String direction;
     private Byte deleted;
 
     @Id
@@ -83,13 +82,13 @@ public class Reservation {
     }
 
     @Basic
-    @Column(name = "destination")
-    public String getDestination() {
-        return destination;
+    @Column(name = "direction")
+    public String getDirection() {
+        return direction;
     }
 
-    public void setDestination(String destination) {
-        this.destination = destination;
+    public void setDirection(String direction) {
+        this.direction = direction;
     }
 
     @Basic
@@ -122,6 +121,16 @@ public class Reservation {
         this.status = status;
     }
 
+    @Basic
+    @Column(name = "deleted")
+    public Byte getDeleted() {
+        return deleted;
+    }
+
+    public void setDeleted(Byte deleted) {
+        this.deleted = deleted;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
@@ -133,35 +142,16 @@ public class Reservation {
                 Objects.equals(carId, that.carId) &&
                 Objects.equals(startMileage, that.startMileage) &&
                 Objects.equals(finishMileage, that.finishMileage) &&
-                Objects.equals(destination, that.destination) &&
+                Objects.equals(direction, that.direction) &&
                 Objects.equals(startTime, that.startTime) &&
                 Objects.equals(endTime, that.endTime) &&
-                Objects.equals(status, that.status);
+                Objects.equals(status, that.status) &&
+                Objects.equals(deleted, that.deleted);
     }
 
     @Override
     public int hashCode() {
 
-        return Objects.hash(id, createdTime, userId, carId, startMileage, finishMileage, destination, startTime, endTime, status);
-    }
-
-    @Basic
-    @Column(name = "direction")
-    public String getDirection() {
-        return direction;
-    }
-
-    public void setDirection(String direction) {
-        this.direction = direction;
-    }
-
-    @Basic
-    @Column(name = "deleted")
-    public Byte getDeleted() {
-        return deleted;
-    }
-
-    public void setDeleted(Byte deleted) {
-        this.deleted = deleted;
+        return Objects.hash(id, createdTime, userId, carId, startMileage, finishMileage, direction, startTime, endTime, status, deleted);
     }
 }

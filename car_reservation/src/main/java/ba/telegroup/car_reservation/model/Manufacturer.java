@@ -12,6 +12,7 @@ public class Manufacturer {
     private Integer id;
     private String name;
     private byte[] logo;
+    private Byte deleted;
 
     @Id
     @Column(name = "id")
@@ -43,6 +44,16 @@ public class Manufacturer {
         this.logo = logo;
     }
 
+    @Basic
+    @Column(name = "deleted")
+    public Byte getDeleted() {
+        return deleted;
+    }
+
+    public void setDeleted(Byte deleted) {
+        this.deleted = deleted;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
@@ -50,13 +61,14 @@ public class Manufacturer {
         Manufacturer that = (Manufacturer) o;
         return Objects.equals(id, that.id) &&
                 Objects.equals(name, that.name) &&
-                Arrays.equals(logo, that.logo);
+                Arrays.equals(logo, that.logo) &&
+                Objects.equals(deleted, that.deleted);
     }
 
     @Override
     public int hashCode() {
 
-        int result = Objects.hash(id, name);
+        int result = Objects.hash(id, name, deleted);
         result = 31 * result + Arrays.hashCode(logo);
         return result;
     }

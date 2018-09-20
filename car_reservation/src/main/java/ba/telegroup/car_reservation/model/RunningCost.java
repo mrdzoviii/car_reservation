@@ -76,6 +76,16 @@ public class RunningCost {
         this.description = description;
     }
 
+    @Basic
+    @Column(name = "deleted")
+    public Byte getDeleted() {
+        return deleted;
+    }
+
+    public void setDeleted(Byte deleted) {
+        this.deleted = deleted;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
@@ -86,22 +96,13 @@ public class RunningCost {
                 Objects.equals(carId, that.carId) &&
                 Objects.equals(datetime, that.datetime) &&
                 Objects.equals(price, that.price) &&
-                Objects.equals(description, that.description);
+                Objects.equals(description, that.description) &&
+                Objects.equals(deleted, that.deleted);
     }
 
     @Override
     public int hashCode() {
 
-        return Objects.hash(id, costId, carId, datetime, price, description);
-    }
-
-    @Basic
-    @Column(name = "deleted")
-    public Byte getDeleted() {
-        return deleted;
-    }
-
-    public void setDeleted(Byte deleted) {
-        this.deleted = deleted;
+        return Objects.hash(id, costId, carId, datetime, price, description, deleted);
     }
 }
