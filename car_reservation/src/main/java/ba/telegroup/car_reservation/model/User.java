@@ -1,12 +1,16 @@
 package ba.telegroup.car_reservation.model;
 
+import ba.telegroup.car_reservation.common.interfaces.Deletable;
+import ba.telegroup.car_reservation.common.interfaces.HasCompanyId;
+
 import javax.persistence.*;
 import java.sql.Timestamp;
 import java.util.Arrays;
 import java.util.Objects;
 
 @Entity
-public class User {
+@Inheritance(strategy = InheritanceType.JOINED)
+public class User implements HasCompanyId,Deletable {
     private Integer id;
     private String email;
     private String username;
