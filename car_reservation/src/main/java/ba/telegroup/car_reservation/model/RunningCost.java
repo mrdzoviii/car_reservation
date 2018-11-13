@@ -18,7 +18,6 @@ public class RunningCost {
 
     @Id
     @Column(name = "id")
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
     public Integer getId() {
         return id;
     }
@@ -92,18 +91,11 @@ public class RunningCost {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         RunningCost that = (RunningCost) o;
-        return Objects.equals(id, that.id) &&
-                Objects.equals(costId, that.costId) &&
-                Objects.equals(carId, that.carId) &&
-                Objects.equals(datetime, that.datetime) &&
-                Objects.equals(price, that.price) &&
-                Objects.equals(description, that.description) &&
-                Objects.equals(deleted, that.deleted);
+        return Objects.equals(id, that.id);
     }
 
     @Override
     public int hashCode() {
-
-        return Objects.hash(id, costId, carId, datetime, price, description, deleted);
+        return Objects.hash(id);
     }
 }

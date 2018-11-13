@@ -2,7 +2,10 @@ package ba.telegroup.car_reservation.model;
 
 import ba.telegroup.car_reservation.common.interfaces.Deletable;
 
-import javax.persistence.*;
+import javax.persistence.Basic;
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.Id;
 import java.util.Objects;
 
 @Entity
@@ -12,7 +15,6 @@ public class Manufacturer implements Deletable {
     private Byte deleted;
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id")
     public Integer getId() {
         return id;
@@ -47,14 +49,11 @@ public class Manufacturer implements Deletable {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         Manufacturer that = (Manufacturer) o;
-        return Objects.equals(id, that.id) &&
-                Objects.equals(name, that.name) &&
-                Objects.equals(deleted, that.deleted);
+        return Objects.equals(id, that.id);
     }
 
     @Override
     public int hashCode() {
-
-        return Objects.hash(id, name, deleted);
+        return Objects.hash(id);
     }
 }

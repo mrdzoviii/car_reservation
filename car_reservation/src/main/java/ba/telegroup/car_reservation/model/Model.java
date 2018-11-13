@@ -1,6 +1,9 @@
 package ba.telegroup.car_reservation.model;
 
-import javax.persistence.*;
+import javax.persistence.Basic;
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.Id;
 import java.util.Arrays;
 import java.util.Objects;
 
@@ -20,7 +23,6 @@ public class Model {
 
     @Id
     @Column(name = "id")
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
     public Integer getId() {
         return id;
     }
@@ -133,25 +135,12 @@ public class Model {
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
-        Model model1 = (Model) o;
-        return Objects.equals(id, model1.id) &&
-                Objects.equals(manufacturer, model1.manufacturer) &&
-                Objects.equals(model, model1.model) &&
-                Objects.equals(type, model1.type) &&
-                Objects.equals(bodyStyle, model1.bodyStyle) &&
-                Objects.equals(engine, model1.engine) &&
-                Objects.equals(transmission, model1.transmission) &&
-                Objects.equals(year, model1.year) &&
-                Objects.equals(fuel, model1.fuel) &&
-                Arrays.equals(image, model1.image) &&
-                Objects.equals(deleted, model1.deleted);
+        Model model = (Model) o;
+        return Objects.equals(id, model.id);
     }
 
     @Override
     public int hashCode() {
-
-        int result = Objects.hash(id, manufacturer, model, type, bodyStyle, engine, transmission, year, fuel, deleted);
-        result = 31 * result + Arrays.hashCode(image);
-        return result;
+        return Objects.hash(id);
     }
 }

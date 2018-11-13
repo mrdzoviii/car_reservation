@@ -1,6 +1,9 @@
 package ba.telegroup.car_reservation.model;
 
-import javax.persistence.*;
+import javax.persistence.Basic;
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.Id;
 import java.sql.Timestamp;
 import java.util.Objects;
 
@@ -20,7 +23,6 @@ public class Reservation {
 
     @Id
     @Column(name = "id")
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
     public Integer getId() {
         return id;
     }
@@ -134,22 +136,11 @@ public class Reservation {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         Reservation that = (Reservation) o;
-        return Objects.equals(id, that.id) &&
-                Objects.equals(createdTime, that.createdTime) &&
-                Objects.equals(userId, that.userId) &&
-                Objects.equals(carId, that.carId) &&
-                Objects.equals(startMileage, that.startMileage) &&
-                Objects.equals(finishMileage, that.finishMileage) &&
-                Objects.equals(direction, that.direction) &&
-                Objects.equals(startTime, that.startTime) &&
-                Objects.equals(endTime, that.endTime) &&
-                Objects.equals(status, that.status) &&
-                Objects.equals(deleted, that.deleted);
+        return Objects.equals(id, that.id);
     }
 
     @Override
     public int hashCode() {
-
-        return Objects.hash(id, createdTime, userId, carId, startMileage, finishMileage, direction, startTime, endTime, status, deleted);
+        return Objects.hash(id);
     }
 }

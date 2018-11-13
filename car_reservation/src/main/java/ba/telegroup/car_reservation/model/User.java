@@ -1,23 +1,24 @@
 package ba.telegroup.car_reservation.model;
 
-import ba.telegroup.car_reservation.common.interfaces.Deletable;
 import ba.telegroup.car_reservation.common.interfaces.HasCompanyId;
 
-import javax.persistence.*;
+import javax.persistence.Basic;
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.Id;
 import java.sql.Timestamp;
 import java.util.Arrays;
 import java.util.Objects;
 
 @Entity
-@Inheritance(strategy = InheritanceType.JOINED)
-public class User implements HasCompanyId,Deletable {
+public class User implements HasCompanyId {
     private Integer id;
     private String email;
     private String username;
     private String password;
     private String firstName;
     private String lastName;
-    private Byte status;
+    private Integer statusId;
     private Byte deleted;
     private Integer mailOptionId;
     private Integer locationId;
@@ -29,7 +30,6 @@ public class User implements HasCompanyId,Deletable {
 
     @Id
     @Column(name = "id")
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
     public Integer getId() {
         return id;
     }
@@ -89,13 +89,13 @@ public class User implements HasCompanyId,Deletable {
     }
 
     @Basic
-    @Column(name = "status")
-    public Byte getStatus() {
-        return status;
+    @Column(name = "status_id")
+    public Integer getStatusId() {
+        return statusId;
     }
 
-    public void setStatus(Byte status) {
-        this.status = status;
+    public void setStatusId(Integer statusId) {
+        this.statusId = statusId;
     }
 
     @Basic
@@ -183,28 +183,11 @@ public class User implements HasCompanyId,Deletable {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         User user = (User) o;
-        return Objects.equals(id, user.id) &&
-                Objects.equals(email, user.email) &&
-                Objects.equals(username, user.username) &&
-                Objects.equals(password, user.password) &&
-                Objects.equals(firstName, user.firstName) &&
-                Objects.equals(lastName, user.lastName) &&
-                Objects.equals(status, user.status) &&
-                Objects.equals(deleted, user.deleted) &&
-                Objects.equals(mailOptionId, user.mailOptionId) &&
-                Objects.equals(locationId, user.locationId) &&
-                Objects.equals(companyId, user.companyId) &&
-                Objects.equals(roleId, user.roleId) &&
-                Objects.equals(token, user.token) &&
-                Objects.equals(tokenValidUntil, user.tokenValidUntil) &&
-                Arrays.equals(avatar, user.avatar);
+        return Objects.equals(id, user.id);
     }
 
     @Override
     public int hashCode() {
-
-        int result = Objects.hash(id, email, username, password, firstName, lastName, status, deleted, mailOptionId, locationId, companyId, roleId, token, tokenValidUntil);
-        result = 31 * result + Arrays.hashCode(avatar);
-        return result;
+        return Objects.hash(id);
     }
 }

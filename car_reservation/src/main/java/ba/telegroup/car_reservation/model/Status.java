@@ -7,9 +7,9 @@ import javax.persistence.Id;
 import java.util.Objects;
 
 @Entity
-public class Cost {
+public class Status {
     private Integer id;
-    private String name;
+    private String status;
 
     @Id
     @Column(name = "id")
@@ -22,21 +22,21 @@ public class Cost {
     }
 
     @Basic
-    @Column(name = "name")
-    public String getName() {
-        return name;
+    @Column(name = "status")
+    public String getStatus() {
+        return status;
     }
 
-    public void setName(String name) {
-        this.name = name;
+    public void setStatus(String status) {
+        this.status = status;
     }
 
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
-        Cost cost = (Cost) o;
-        return Objects.equals(id, cost.id);
+        Status status = (Status) o;
+        return Objects.equals(id, status.id);
     }
 
     @Override

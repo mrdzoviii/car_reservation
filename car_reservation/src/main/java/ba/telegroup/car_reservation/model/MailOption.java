@@ -10,7 +10,6 @@ public class MailOption {
     private String option;
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id")
     public Integer getId() {
         return id;
@@ -35,13 +34,11 @@ public class MailOption {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         MailOption that = (MailOption) o;
-        return Objects.equals(id, that.id) &&
-                Objects.equals(option, that.option);
+        return Objects.equals(id, that.id);
     }
 
     @Override
     public int hashCode() {
-
-        return Objects.hash(id, option);
+        return Objects.hash(id);
     }
 }

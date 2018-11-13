@@ -1,6 +1,9 @@
 package ba.telegroup.car_reservation.model;
 
-import javax.persistence.*;
+import javax.persistence.Basic;
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.Id;
 import java.util.Objects;
 
 @Entity
@@ -13,7 +16,6 @@ public class Car {
 
     @Id
     @Column(name = "id")
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
     public Integer getId() {
         return id;
     }
@@ -67,16 +69,11 @@ public class Car {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         Car car = (Car) o;
-        return Objects.equals(id, car.id) &&
-                Objects.equals(modelId, car.modelId) &&
-                Objects.equals(locationId, car.locationId) &&
-                Objects.equals(plateNumber, car.plateNumber) &&
-                Objects.equals(deleted, car.deleted);
+        return Objects.equals(id, car.id);
     }
 
     @Override
     public int hashCode() {
-
-        return Objects.hash(id, modelId, locationId, plateNumber, deleted);
+        return Objects.hash(id);
     }
 }

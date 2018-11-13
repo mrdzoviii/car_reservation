@@ -1,22 +1,38 @@
 package ba.telegroup.car_reservation.model;
 
-import ba.telegroup.car_reservation.common.interfaces.HasCompanyId;
+import com.fasterxml.jackson.annotation.JsonFormat;
 
 import javax.persistence.*;
 import java.sql.Timestamp;
+import java.util.Date;
 import java.util.Objects;
 
 @Entity
 @Inheritance(strategy = InheritanceType.JOINED)
-public class Logger implements HasCompanyId {
+public class Logger {
     private Integer id;
     private String actionType;
     private String actionDetails;
     private String tableName;
     private Timestamp created;
-    private Integer userId;
     private Byte atomic;
+    private Integer userId;
     private Integer companyId;
+
+    public Logger() {
+
+    }
+
+    public Logger(Integer id, String actionType, String actionDetails, String tableName, Date created, Byte atomic, Integer userId, Integer companyId) {
+        this.id = id;
+        this.actionType = actionType;
+        this.actionDetails = actionDetails;
+        this.tableName = tableName;
+        this.created = created == null ? null : new Timestamp(created.getTime());
+        this.atomic = atomic;
+        this.userId = userId;
+        this.companyId = companyId;
+    }
 
     public Logger(Integer userId, String actionType, String actionDetails, String tableName, Byte atomic, Integer companyId) {
         this.userId = userId;
@@ -27,11 +43,8 @@ public class Logger implements HasCompanyId {
         this.companyId = companyId;
     }
 
-    public Logger() {
-    }
-
     @Id
-    @Column(name = "id")
+    @Column(name = "id", nullable = false)
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     public Integer getId() {
         return id;
@@ -42,7 +55,7 @@ public class Logger implements HasCompanyId {
     }
 
     @Basic
-    @Column(name = "action_type")
+    @Column(name = "action_type", nullable = false, length = 128)
     public String getActionType() {
         return actionType;
     }
@@ -52,7 +65,7 @@ public class Logger implements HasCompanyId {
     }
 
     @Basic
-    @Column(name = "action_details")
+    @Column(name = "action_details", nullable = false, length = 1024)
     public String getActionDetails() {
         return actionDetails;
     }
@@ -62,7 +75,7 @@ public class Logger implements HasCompanyId {
     }
 
     @Basic
-    @Column(name = "table_name")
+    @Column(name = "table_name", nullable = false, length = 128)
     public String getTableName() {
         return tableName;
     }
@@ -72,7 +85,8 @@ public class Logger implements HasCompanyId {
     }
 
     @Basic
-    @Column(name = "created")
+    @Column(name = "created", nullable = false)
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "dd.MM.yyyy. HH:mm", timezone = "Europe/Belgrade")
     public Timestamp getCreated() {
         return created;
     }
@@ -82,17 +96,7 @@ public class Logger implements HasCompanyId {
     }
 
     @Basic
-    @Column(name = "user_id")
-    public Integer getUserId() {
-        return userId;
-    }
-
-    public void setUserId(Integer userId) {
-        this.userId = userId;
-    }
-
-    @Basic
-    @Column(name = "atomic")
+    @Column(name = "atomic", nullable = false)
     public Byte getAtomic() {
         return atomic;
     }
@@ -102,7 +106,17 @@ public class Logger implements HasCompanyId {
     }
 
     @Basic
-    @Column(name = "company_id")
+    @Column(name = "user_id", nullable = false)
+    public Integer getUserId() {
+        return userId;
+    }
+
+    public void setUserId(Integer userId) {
+        this.userId = userId;
+    }
+
+    @Basic
+    @Column(name = "company_id", nullable = true)
     public Integer getCompanyId() {
         return companyId;
     }
@@ -116,20 +130,12 @@ public class Logger implements HasCompanyId {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         Logger logger = (Logger) o;
-        return Objects.equals(id, logger.id) &&
-                Objects.equals(actionType, logger.actionType) &&
-                Objects.equals(actionDetails, logger.actionDetails) &&
-                Objects.equals(tableName, logger.tableName) &&
-                Objects.equals(created, logger.created) &&
-                Objects.equals(userId, logger.userId) &&
-                Objects.equals(atomic, logger.atomic) &&
-                Objects.equals(companyId, logger.companyId);
+        return Objects.equals(id, logger.id);
     }
 
     @Override
     public int hashCode() {
-
-        return Objects.hash(id, actionType, actionDetails, tableName, created, userId, atomic, companyId);
+        return Objects.hash(id);
     }
 
     public enum ActionType {
@@ -143,6 +149,7 @@ public class Logger implements HasCompanyId {
         ActionType(final String text) {
             this.text = text;
         }
+
         @Override
         public String toString() {
             return text;

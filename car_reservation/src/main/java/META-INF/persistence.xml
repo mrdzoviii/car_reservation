@@ -14,6 +14,7 @@
         <class>ba.telegroup.car_reservation.model.Logger</class>
         <class>ba.telegroup.car_reservation.model.MailOption</class>
         <class>ba.telegroup.car_reservation.model.Manufacturer</class>
+        <class>ba.telegroup.car_reservation.model.Status</class>
         <properties>
             <property name="hibernate.connection.url" value="jdbc:mariadb://localhost:3307/car_reservation"/>
             <property name="hibernate.connection.driver_class" value="org.mariadb.jdbc.Driver"/>
