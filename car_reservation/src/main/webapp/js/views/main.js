@@ -117,8 +117,8 @@ var loginLayout = {
                                     id: "username",
                                     name: "username",
                                     view: "text",
-                                    label: "Korisničko ime:",
-                                    invalidMessage: "Korisničke ime je obavezno!",
+                                    label: "Username:",
+                                    invalidMessage: "Username required!",
                                     required: true
                                 },
                                 {
@@ -126,20 +126,20 @@ var loginLayout = {
                                     name: "password",
                                     view: "text",
                                     type: "password",
-                                    label: "Lozinka:",
-                                    invalidMessage: "Lozinka je obavezna!",
+                                    label: "Password:",
+                                    invalidMessage: "Password required!",
                                     required: true
                                 },
                                 {
                                     id: "companyName",
                                     name: "companyName",
                                     view: "text",
-                                    label: "Kompanija:"
+                                    label: "Company:"
                                 },
                                 {
                                     id: "loginBtn",
                                     view: "button",
-                                    value: "Prijavite se",
+                                    value: "Log in",
                                     type: "form",
                                     click: "login",
                                     align: "right",
@@ -158,8 +158,9 @@ var loginLayout = {
                     borderless: true,
                     height: 500,
                     width: 700,
-                    template: '<img  height="500" width="700" src="../../img/app-logo.png"/>'
-                } ,{}
+                    template: '<img  height="500" width="500" src="../../img/app-logo.png"/>'
+                } ,
+                {}
             ]
         },
 
@@ -176,7 +177,7 @@ var login = function () {
             userData = data.json();
             showApp();
         }).fail(function (err) {
-            util.messages.showErrorMessage("Prijavljivanje nije uspjelo!");
+            util.messages.showErrorMessage("Login failed!");
         });
     }
 };
