@@ -2,13 +2,29 @@ package ba.telegroup.car_reservation.model;
 
 import ba.telegroup.car_reservation.common.interfaces.HasCompanyId;
 
-import javax.persistence.Basic;
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.Id;
+import javax.persistence.*;
 import java.sql.Timestamp;
-import java.util.Arrays;
 import java.util.Objects;
+
+@SqlResultSetMapping(
+        name = "UserMapping",
+        classes = @ConstructorResult(targetClass = User.class,
+                columns = {
+                        @ColumnResult(name = "id", type = Integer.class),
+                        @ColumnResult(name = "email", type = String.class),
+                        @ColumnResult(name = "username", type = String.class),
+                        @ColumnResult(name = "first_name", type = String.class),
+                        @ColumnResult(name = "last_name", type = String.class),
+                        @ColumnResult(name = "status_id", type = Integer.class),
+                        @ColumnResult(name = "company_id", type = Integer.class),
+                        @ColumnResult(name = "location_id", type = Integer.class),
+                        @ColumnResult(name = "mail_option_id", type = Integer.class),
+                        @ColumnResult(name = "avatar", type = byte[].class),
+                        @ColumnResult(name = "role_id", type = Integer.class),
+                        @ColumnResult(name = "deleted", type = Byte.class)
+                }
+        )
+)
 
 @Entity
 public class User implements HasCompanyId {
@@ -27,6 +43,24 @@ public class User implements HasCompanyId {
     private String token;
     private Timestamp tokenValidUntil;
     private byte[] avatar;
+
+    public User() {
+    }
+
+    public User(Integer id, String email,String username, String firstName, String lastName, Integer statusId, Integer companyId, Integer locationId, Integer mailOptionId, byte[] avatar, Integer roleId,Byte deleted) {
+        this.id = id;
+        this.email = email;
+        this.username = username;
+        this.firstName = firstName;
+        this.lastName = lastName;
+        this.statusId = statusId;
+        this.deleted = deleted;
+        this.mailOptionId = mailOptionId;
+        this.locationId = locationId;
+        this.companyId = companyId;
+        this.roleId = roleId;
+        this.avatar = avatar;
+    }
 
     @Id
     @Column(name = "id")

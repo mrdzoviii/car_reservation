@@ -1,20 +1,22 @@
 package ba.telegroup.car_reservation.controller;
 
-import ba.telegroup.car_reservation.controller.genericController.GenericHasCompanyIdAndDeletableController;
 import ba.telegroup.car_reservation.controller.genericController.GenericHasCompanyIdController;
+import ba.telegroup.car_reservation.model.LoginBean;
 import ba.telegroup.car_reservation.model.User;
 import ba.telegroup.car_reservation.repository.UserRepository;
 import org.bouncycastle.util.encoders.Hex;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
-import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RestController;
 
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 
 @RequestMapping("/api/user")
-@Controller
+@RestController
 @Scope("request")
 public class UserController extends GenericHasCompanyIdController<User,Integer> {
     private UserRepository userRepository;
@@ -22,6 +24,10 @@ public class UserController extends GenericHasCompanyIdController<User,Integer> 
     public UserController(UserRepository userRepository){
         super(userRepository);
         this.userRepository=userRepository;
+    }
+    @RequestMapping(value = "/login",method = RequestMethod.POST)
+    public User login(@RequestBody LoginBean bean){
+        return userRepository.login(bean.getUsername(),bean.getPassword(),bean.getCompany());
     }
 
     private String makeHash(String plain) throws NoSuchAlgorithmException {
