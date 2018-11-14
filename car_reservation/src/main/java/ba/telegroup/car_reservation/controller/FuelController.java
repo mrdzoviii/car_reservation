@@ -1,19 +1,19 @@
 package ba.telegroup.car_reservation.controller;
 
 import ba.telegroup.car_reservation.common.ReadOnlyController;
-import ba.telegroup.car_reservation.model.Role;
-import ba.telegroup.car_reservation.repository.RoleRepository;
+import ba.telegroup.car_reservation.model.Fuel;
+import ba.telegroup.car_reservation.repository.FuelRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-@RequestMapping("/api/role")
 @RestController
+@RequestMapping("api/fuel")
 @Scope("request")
-public class RoleController extends ReadOnlyController<Role,Integer> {
+public class FuelController extends ReadOnlyController<Fuel,Integer> {
     @Autowired
-    public RoleController(RoleRepository roleRepository){
-        super(roleRepository);
+    public FuelController(FuelRepository fuelRepository){
+        super(fuelRepository);
     }
 }

@@ -131,8 +131,8 @@ var loginLayout = {
                                     required: true
                                 },
                                 {
-                                    id: "companyName",
-                                    name: "companyName",
+                                    id: "company",
+                                    name: "company",
                                     view: "text",
                                     label: "Company:"
                                 },

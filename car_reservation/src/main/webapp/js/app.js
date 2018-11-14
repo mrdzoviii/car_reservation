@@ -24,22 +24,22 @@ var menyCompanyAdmin=[
     {
         id:"dashboard",
         icon:"home",
-        value:"Početna"
+        value:"Home"
     },
     {
         id:"vehicle",
         icon:"car",
-        value:"Vozila"
+        value:"Vehicles"
     },
     {
         id: "logger",
         icon: "history",
-        value: "Korisničke akcije"
+        value: "User logs"
     },
     {
         id:"user",
         icon:"user",
-        value:"Korisnici"
+        value:"Users"
     }
 ];
 
@@ -195,7 +195,7 @@ var preloadDependencies = function () {
         dependencyMap["status"] = status;
         dependency["status"] = array;
     }));
-    promises.push(webix.ajax().get("api/expense-type").then(function (data) {
+    promises.push(webix.ajax().get("api/cost").then(function (data) {
         var expenseTypes = [];
         var array = [];
 
@@ -203,29 +203,29 @@ var preloadDependencies = function () {
             expenseTypes[obj.id] = obj.value;
             array.push(obj);
         });
-        dependencyMap["expenseType"] = expenseTypes;
-        dependency["expenseType"] = array;
+        dependencyMap["cost"] = expenseTypes;
+        dependency["cost"] = array;
     }));
-    promises.push(webix.ajax().get("api/notification-type").then(function (data) {
+    promises.push(webix.ajax().get("api/mail-option").then(function (data) {
         var notificationTypes = [];
         var array = [];
         data.json().forEach(function (obj) {
             notificationTypes[obj.id] = obj.value;
             array.push(obj);
         });
-        dependencyMap["notificationType"] = notificationTypes;
-        dependency["notificationType"] = array;
+        dependencyMap["mail-option"] = notificationTypes;
+        dependency["mail-option"] = array;
 
     }));
-    promises.push(webix.ajax().get("api/fuel-type").then(function (data) {
+    promises.push(webix.ajax().get("api/fuel").then(function (data) {
         var fuel = [];
         var array = [];
         data.json().forEach(function (obj) {
             fuel[obj.id] = obj.value;
             array.push(obj);
         });
-        dependencyMap['fuelType'] = fuel;
-        dependency['fuelType'] = array;
+        dependencyMap['fuel'] = fuel;
+        dependency['fuel'] = array;
 
     }));
     return webix.promise.all(promises);

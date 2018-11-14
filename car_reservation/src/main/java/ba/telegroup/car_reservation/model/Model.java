@@ -17,7 +17,7 @@ public class Model {
     private String engine;
     private String transmission;
     private String year;
-    private String fuel;
+    private Integer fuelId;
     private byte[] image;
     private Byte deleted;
 
@@ -102,13 +102,13 @@ public class Model {
     }
 
     @Basic
-    @Column(name = "fuel")
-    public String getFuel() {
-        return fuel;
+    @Column(name = "fuel_id")
+    public Integer getFuelId() {
+        return fuelId;
     }
 
-    public void setFuel(String fuel) {
-        this.fuel = fuel;
+    public void setFuelId(Integer fuelId) {
+        this.fuelId = fuelId;
     }
 
     @Basic
