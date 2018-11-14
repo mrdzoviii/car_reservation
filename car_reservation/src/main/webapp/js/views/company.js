@@ -11,7 +11,6 @@ var onCompanyClick=function (id) {
 
 };
 var companyView = {
-
     panel: {
         id: "companyPanel",
         adjust: true,

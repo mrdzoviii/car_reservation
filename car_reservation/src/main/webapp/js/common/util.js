@@ -237,16 +237,16 @@ var util = {
             webix.message({type: "warning", text: message, expire: expire || 0});
         },
         showSessionExpiredError: function () {
-            webix.message({type: "error", text: "Vaša sesija je istekla. Prijavite se ponovo..."});
+            webix.message({type: "error", text: "Session has been expired. Please login again..."});
         },
         showLogoutMessage: function () {
-            webix.message({type: "defult", text: "Uspješno ste se odjavili."});
+            webix.message({type: "default", text: "Successfully logged out."});
         },
 
         showLogoutErrorMessage: function () {
             webix.message({
                 type: "default",
-                text: "Greška prilikom odjavljivanja. Aplikacija će biti ponovo učitana..."
+                text: "Error during logging out. Application reloading..."
             });
         }
     },

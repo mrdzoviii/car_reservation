@@ -10,7 +10,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @Scope("request")
-@RequestMapping("/api/mail-option")
+@RequestMapping("api/mail-option")
 public class MailOptionController extends ReadOnlyController<MailOption,Integer> {
     @Autowired
     public MailOptionController(MailOptionRepository mailOptionRepository){

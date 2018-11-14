@@ -8,7 +8,7 @@ public class UserRepositoryImpl extends CustomRepositoryImpl implements UserRepo
 
     private final String SQL_LOGIN="select u.id,u.email,u.username,u.first_name,u.last_name,u.status_id,u.company_id,u.location_id,u.mail_option_id,u.avatar,u.role_id,u.deleted from user u inner join company c on u.company_id = c.id " +
             " where username=? and lower(password)=lower(SHA2(?,512)) and c.name=? and u.status_id=1 and u.deleted=0";
-    private final String SQL_LOGIN_NO_COMPANY="select u.id,u.email,u.username,u.first_name,u.last_name,u.status_id,u.company_id,u.location_id,u.mail_option_id,u.avatar,u.role_id,u.deleted from user u where u.username=? and lower(u.password)=lower(SHA2(?,512) and u.company_id is null " +
+    private final String SQL_LOGIN_NO_COMPANY="select u.id,u.email,u.username,u.first_name,u.last_name,u.status_id,u.company_id,u.location_id,u.mail_option_id,u.avatar,u.role_id,u.deleted from user u where u.username=? and lower(u.password)=lower(SHA2(?,512)) and u.company_id is null " +
             "and u.status_id=1 and u.deleted=0";
 
 

@@ -20,7 +20,7 @@ var mainLayout = {
                             id: "appNameLabel",
                             view: "label",
                             css: "appNameLabel",
-                            label: "Vehicle Management System"
+                            label: "Car Reservation System"
                         },
                         {},
                         {
@@ -36,7 +36,7 @@ var mainLayout = {
                                         {
                                             id: "1",
                                             icon: "sign-out",
-                                            value: "Odjavite se",
+                                            value: "Sign out",
                                         }
                                     ]
                                 }

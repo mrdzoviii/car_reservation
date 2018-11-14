@@ -14,15 +14,20 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.security.MessageDigest;
-import java.security.NoSuchAlgorithmException;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpSession;
 
-@RequestMapping("/api/user")
+
+@RequestMapping("api/user")
 @RestController
 @Scope("request")
 public class UserController extends GenericHasCompanyIdController<User,Integer> {
     @Value(value = "${forbidden.login}")
     private String forbiddenLogin;
+    @Value(value = "${logout.success}")
+    private String logoutSuccess;
+    @Value(value="${forbidden.action}")
+    private String forbiddenAction;
     private UserRepository userRepository;
     @Autowired
     public UserController(UserRepository userRepository){
@@ -35,13 +40,28 @@ public class UserController extends GenericHasCompanyIdController<User,Integer> 
         if(loggedUser!=null){
             userBean.setLoggedIn(true);
             userBean.setUser(loggedUser);
+            System.out.println("LOGIN"+userBean.getUser().getUsername()+"  "+userBean.getLoggedIn());
             return loggedUser;
         }
         throw new ForbiddenException(forbiddenLogin);
     }
 
-    private String makeHash(String plain) throws NoSuchAlgorithmException {
-        MessageDigest sha512=MessageDigest.getInstance("SHA-512");
-        return Hex.toHexString(sha512.digest(plain.getBytes()));
+    @RequestMapping(value="/logout",method = RequestMethod.GET)
+    public String logout(HttpServletRequest request) throws ForbiddenException {
+            HttpSession session=request.getSession(false);
+        System.out.println("LOGOUT CALLED:"+userBean.getUser().getUsername()+"  "+userBean.getLoggedIn());
+            if(session!=null && userBean.getLoggedIn()){
+                session.invalidate();
+                return logoutSuccess;
+            }
+        throw new ForbiddenException(forbiddenAction);
+    }
+
+    @RequestMapping(value="/state",method = RequestMethod.GET)
+    public User check() throws ForbiddenException {
+        if(userBean.getLoggedIn()){
+            return userBean.getUser();
+        }
+        throw new ForbiddenException(forbiddenAction);
     }
 }

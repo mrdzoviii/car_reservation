@@ -10,7 +10,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @Scope("request")
-@RequestMapping("/api/cost")
+@RequestMapping("api/cost")
 public class CostController extends ReadOnlyController<Cost,Integer> {
     @Autowired
     public CostController(CostRepository costRepository){

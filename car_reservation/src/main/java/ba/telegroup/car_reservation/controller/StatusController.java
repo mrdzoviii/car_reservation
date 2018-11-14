@@ -10,7 +10,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @Scope("request")
-@RequestMapping("/api/status")
+@RequestMapping("api/status")
 public class StatusController extends ReadOnlyController<Status,Integer> {
     @Autowired
     public StatusController(StatusRepository statusRepository) {

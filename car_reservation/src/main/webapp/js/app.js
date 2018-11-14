@@ -11,16 +11,16 @@ var menuSystemAdmin = [
     {
         id: "company",
         icon: "briefcase",
-        value: "Kompanije"
+        value: "Company"
     },
     {
         id: "logger",
         icon: "history",
-        value: "Korisničke akcije"
+        value: "User logs"
     }
 ];
 
-var menyCompanyAdmin=[
+var menuCompanyAdmin=[
     {
         id:"dashboard",
         icon:"home",
@@ -151,7 +151,7 @@ var showApp = function () {
             localMenuData = menuSystemAdmin;
             break;
         case role.companyAdministrator:
-            localMenuData=menyCompanyAdmin;
+            localMenuData=menuCompanyAdmin;
             break;
     }
     $$("mainMenu").define("data", localMenuData);
