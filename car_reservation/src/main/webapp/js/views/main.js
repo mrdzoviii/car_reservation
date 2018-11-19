@@ -23,6 +23,29 @@ var mainLayout = {
                             label: "Car Reservation System"
                         },
                         {},
+
+                        {
+                            id:"userLabel",
+                            view: "label",
+                            align: "right",
+                            label: ""
+                        },
+                        {
+                            id:"userAvatar",
+                            view:"template",
+                            align:"right",
+                            css:"profile-image",
+                            borderless:"true",
+                            height:40,
+                            width:40,
+                            template:  function (obj) {
+                                if(obj.avatar!==null){
+                                    return '<img src="data:image/jpeg;charset=utf-8;base64, '+obj.avatar+'" width="40px" height="40px">';
+                                }
+                                return '<img  src="../../img/avatar-default.png" width="40px" height="40px">'
+                            }
+                        },
+
                         {
                             view: "menu",
                             id: "userMenu",
@@ -134,7 +157,8 @@ var loginLayout = {
                                     id: "company",
                                     name: "company",
                                     view: "text",
-                                    label: "Company:"
+                                    label: "Company:",
+                                    icon: ""
                                 },
                                 {
                                     id: "loginBtn",
@@ -176,11 +200,13 @@ var login = function () {
         }).post("/api/user/login", form.getValues()).then(function (data) {
             userData = data.json();
             showApp();
+
         }).fail(function (err) {
             util.messages.showErrorMessage("Login failed!");
         });
     }
 };
+
 
 var logout = function () {
 

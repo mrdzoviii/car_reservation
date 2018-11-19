@@ -193,3 +193,13 @@
     left:auto !important;
     right:0px !important;
 }
+
+.profile-image{
+    height: 40px;
+    width: 40px;
+    background: transparent;
+}
+.profile-image > div:first-child {
+    padding: 0px !important;
+
+}

@@ -154,6 +154,13 @@ var showApp = function () {
             localMenuData=menuCompanyAdmin;
             break;
     }
+    if(userData.roleId===1)
+        $$("userLabel").setHTML("<p style='margin-top:2px;display: table-cell; line-height: 13px; vertical-align: text-top; horizontal-align:right;font-size: 14px; margin-left: auto;margin-right: 0;}'>"+userData.firstName+" "+userData.lastName+"<br> System admin</p>");
+    else if(userData.roleId===2)
+        $$("userLabel").setHTML("<p style='margin-top:2px;display: table-cell; line-height: 13px; vertical-align: text-top; horizontal-align:right;font-size: 14px; margin-left: auto;margin-right: 0;}'>"+userData.firstName+" "+userData.lastName+"<br> Company admin</p>");
+    else $$("userLabel").setHTML("<p style='margin-top:2px;display: table-cell; line-height: 13px; vertical-align: text-top; horizontal-align:right;font-size: 14px; margin-left: auto;margin-right: 0;}'>"+userData.firstName+" "+userData.lastName+"<br>User</p>");
+    var avatar={"avatar":userData.avatar};
+    $$("userAvatar").define("data",avatar);
     $$("mainMenu").define("data", localMenuData);
     $$("mainMenu").define("on", menuEvents);
     rightPanel = "emptyRightPanel";
