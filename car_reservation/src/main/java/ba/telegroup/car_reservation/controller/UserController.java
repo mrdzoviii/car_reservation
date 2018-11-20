@@ -1,7 +1,7 @@
 package ba.telegroup.car_reservation.controller;
 
 import ba.telegroup.car_reservation.common.exceptions.ForbiddenException;
-import ba.telegroup.car_reservation.controller.genericController.GenericHasCompanyIdController;
+import ba.telegroup.car_reservation.controller.genericController.GenericHasCompanyIdAndDeletableController;
 import ba.telegroup.car_reservation.model.LoginBean;
 import ba.telegroup.car_reservation.model.User;
 import ba.telegroup.car_reservation.model.modelCustom.UserCompany;
@@ -9,25 +9,29 @@ import ba.telegroup.car_reservation.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Scope;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
+import java.util.List;
 
 
 @RequestMapping("api/user")
 @RestController
 @Scope("request")
-public class UserController extends GenericHasCompanyIdController<User,Integer> {
+public class UserController extends GenericHasCompanyIdAndDeletableController<User,Integer> {
     @Value(value = "${forbidden.login}")
     private String forbiddenLogin;
     @Value(value = "${logout.success}")
     private String logoutSuccess;
     @Value(value="${forbidden.action}")
     private String forbiddenAction;
+    @Value("${deleted.not}")
+    private Byte notDeleted;
+    @Value("${deleted.yes}")
+    private Byte deleted;
+    @Value("${role.system_admin}")
+    private Integer systemAdmin;
     private UserRepository userRepository;
     @Autowired
     public UserController(UserRepository userRepository){
@@ -40,7 +44,6 @@ public class UserController extends GenericHasCompanyIdController<User,Integer> 
         if(loggedUser!=null){
             userBean.setLoggedIn(true);
             userBean.setUser(loggedUser);
-            System.out.println("LOGIN"+userBean.getUser().getUsername()+"  "+userBean.getLoggedIn());
             return loggedUser;
         }
         throw new ForbiddenException(forbiddenLogin);
@@ -49,7 +52,6 @@ public class UserController extends GenericHasCompanyIdController<User,Integer> 
     @RequestMapping(value="/logout",method = RequestMethod.GET)
     public String logout(HttpServletRequest request) throws ForbiddenException {
             HttpSession session=request.getSession(false);
-        System.out.println("LOGOUT CALLED:"+userBean.getUser().getUsername()+"  "+userBean.getLoggedIn());
             if(session!=null && userBean.getLoggedIn()){
                 session.invalidate();
                 return logoutSuccess;
@@ -64,4 +66,13 @@ public class UserController extends GenericHasCompanyIdController<User,Integer> 
         }
         throw new ForbiddenException(forbiddenAction);
     }
+
+    @RequestMapping(value="/company/{id}",method = RequestMethod.GET)
+    public List<User> getAllUsersByCompanyId(@PathVariable("id") Integer id){
+        if(id.equals(0)){
+            return userRepository.getAllByRoleIdAndDeleted(systemAdmin,notDeleted);
+        }
+        return userRepository.getAllByCompanyIdAndDeleted(id,notDeleted);
+    }
+
 }

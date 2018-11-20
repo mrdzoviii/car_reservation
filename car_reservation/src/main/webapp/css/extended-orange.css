@@ -203,3 +203,12 @@
     padding: 0px !important;
 
 }
+.company-logo {
+    margin: 5px;
+}
+
+.wrap-line{
+    line-height: 20px !important;
+    top:15px !important;
+    position: relative;
+}

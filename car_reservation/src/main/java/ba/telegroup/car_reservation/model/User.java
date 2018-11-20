@@ -1,5 +1,6 @@
 package ba.telegroup.car_reservation.model;
 
+import ba.telegroup.car_reservation.common.interfaces.Deletable;
 import ba.telegroup.car_reservation.common.interfaces.HasCompanyId;
 
 import javax.persistence.*;
@@ -28,7 +29,7 @@ import java.util.Objects;
 
 @Entity
 @Inheritance(strategy = InheritanceType.JOINED)
-public class User implements HasCompanyId {
+public class User implements HasCompanyId, Deletable {
     private Integer id;
     private String email;
     private String username;
@@ -64,7 +65,7 @@ public class User implements HasCompanyId {
     }
 
     @Id
-    @Column(name = "id")
+    @Column(name = "id",nullable = false)
     public Integer getId() {
         return id;
     }
@@ -124,7 +125,7 @@ public class User implements HasCompanyId {
     }
 
     @Basic
-    @Column(name = "status_id")
+    @Column(name = "status_id",nullable = false)
     public Integer getStatusId() {
         return statusId;
     }
@@ -134,7 +135,7 @@ public class User implements HasCompanyId {
     }
 
     @Basic
-    @Column(name = "deleted")
+    @Column(name = "deleted",nullable = false)
     public Byte getDeleted() {
         return deleted;
     }
@@ -174,7 +175,7 @@ public class User implements HasCompanyId {
     }
 
     @Basic
-    @Column(name = "role_id")
+    @Column(name = "role_id",nullable = false)
     public Integer getRoleId() {
         return roleId;
     }
