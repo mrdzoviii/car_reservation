@@ -167,15 +167,17 @@ var showApp = function () {
     $$("companyLogo").define("data",companyLogo);
     rightPanel = "emptyRightPanel";
     promise.then(function (value) {
+        console.log("RESULT OF IF:"+(userData.roleId===role.systemAdministrator));
         if (userData.roleId === role.systemAdministrator) {
             companyView.selectPanel();
             $$("mainMenu").select("company");
+            console.log("selected company")
         }else{
             locationView.selectPanel();
             $$("mainMenu").select("dashboard");
         }
     }).fail(function (err) {
-     //   connection.reload();
+        //connection.reload();
     });
 
 };

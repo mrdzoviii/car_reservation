@@ -116,7 +116,7 @@ public class Logger {
     }
 
     @Basic
-    @Column(name = "company_id", nullable = true)
+    @Column(name = "company_id")
     public Integer getCompanyId() {
         return companyId;
     }

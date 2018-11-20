@@ -7,245 +7,246 @@ var onCompanyClick=function (id) {
     datatable.clearAll();
     connection.attachAjaxEvents("userDT","api/user");
 
-    return datatable.load("api/user/byCompany/" + companyId);
+    return datatable.load("api/user/company/" + companyId);
 
 };
 var companyView = {
+
     panel: {
         id: "companyPanel",
         adjust: true,
         cols: [
+            {
+                width:300,
+                rows: [
                     {
-                        width:300,
-                        rows: [
+                        view: "toolbar",
+                        css: "panelToolbar",
+                        cols: [
                             {
-                                view: "toolbar",
-                                css: "panelToolbar",
-                                cols: [
-                                    {
-                                        view: "label",
-                                        width: 150,
-                                        template: "<span class='fa fa-briefcase'/> Kompanije"
-                                    },
-                                    {},
-                                    {
-                                        id: "addCompanyBtn",
-                                        view: "button",
-                                        type: "iconButton",
-                                        label: "Dodajte",
-                                        icon: "plus-circle",
-                                        click: 'companyView.showAddCompanyDialog',
-                                        autowidth: true
-                                    }
-                                ]
+                                view: "label",
+                                width: 150,
+                                template: "<span class='fa fa-briefcase'/> Kompanije"
                             },
+                            {},
                             {
-                                id: "companyDT",
-                                view: "datatable",
-                                css:"webixDatatable",
-                                fillspace:true,
-                                header: false,
-                                select: true,
-                                navigation: true,
-                                editable: true,
-                                editaction: "custom",
-                                on: {
-                                    onItemDblClick: function (id) {
-                                        if (id.row !== -1)
-                                            this.editRow(id);
-                                    },
-                                    onItemClick:function(id){
-                                        onCompanyClick(id.row);
-                                    } ,
-                                    onBeforeContextMenu: function (item) {
-                                        if (item.row === -1)
-                                            return false;
-                                        this.select(item.row);
-                                    }
-                                },
-
-                                url: "api/company",
-                                data: [
-                                    {
-                                        name: "Administratori sistema",
-                                        id: -1
-
-                                    }
-                                ],
-                                columns: [
-                                    {
-                                        id: "id",
-                                        hidden: true
-                                    },
-                                    {
-                                        id: "deleted",
-                                        hidden: true
-                                    },
-                                    {
-                                        id: "name",
-                                        editable: true,
-                                        editor: "text",
-                                        fillspace: true
-                                    }
-                                ]
+                                id: "addCompanyBtn",
+                                view: "button",
+                                type: "iconButton",
+                                label: "Dodajte",
+                                icon: "plus-circle",
+                                click: 'companyView.showAddCompanyDialog',
+                                autowidth: true
                             }
                         ]
                     },
-
                     {
-                        rows: [
+                        id: "companyDT",
+                        view: "datatable",
+                        css:"webixDatatable",
+                        fillspace:true,
+                        header: false,
+                        select: true,
+                        navigation: true,
+                        editable: true,
+                        editaction: "custom",
+                        on: {
+                            onItemDblClick: function (id) {
+                                if (id.row !== -1)
+                                    this.editRow(id);
+                            },
+                            onItemClick:function(id){
+                                onCompanyClick(id.row);
+                            } ,
+                            onBeforeContextMenu: function (item) {
+                                if (item.row === -1)
+                                    return false;
+                                this.select(item.row);
+                            }
+                        },
+
+                        url: "api/company",
+                        data: [
                             {
-                                view: "toolbar",
-                                css: "panelToolbar",
+                                name: "Administratori sistema",
+                                id: -1
+
+                            }
+                        ],
+                        columns: [
+                            {
+                                id: "id",
+                                hidden: true
+                            },
+                            {
+                                id: "deleted",
+                                hidden: true
+                            },
+                            {
+                                id: "name",
+                                editable: true,
+                                editor: "text",
+                                fillspace: true
+                            }
+                        ]
+                    }
+                ]
+            },
+
+            {
+                rows: [
+                    {
+                        view: "toolbar",
+                        css: "panelToolbar",
+                        fillspace:true,
+                        cols: [
+                            {
+                                view: "label",
+                                width: 400,
+                                template: "<span class='fa fa-user'/> Korisnici"
+                            },
+                            {},
+                            {
+                                id: "addUserBtn",
+                                view: "button",
+                                type: "iconButton",
+                                label: "Dodajte",
+                                icon: "plus-circle",
+                                click: 'companyView.showAddUserDialog',
+                                autowidth: true
+                            }
+                        ]
+
+                    },
+                    {
+                        // TODO richSelectFilter treba prepraviti sa integera na podatke,
+                        id: "userDT",
+                        view: "datatable",
+                        css:"webixDatatable",
+                        select: true,
+                        navigation: true,
+                        fillspace: true,
+                        url:"api/user",
+                        on: {
+                            onBeforeContextMenu: function (item) {
+                                if (item.row === userData.id)
+                                    return false;
+                                this.select(item.row);
+                            }
+                        },
+                        columns: [
+                            {
+                                id: "id",
+                                hidden: true
+                            },
+                            {
+                                id: "email",
                                 fillspace:true,
-                                cols: [
+                                header: [
+                                    "E-mail",
                                     {
-                                        view: "label",
-                                        width: 400,
-                                        template: "<span class='fa fa-user'/> Korisnici"
-                                    },
-                                    {},
+                                        content: "textFilter",
+                                        sort: "string"
+                                    }
+                                ]
+                            },
+                            {
+                                id: "username",
+                                fillspace:true,
+                                header: [
+                                    "Korisničko ime",
                                     {
-                                        id: "addUserBtn",
-                                        view: "button",
-                                        type: "iconButton",
-                                        label: "Dodajte",
-                                        icon: "plus-circle",
-                                        click: 'companyView.showAddUserDialog',
-                                        autowidth: true
+                                        content: "textFilter",
+                                        sort: "string"
+                                    }
+                                ]
+                            },
+                            {
+                                id: "name",
+                                template: function(obj) {
+                                    if (obj.firstName){
+                                        return obj.firstName+" "+obj.lastName;
+                                    } else return "";
+                                },
+                                fillspace:true,
+                                header: [
+                                    "Ime i prezime",
+                                    {
+                                        content: "textFilter",
+                                        sort: "string"
+                                    }
+                                ]
+                            },
+                            {
+                                id: "statusId",
+                                fillspace:true,
+                                template: function (obj) {
+                                    return dependencyMap['status'][obj.statusId];
+                                },
+                                header: [
+                                    "Status",
+
+                                    {
+                                        content: "richSelectFilter",
+                                        suggest: {
+                                            body: {
+                                                template: function (obj) {	// template for options list
+                                                    if (obj.$empty)
+                                                        return "";
+                                                    return dependencyMap['status'][obj.value];
+                                                }
+                                            }
+
+                                        },
+                                        fillspace: true,
+                                        sort: "string"
+                                    }
+                                ]
+                            },
+                            {
+                                id: "roleId",
+                                width:230,
+                                template: function (obj) {
+                                    return dependencyMap['role'][obj.roleId];
+                                },
+                                header: [
+                                    "Tip korisnika",
+                                    {
+
+                                        content: "richSelectFilter",
+                                        suggest: {
+                                            body: {
+
+                                                template: function (obj) {	// template for options list
+                                                    if (obj.$empty)
+                                                        return "";
+                                                    return dependencyMap['role'][obj.value];
+                                                }
+                                            }
+
+                                        },
+                                        sort: "string"
                                     }
                                 ]
 
                             },
                             {
-                                // TODO richSelectFilter treba prepraviti sa integera na podatke,
-                                id: "userDT",
-                                view: "datatable",
-                                css:"webixDatatable",
-                                select: true,
-                                navigation: true,
-                                fillspace: true,
-                                url:"api/user",
-                                on: {
-                                    onBeforeContextMenu: function (item) {
-                                        if (item.row === userData.id)
-                                            return false;
-                                        this.select(item.row);
-                                    }
-                                },
-                                columns: [
+                                id:"locationName",
+                                fillspace:true,
+                                header: [
+                                    "Lokacija",
                                     {
-                                        id: "id",
-                                        hidden: true
-                                    },
-                                    {
-                                        id: "email",
-                                        fillspace:true,
-                                        header: [
-                                            "E-mail",
-                                            {
-                                                content: "textFilter",
-                                                sort: "string"
-                                            }
-                                        ]
-                                    },
-                                    {
-                                        id: "username",
-                                        fillspace:true,
-                                        header: [
-                                            "Korisničko ime",
-                                            {
-                                                content: "textFilter",
-                                                sort: "string"
-                                            }
-                                        ]
-                                    },
-                                    {
-                                        id: "name",
-                                        template: function(obj) {
-                                            if (obj.firstName){
-                                                return obj.firstName+" "+obj.lastName;
-                                            } else return "";
-                                        },
-                                        fillspace:true,
-                                        header: [
-                                            "Ime i prezime",
-                                            {
-                                                content: "textFilter",
-                                                sort: "string"
-                                            }
-                                        ]
-                                    },
-                                    {
-                                        id: "statusId",
-                                        fillspace:true,
-                                        template: function (obj) {
-                                            return dependencyMap['status'][obj.statusId];
-                                        },
-                                        header: [
-                                            "Status",
-
-                                            {
-                                                content: "richSelectFilter",
-                                                suggest: {
-                                                    body: {
-                                                        template: function (obj) {	// template for options list
-                                                            if (obj.$empty)
-                                                                return "";
-                                                            return dependencyMap['status'][obj.value];
-                                                        }
-                                                    }
-
-                                                },
-                                                    fillspace: true,
-                                                sort: "string"
-                                            }
-                                        ]
-                                    },
-                                    {
-                                        id: "roleId",
-                                        width:230,
-                                        template: function (obj) {
-                                            return dependencyMap['role'][obj.roleId];
-                                        },
-                                        header: [
-                                            "Tip korisnika",
-                                            {
-
-                                                content: "richSelectFilter",
-                                                suggest: {
-                                                    body: {
-
-                                                        template: function (obj) {	// template for options list
-                                                            if (obj.$empty)
-                                                                return "";
-                                                            return dependencyMap['role'][obj.value];
-                                                        }
-                                                    }
-
-                                                },
-                                                sort: "string"
-                                            }
-                                        ]
-
-                                    },
-                                    {
-                                        id:"locationName",
-                                        fillspace:true,
-                                        header: [
-                                            "Lokacija",
-                                            {
-                                                content: "richSelectFilter",
-                                                fillspace: true,
-                                                sort: "string"
-                                            }
-                                        ]
+                                        content: "richSelectFilter",
+                                        fillspace: true,
+                                        sort: "string"
                                     }
                                 ]
                             }
                         ]
                     }
                 ]
+            }
+        ]
 
     },
 
@@ -306,7 +307,7 @@ var companyView = {
             }
         });
         $$("companyDT").select(-1);
-        $$("userDT").load("api/user/byCompany/0");
+        $$("userDT").load("api/user/company/0");
     },
 
     addCompanyDialog: {

@@ -9,13 +9,11 @@ import ba.telegroup.car_reservation.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Scope;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
+import java.util.List;
 
 
 @RequestMapping("api/user")
@@ -28,6 +26,10 @@ public class UserController extends GenericHasCompanyIdController<User,Integer> 
     private String logoutSuccess;
     @Value(value="${forbidden.action}")
     private String forbiddenAction;
+    @Value("${deleted.not}")
+    private Byte notDeleted;
+    @Value("${role.system_admin}")
+    private Integer systemAdmin;
     private UserRepository userRepository;
     @Autowired
     public UserController(UserRepository userRepository){
@@ -63,5 +65,12 @@ public class UserController extends GenericHasCompanyIdController<User,Integer> 
             return userBean.getUser();
         }
         throw new ForbiddenException(forbiddenAction);
+    }
+
+    @RequestMapping(value="/company/{id}",method = RequestMethod.GET)
+    public List<User> getAllUsersByCompany(@PathVariable("id") Integer id){
+        if(Integer.valueOf(0).equals(id))
+            return userRepository.getAllByRoleIdAndDeleted(systemAdmin,notDeleted);
+        return userRepository.getAllByCompanyIdAndDeleted(id,notDeleted);
     }
 }
