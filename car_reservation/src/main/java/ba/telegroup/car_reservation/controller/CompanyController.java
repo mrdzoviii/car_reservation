@@ -4,9 +4,7 @@ import ba.telegroup.car_reservation.model.Company;
 import ba.telegroup.car_reservation.repository.CompanyRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
-import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
 @RequestMapping("api/company")
@@ -19,5 +17,4 @@ public class CompanyController extends GenericDeletableController<Company,Intege
         super(companyRepository);
         this.companyRepository=companyRepository;
     }
-
 }

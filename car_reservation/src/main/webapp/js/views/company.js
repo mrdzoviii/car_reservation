@@ -1,11 +1,14 @@
 
 var onCompanyClick=function (id) {
     $$("companyDT").select(id);
+    var companyId = id === -1 ? 0 : id;
     var datatable = $$("userDT");
     connection.dettachAjaxEvents("userDT");
     datatable.clearAll();
     connection.attachAjaxEvents("userDT","api/user");
-    return datatable.load("api/user/company/" + id);
+
+    return datatable.load("api/user/byCompany/" + companyId);
+
 };
 var companyView = {
     panel: {
@@ -22,14 +25,14 @@ var companyView = {
                                     {
                                         view: "label",
                                         width: 150,
-                                        template: "<span class='fa fa-briefcase'/> Companies"
+                                        template: "<span class='fa fa-briefcase'/> Kompanije"
                                     },
                                     {},
                                     {
                                         id: "addCompanyBtn",
                                         view: "button",
                                         type: "iconButton",
-                                        label: "New company",
+                                        label: "Dodajte",
                                         icon: "plus-circle",
                                         click: 'companyView.showAddCompanyDialog',
                                         autowidth: true
@@ -64,8 +67,9 @@ var companyView = {
                                 url: "api/company",
                                 data: [
                                     {
-                                        id:0,
-                                        name:"System admins"
+                                        name: "Administratori sistema",
+                                        id: -1
+
                                     }
                                 ],
                                 columns: [
