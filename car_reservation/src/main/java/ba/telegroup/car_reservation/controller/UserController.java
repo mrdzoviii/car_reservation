@@ -4,8 +4,8 @@ import ba.telegroup.car_reservation.common.exceptions.ForbiddenException;
 import ba.telegroup.car_reservation.controller.genericController.GenericHasCompanyIdController;
 import ba.telegroup.car_reservation.model.LoginBean;
 import ba.telegroup.car_reservation.model.User;
+import ba.telegroup.car_reservation.model.modelCustom.UserCompany;
 import ba.telegroup.car_reservation.repository.UserRepository;
-import org.bouncycastle.util.encoders.Hex;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Scope;
@@ -35,8 +35,8 @@ public class UserController extends GenericHasCompanyIdController<User,Integer> 
         this.userRepository=userRepository;
     }
     @RequestMapping(value = "/login",method = RequestMethod.POST)
-    public User login(@RequestBody LoginBean bean) throws ForbiddenException {
-        User loggedUser= userRepository.login(bean.getUsername(),bean.getPassword(),bean.getCompany());
+    public UserCompany login(@RequestBody LoginBean bean) throws ForbiddenException {
+        UserCompany loggedUser= userRepository.login(bean.getUsername(),bean.getPassword(),bean.getCompany());
         if(loggedUser!=null){
             userBean.setLoggedIn(true);
             userBean.setUser(loggedUser);
@@ -58,7 +58,7 @@ public class UserController extends GenericHasCompanyIdController<User,Integer> 
     }
 
     @RequestMapping(value="/state",method = RequestMethod.GET)
-    public User check() throws ForbiddenException {
+    public UserCompany check() throws ForbiddenException {
         if(userBean.getLoggedIn()){
             return userBean.getUser();
         }

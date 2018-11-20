@@ -827,7 +827,7 @@ webix.html = {
         else
             rescue.appendChild(node);
     },
-    //return custom ID from html element
+    //return modelCustom ID from html element
     //will check all parents starting from event's target
     locate: function (e, id) {
         var trg;
@@ -1403,7 +1403,7 @@ webix.debug_blacklist = {
             var fn = args.shift()
             try {
 
-                // Add our custom promise callback to the end of the arguments
+                // Add our modelCustom promise callback to the end of the arguments
                 args.push(function (err, val) {
                     if (err) {
                         return def.reject(err)
@@ -3899,7 +3899,7 @@ webix.CollectionBind = {
 
 /*
 	REnders single item.
-	Can be used for elements without datastore, or with complex custom rendering logic
+	Can be used for elements without datastore, or with complex modelCustom rendering logic
 
 	@export
 		render
@@ -4516,7 +4516,7 @@ webix.IdSpace = {
             node.appendChild(top_node._viewobj);
             //resize window with position center or top
             //do not resize other windows and elements
-            // which are attached to custom html containers
+            // which are attached to modelCustom html containers
             if (((!top_node.setPosition || top_node._settings.fullscreen) && node == document.body) || top_node._settings.position)
                 resize.push(top_node);
             if (!config.skipResize)
@@ -5081,7 +5081,7 @@ webix.IdSpace = {
             }
 
             if ((border_not_set && this.defaults.borderless) || config.borderless) {
-                //button and custom borderless
+                //button and modelCustom borderless
                 config._inner = {top: true, left: true, bottom: true, right: true};
             } else {
                 //default borders
@@ -7056,7 +7056,7 @@ webix.DragControl = {
         var master = this._drag_masters[a.webix_drag];
         var drag_container;
 
-        //if custom method is defined - use it
+        //if modelCustom method is defined - use it
         if (master.$dragCreate) {
             drag_container = master.$dragCreate(a, e);
             if (!drag_container) return false;
@@ -8499,7 +8499,7 @@ webix.attachEvent("onClick", function (e) {
 
         //for inline elements - restore pointer to the master element
         element.getNode(e);
-        //reaction on custom css elements in buttons
+        //reaction on modelCustom css elements in buttons
         var trg = e.target || e.srcElement;
         if (trg.className == "webix_disabled")
             return;
@@ -15216,7 +15216,7 @@ webix.protoUI({
     },
     //attribute , which will be used for ID storing
     _id: "webix_tm_id",
-    //supports custom context menu
+    //supports modelCustom context menu
     on_context: {},
     on_dblclick: {
         webix_tree_checkbox: function () {
@@ -18281,7 +18281,7 @@ webix.Undo = {
                     data = view._deletedItem;
                 }
                 else if (mode == "update") {
-                    // update can also be called due to custom updateItem call
+                    // update can also be called due to modelCustom updateItem call
                     if (view._editedItem && view._editedItem.id == id) {
                         data = view._editedItem;
                         view._editedItem = null;
@@ -20136,7 +20136,7 @@ webix.protoUI({
             }
         }
     },
-    //because we using non-standard rendering model, custom logic for mouse detection need to be used
+    //because we using non-standard rendering model, modelCustom logic for mouse detection need to be used
     _mouseEvent: function (e, hash, name, pair) {
         e = e || event;
         var trg = e.target || e.srcElement;
@@ -20183,7 +20183,7 @@ webix.protoUI({
                     } else
                         this._item_clicked = id = {column: this._columns[column].id};
 
-                    //some custom css handlers was found
+                    //some modelCustom css handlers was found
                     res = this._mouseEventCall(css_call, e, id, trg);
                     if (res === false) return;
 
@@ -23443,7 +23443,7 @@ webix.extend(webix.ui.datatable, {
     },
     _custom_tab_handler: function (tab, e) {
         if (this._settings.editable && !this._in_edit_mode) {
-            //if we have focus in some custom input inside of datatable
+            //if we have focus in some modelCustom input inside of datatable
             if (e.target && e.target.tagName == "INPUT") return true;
 
             var selection = this.getSelectedId(true);
@@ -27596,7 +27596,7 @@ webix.extend(webix.ui.chart, {
             startValue = 10;
             unit = (relValue ? (totalHeight - startValue) / relValue : startValue);
         }
-        /*if yAxis isn't set, but with custom origin */
+        /*if yAxis isn't set, but with modelCustom origin */
         if (!sIndex && (this._settings.origin != "auto" && !yax) && this._settings.origin > minValue) {
             this._drawXAxis(ctx, data, point0, point1, cellWidth, point1.y - unit * (this._settings.origin - minValue));
         }
@@ -33289,7 +33289,7 @@ webix.protoUI({
         if (this._open_sub_menu) {
             //recursive sub-closing
             var sub = webix.$$(this._open_sub_menu);
-            if (sub._hide_sub_menu)	//custom context may not have submenu
+            if (sub._hide_sub_menu)	//modelCustom context may not have submenu
                 sub._hide_sub_menu(mode);
             if (mode || !sub._show_on_mouse_out) {
                 sub.hide();
@@ -34510,7 +34510,7 @@ webix.DataProcessor = webix.proto({
         this.callEvent("onAfter" + status, [obj, id, details]);
     },
     processResult: function (state, hash, details) {
-        //compatibility with custom json response
+        //compatibility with modelCustom json response
         var error = (hash && (hash.status == "error" || hash.status == "invalid"));
         var newid = (hash ? (hash.newid || hash.id) : false);
 
@@ -37836,7 +37836,7 @@ webix.protoUI({
     },
     //attribute , which will be used for ID storing
     _id: "webix_dg_id",
-    //supports custom context menu
+    //supports modelCustom context menu
     on_click: {
         webix_organogram_item: function (e, id) {
             if (this._settings.select) {

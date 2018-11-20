@@ -6,10 +6,17 @@ var mainLayout = {
         {
             cols: [
                 {
+                    id:"companyLogo",
                     view: "template",
                     width: 240,
                     css: "logoInside",
-                    template: '<img  src="../../img/telegroup-logo.png"/>'
+                    template: function (obj) {
+                        if(obj.companyLogo!==null){
+                            return '<img src="data:image/jpeg;charset=utf-8;base64, '+obj.companyLogo+'" width="240px" height="40px">'
+                        }
+                        return '<img  src="../../img/app-logo.png" width="40px" height="40px"/>'
+
+                    }
                 },
                 {
                     view: "toolbar",

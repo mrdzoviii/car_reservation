@@ -122,7 +122,7 @@ var connection = {
             }
             var addLink = link;
             if (typeof customInsert !== 'undefined' && customInsert === true) {
-                addLink = addLink + "/custom/";
+                addLink = addLink + "/modelCustom/";
             }
             util.preloader.inc();
 
@@ -178,7 +178,7 @@ var connection = {
                 if (newValue == oldValue) return;
                 var editLink = "";
                 if (typeof customInsert !== 'undefined' && customInsert === true) {
-                    editLink = link + "/custom/" + id;
+                    editLink = link + "/modelCustom/" + id;
                 } else {
                     editLink = link + "/" + id;
                 }

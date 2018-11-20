@@ -160,9 +160,11 @@ var showApp = function () {
         $$("userLabel").setHTML("<p style='margin-top:2px;display: table-cell; line-height: 13px; vertical-align: text-top; horizontal-align:right;font-size: 14px; margin-left: auto;margin-right: 0;}'>"+userData.firstName+" "+userData.lastName+"<br> Company admin</p>");
     else $$("userLabel").setHTML("<p style='margin-top:2px;display: table-cell; line-height: 13px; vertical-align: text-top; horizontal-align:right;font-size: 14px; margin-left: auto;margin-right: 0;}'>"+userData.firstName+" "+userData.lastName+"<br>User</p>");
     var avatar={"avatar":userData.avatar};
+    var companyLogo={"companyLogo":userData.companyLogo};
     $$("userAvatar").define("data",avatar);
     $$("mainMenu").define("data", localMenuData);
     $$("mainMenu").define("on", menuEvents);
+    $$("companyLogo").define("data",companyLogo);
     rightPanel = "emptyRightPanel";
     promise.then(function (value) {
         if (userData.roleId === role.systemAdministrator) {
@@ -184,7 +186,7 @@ var preloadDependencies = function () {
         var roles = [];
         var array = [];
         data.json().forEach(function (obj) {
-            roles[obj.id] = obj.value;
+            roles[obj.id] = obj.role;
             array.push(obj);
         });
         dependencyMap["role"] = roles;
@@ -196,7 +198,7 @@ var preloadDependencies = function () {
         var array = [];
 
         data.json().forEach(function (obj) {
-            status[obj.id] = obj.value;
+            status[obj.id] = obj.status;
             array.push(obj);
         });
         dependencyMap["status"] = status;
@@ -207,7 +209,7 @@ var preloadDependencies = function () {
         var array = [];
 
         data.json().forEach(function (obj) {
-            expenseTypes[obj.id] = obj.value;
+            expenseTypes[obj.id] = obj.cost;
             array.push(obj);
         });
         dependencyMap["cost"] = expenseTypes;
@@ -217,7 +219,7 @@ var preloadDependencies = function () {
         var notificationTypes = [];
         var array = [];
         data.json().forEach(function (obj) {
-            notificationTypes[obj.id] = obj.value;
+            notificationTypes[obj.id] = obj.option;
             array.push(obj);
         });
         dependencyMap["mail-option"] = notificationTypes;
@@ -228,7 +230,7 @@ var preloadDependencies = function () {
         var fuel = [];
         var array = [];
         data.json().forEach(function (obj) {
-            fuel[obj.id] = obj.value;
+            fuel[obj.id] = obj.fuel;
             array.push(obj);
         });
         dependencyMap['fuel'] = fuel;

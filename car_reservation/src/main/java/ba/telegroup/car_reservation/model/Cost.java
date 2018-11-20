@@ -9,7 +9,7 @@ import java.util.Objects;
 @Entity
 public class Cost {
     private Integer id;
-    private String name;
+    private String cost;
 
     @Id
     @Column(name = "id")
@@ -22,13 +22,13 @@ public class Cost {
     }
 
     @Basic
-    @Column(name = "name")
-    public String getName() {
-        return name;
+    @Column(name = "cost")
+    public String getCost() {
+        return cost;
     }
 
-    public void setName(String name) {
-        this.name = name;
+    public void setCost(String cost) {
+        this.cost = cost;
     }
 
     @Override

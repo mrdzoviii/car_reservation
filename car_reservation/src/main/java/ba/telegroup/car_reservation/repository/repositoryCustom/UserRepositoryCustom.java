@@ -1,7 +1,7 @@
 package ba.telegroup.car_reservation.repository.repositoryCustom;
 
-import ba.telegroup.car_reservation.model.User;
+import ba.telegroup.car_reservation.model.modelCustom.UserCompany;
 
 public interface UserRepositoryCustom {
-    User login(String username,String password,String companyName);
+    UserCompany login(String username, String password, String companyName);
 }

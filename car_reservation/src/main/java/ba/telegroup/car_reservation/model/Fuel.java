@@ -9,7 +9,7 @@ import java.util.Objects;
 @Entity
 public class Fuel {
     private Integer id;
-    private String fuelType;
+    private String fuel;
 
     @Id
     @Column(name = "id")
@@ -22,13 +22,13 @@ public class Fuel {
     }
 
     @Basic
-    @Column(name = "fuel_type")
-    public String getFuelType() {
-        return fuelType;
+    @Column(name = "fuel")
+    public String getFuel() {
+        return fuel;
     }
 
-    public void setFuelType(String fuelType) {
-        this.fuelType = fuelType;
+    public void setFuel(String fuel) {
+        this.fuel = fuel;
     }
 
     @Override

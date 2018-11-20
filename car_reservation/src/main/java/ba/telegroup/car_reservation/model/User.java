@@ -27,6 +27,7 @@ import java.util.Objects;
 )
 
 @Entity
+@Inheritance(strategy = InheritanceType.JOINED)
 public class User implements HasCompanyId {
     private Integer id;
     private String email;
