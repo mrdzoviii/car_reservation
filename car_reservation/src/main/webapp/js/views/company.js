@@ -108,6 +108,8 @@ var companyView = {
                 ]
             },
 
+            //users part
+
             {
                 rows: [
                     {
@@ -118,14 +120,14 @@ var companyView = {
                             {
                                 view: "label",
                                 width: 400,
-                                template: "<span class='fa fa-user'/> Korisnici"
+                                template: "<span class='fa fa-users'/> Users"
                             },
                             {},
                             {
                                 id: "addUserBtn",
                                 view: "button",
                                 type: "iconButton",
-                                label: "Dodajte",
+                                label: "New user",
                                 icon: "plus-circle",
                                 click: 'companyView.showAddUserDialog',
                                 autowidth: true
@@ -277,15 +279,19 @@ var companyView = {
             width: "200",
             data: [
                 {
-                    id: "delete",
-                    value: "Delete",
-                    icon: "trash"
-                } ,
-                {
                     id: "update",
                     value: "Update",
                     icon: "pencil"
+                },
+                {
+                    $template: "Separator"
+                },
+                {
+                    id: "delete",
+                    value: "Delete",
+                    icon: "trash"
                 }
+
             ],
             master: $$("companyDT"),
             on: {
