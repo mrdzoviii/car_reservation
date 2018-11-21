@@ -4,4 +4,5 @@ import ba.telegroup.car_reservation.model.modelCustom.UserCompany;
 
 public interface UserRepositoryCustom {
     UserCompany login(String username, String password, String companyName);
+    Boolean deleteUsersByCompanyId(Integer companyId);
 }

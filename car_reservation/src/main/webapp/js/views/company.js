@@ -290,6 +290,9 @@ var companyView = {
                     delBox.callback = function (result) {
                         if (result) {
                             $$("companyDT").remove(context.id.row);
+                            $$("companyDT").select(-1);
+                            $$("userDT").clearAll();
+                            $$("userDT").load("api/user/company/0");
                         }
                     };
                     webix.confirm(delBox);

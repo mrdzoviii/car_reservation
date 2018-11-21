@@ -1,9 +1,15 @@
 package ba.telegroup.car_reservation.controller;
+import ba.telegroup.car_reservation.common.exceptions.BadRequestException;
+import ba.telegroup.car_reservation.common.exceptions.ForbiddenException;
 import ba.telegroup.car_reservation.controller.genericController.GenericDeletableController;
 import ba.telegroup.car_reservation.model.Company;
 import ba.telegroup.car_reservation.repository.CompanyRepository;
+import ba.telegroup.car_reservation.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Scope;
+import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -11,10 +17,23 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @Scope("request")
 public class CompanyController extends GenericDeletableController<Company,Integer> {
-    private  CompanyRepository companyRepository;
+    @Value("${badRequest.delete}")
+    private String badRequestDelete;
+    private final CompanyRepository companyRepository;
+    private  final UserRepository userRepository;
     @Autowired
-    public CompanyController(CompanyRepository companyRepository){
+    public CompanyController(CompanyRepository companyRepository,UserRepository userRepository){
         super(companyRepository);
         this.companyRepository=companyRepository;
+        this.userRepository=userRepository;
+    }
+
+    @Transactional
+    @Override
+    public String delete(@PathVariable Integer id) throws BadRequestException, ForbiddenException {
+            if(userRepository.deleteUsersByCompanyId(id)) {
+                return super.delete(id);
+            }
+            throw new BadRequestException(badRequestDelete);
     }
 }
