@@ -9,4 +9,5 @@ import java.util.List;
 public interface UserRepository extends JpaRepository<User,Integer>, HasCompanyIdRepository<User> , UserRepositoryCustom {
     List<User> getAllByCompanyIdAndDeleted(Integer companyId,Byte deleted);
     List<User> getAllByRoleIdAndDeleted(Integer roleId,Byte deleted);
+    Long countAllByCompanyIdAndDeleted(Integer companyId,Byte deleted);
 }

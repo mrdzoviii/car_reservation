@@ -19,6 +19,8 @@ import org.springframework.web.bind.annotation.RestController;
 public class CompanyController extends GenericDeletableController<Company,Integer> {
     @Value("${badRequest.delete}")
     private String badRequestDelete;
+    @Value("${deleted.not}")
+    private Byte deleted;
     private final CompanyRepository companyRepository;
     private  final UserRepository userRepository;
     @Autowired
@@ -31,7 +33,7 @@ public class CompanyController extends GenericDeletableController<Company,Intege
     @Transactional
     @Override
     public String delete(@PathVariable Integer id) throws BadRequestException, ForbiddenException {
-            if(userRepository.deleteUsersByCompanyId(id)) {
+            if(userRepository.deleteUsersByCompanyId(id).equals(userRepository.countAllByCompanyIdAndDeleted(id,deleted))) {
                 return super.delete(id);
             }
             throw new BadRequestException(badRequestDelete);

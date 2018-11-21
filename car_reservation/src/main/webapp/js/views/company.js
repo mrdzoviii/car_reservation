@@ -279,23 +279,45 @@ var companyView = {
                 {
                     id: "delete",
                     value: "Delete",
-                    icon: "trash-alt"
+                    icon: "trash"
+                } ,
+                {
+                    id: "update",
+                    value: "Update",
+                    icon: "pencil"
                 }
             ],
             master: $$("companyDT"),
             on: {
                 onItemClick: function (id) {
                     var context = this.getContext();
-                    var delBox = (webix.copy(commonViews.deleteConfirm("company")));
-                    delBox.callback = function (result) {
-                        if (result) {
-                            $$("companyDT").remove(context.id.row);
-                            $$("companyDT").select(-1);
-                            $$("userDT").clearAll();
-                            $$("userDT").load("api/user/company/0");
-                        }
-                    };
-                    webix.confirm(delBox);
+                    switch(id){
+                        case "delete":
+                            var delBox = (webix.copy(commonViews.deleteConfirm("company")));
+                            delBox.callback = function (result) {
+                                if (result) {
+                                    var item = $$("companyDT").getItem(context.id.row);
+                                    $$("companyDT").detachEvent("onBeforeDelete");
+                                    connection.sendAjax("DELETE", "api/company/" + item.id, function (text, data, xhr) {
+                                        if (text) {
+                                            $$("companyDT").remove(context.id.row);
+                                            $$("companyDT").select(-1);
+                                            $$("userDT").clearAll();
+                                            $$("userDT").load("api/user/company/0");
+                                            util.messages.showMessage("Success delete");
+                                        }
+                                    }, function (text, data, xhr) {
+                                        util.messages.showErrorMessage(text);
+                                    }, item);
+                                }
+                            };
+                            webix.confirm(delBox);
+                            break;
+                        case "update":
+                            companyView.showEditCompanyDialog($$("companyDT").getSelectedItem());
+                            break;
+                    }
+
                 }
             }
         });
@@ -519,6 +541,229 @@ var companyView = {
             $$("companyDT").add(newCompany);
             util.dismissDialog('addCompanyDialog');
         }
+    },
+    editCompanyDialog: {
+        view: "popup",
+        id: "editCompanyDialog",
+        modal: true,
+        position: "center",
+
+        body: {
+            id: "editCompanyInside",
+            rows: [{
+                view: "toolbar",
+                cols: [{
+                    view: "label",
+                    label: "<span class='webix_icon fa-briefcase'></span> Edit company",
+                    width: 400
+                }, {}, {
+                    hotkey: 'esc',
+                    view: "icon",
+                    icon: "close",
+                    align: "right",
+                    click: "util.dismissDialog('editCompanyDialog');"
+                }]
+            }, {
+                view: "form",
+                id: "editCompanyForm",
+                width: 600,
+                elementsConfig: {
+                    labelWidth: 200,
+                    bottomPadding: 18
+                },
+                elements: [{
+                    view: "text",
+                    name: "id",
+                    hidden: true
+                },
+                    {
+                        view: "text",
+                        name: "deleted",
+                        hidden: true,
+                    }
+                    ,
+                    {
+                    view: "text",
+                    id: "name",
+                    name: "name",
+                    label: "Name:",
+                    invalidMessage: "Please enter company name!",
+                    required: true
+                },
+                    {
+                        height:50,
+                        cols:[
+                            {
+                                view:"label",
+                                width:200,
+                                bottomPadding:18,
+                                leftPadding:3,
+                                required:true,
+                                label:"Logo: <span style='color:#e32'>*</span>"
+                            },
+                            {
+                                view:"list",
+                                id:"editCompanyLogoList",
+                                name:"editCompanyLogoList",
+                                rules:{
+                                    content:webix.rules.isNotEmpty
+                                },
+                                scroll:false,
+                                id:"editCompanyLogoList",
+                                width:290,
+                                type: {
+                                    height: "auto"
+                                },
+                                css:"relative image-upload",
+                                template:"<img src='data:image/jpg;base64,#content#'/> <span class='delete-file'><span class='webix fa fa-close'/></span>",
+                                onClick:{
+                                    'delete-file':function (e,id) {
+                                        this.remove(id);
+                                        return false;
+                                    }
+                                }
+                            },{},
+                            {
+                                view:"uploader",
+                                id:"photoUploader",
+                                width:24,
+                                height:24,
+                                css:"upload-photo",
+                                template:"<span class='webix fa fa-upload' /></span>",
+                                on: {
+                                    onBeforeFileAdd: function (upload) {
+                                        var type = upload.type.toLowerCase();
+                                        if (type != "jpg" && type != "png"){
+                                            util.messages.showErrorMessage("Only jpg and png extensions allowed")
+                                            return false;
+                                        }
+                                        var file = upload.file;
+                                        var reader = new FileReader();
+                                        reader.onload = function (event) {
+                                            var img=new Image();
+                                            img.onload=function (ev) {
+                                                if (img.width===220&& img.height===50) {
+                                                    var newDocument = {
+                                                        name: file['name'],
+                                                        content: event.target.result.split("base64,")[1],
+                                                    };
+                                                    $$("editCompanyLogoList").clearAll();
+                                                    $$("editCompanyLogoList").add(newDocument);
+                                                }else{
+                                                    util.messages.showErrorMessage("Only 220x50 px resolution allowed!")
+                                                }
+                                            };
+                                            img.src=event.target.result;
+                                        };
+                                        reader.readAsDataURL(file);
+                                        return false;
+                                    }
+                                }
+                            },
+                        ]
+                    },
+                    {
+                        height:18,
+                        cols:[
+
+                            {},
+                            {
+                                id:"invalidLabel",
+                                view:"label",
+                                label:"Please select company logo!",
+                                css:" invalid-message-photo-alignment",
+                                hidden:true
+
+                            },
+                            {}
+                        ]
+                    }
+                    ,
+
+                    {
+                        margin: 5,
+                        cols: [{}, {
+                            id: "changeCompany",
+                            view: "button",
+                            value: "Save",
+                            type: "form",
+                            click: "companyView.saveChangedCompany",
+                            hotkey: "enter",
+                            width: 150
+                        }]
+                    }],
+                rules: {
+                    "name": function (value) {
+                        if (!value)
+                            return false;
+                        if (value.length > 100) {
+                            $$('editCompanyForm').elements.name.config.invalidMessage = 'Maximum length is 100!';
+                            return false;
+                        }
+                        return true;
+                    }
+                }
+            }]
+        }
+    },
+
+
+    showEditCompanyDialog: function (company) {
+        webix.ui(webix.copy(companyView.editCompanyDialog));
+        var form = $$("editCompanyForm");
+        form.elements.id.setValue(company.id);
+        form.elements.name.setValue(company.name);
+        form.elements.deleted.setValue(company.deleted);
+
+        setTimeout(function () {
+            $$("editCompanyDialog").show();
+            webix.UIManager.setFocus("name");
+            var newDocument = {
+                name: '',
+                content: company.logo,
+            };
+            $$("editCompanyLogoList").clearAll();
+            $$("editCompanyLogoList").add(newDocument);
+        }, 0);
+
+
+    },
+
+
+    saveChangedCompany: function () {
+        var form = $$("editCompanyForm");
+        var logo=$$("editCompanyLogoList");
+        var photoValidation=logo.count()===1;
+        if (!photoValidation){
+            webix.html.addCss(logo.getNode(),"image-upload-invalid");
+            $$("invalidLabel").show();
+        }else{
+            webix.html.removeCss(logo.getNode(),"image-upload-invalid");
+            $$("invalidLabel").hide();
+        }
+        var validation=form.validate();
+        if (validation && photoValidation) {
+            var newCompany = {
+                id: form.getValues().id,
+                name: form.getValues().name,
+                logo: logo.getItem(logo.getLastId()).content,
+                deleted: form.getValues().deleted
+            };
+            console.log(newCompany);
+            connection.sendAjax("PUT", "api/company/" + newCompany.id,
+                function (text, data, xhr) {
+                    if (text) {
+                        util.messages.showMessage("Company updated successfully.");
+                        $$("companyDT").updateItem(newCompany.id, newCompany);
+                    } else
+                        util.messages.showErrorMessage("Company edit failed.");
+                }, function (text, data, xhr) {
+                    util.messages.showErrorMessage(text);
+                }, newCompany);
+
+            util.dismissDialog('editCompanyDialog');
+        }
+
     },
     addUserDialog: {
         id: "addUserDialog",
