@@ -17,7 +17,7 @@ var companyView = {
         adjust: true,
         cols: [
             {
-                width:300,
+                width:450,
                 rows: [
                     {
                         view: "toolbar",
@@ -26,7 +26,7 @@ var companyView = {
                             {
                                 view: "label",
                                 width: 150,
-                                template: "<span class='fa fa-briefcase'/> Kompanije"
+                                template: "<span class='fa fa-briefcase'/> Companies"
                             },
                             {},
                             {
@@ -45,7 +45,9 @@ var companyView = {
                         view: "datatable",
                         css:"webixDatatable",
                         fillspace:true,
-                        header: false,
+                        borderless:true,
+                        header: true,
+                        adjust:true,
                         select: true,
                         navigation: true,
                         editable: true,
@@ -68,9 +70,9 @@ var companyView = {
                         url: "api/company",
                         data: [
                             {
-                                name: "Administratori sistema",
-                                id: -1
-
+                                name: "System admins",
+                                id: -1,
+                                logo: null
                             }
                         ],
                         columns: [
@@ -83,10 +85,26 @@ var companyView = {
                                 hidden: true
                             },
                             {
+                                id: "logo",
+                                editable:"false",
+                                template: function (obj) {
+                                    if(obj.logo){
+                                        return '<img src="data:image/jpeg;charset=utf-8;base64,'+obj.logo+' " width="176px" height="40px">';
+                                    }
+                                    return '<img src="../../img/system-admin.jpg" width="176px" height="40px">';
+                                },
+                                fillspace:true,
+                                header:{text:"Logo", css:"wrap-line"}
+
+                            },
+
+                            {
                                 id: "name",
-                                editable: true,
-                                editor: "text",
-                                fillspace: true
+                                editable: false,
+                                fillspace: true,
+                                header: [ "Name",{
+                                    content:"textFilter"
+                                }]
                             }
                         ]
                     }
@@ -324,7 +342,7 @@ var companyView = {
                         {
                             view: "label",
                             width: 300,
-                            template: "<span class='fa fa-briefcase'/> Dodavanje kompanije"
+                            template: "<span class='fa fa-briefcase'/>New company"
                         },
                         {},
                         {

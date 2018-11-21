@@ -36,6 +36,12 @@ public class UserController extends GenericHasCompanyIdController<User,Integer> 
         super(userRepository);
         this.userRepository=userRepository;
     }
+
+    @Override
+    public List<User> getAll() throws ForbiddenException {
+        return userRepository.getAllByCompanyIdAndDeleted(userBean.getUser().getCompanyId(),notDeleted);
+    }
+
     @RequestMapping(value = "/login",method = RequestMethod.POST)
     public UserCompany login(@RequestBody LoginBean bean) throws ForbiddenException {
         UserCompany loggedUser= userRepository.login(bean.getUsername(),bean.getPassword(),bean.getCompany());

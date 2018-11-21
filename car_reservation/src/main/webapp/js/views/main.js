@@ -10,11 +10,12 @@ var mainLayout = {
                     view: "template",
                     width: 240,
                     css: "logoInside",
+                    adjust:true,
                     template: function (obj) {
                         if(obj.companyLogo!==null){
-                            return '<img src="data:image/jpeg;charset=utf-8;base64, '+obj.companyLogo+'" width="240px" height="40px">'
+                            return '<img src="data:image/jpeg;charset=utf-8;base64, '+obj.companyLogo+'" width="240px" height="50px">'
                         }
-                        return '<img  src="../../img/app-logo.png" width="40px" height="40px"/>'
+                        return '<img  src="../../img/system-admin.jpg" width="240px" height="50px"/>'
 
                     }
                 },

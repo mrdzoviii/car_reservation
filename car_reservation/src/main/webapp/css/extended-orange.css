@@ -203,3 +203,19 @@
     padding: 0px !important;
 
 }
+
+.wrap-line{
+    line-height: 20px !important;
+    top:15px !important;
+    position: relative;
+}
+
+.logoInside {
+    background: linear-gradient(#FFF, #F8F8F8);
+    text-align: center;
+    padding-top: 0px;
+    cursor: pointer;
+}
+.logoInside > div:first-child{
+    padding: 0px !important;
+}
