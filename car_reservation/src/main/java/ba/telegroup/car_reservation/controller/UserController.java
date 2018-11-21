@@ -48,7 +48,6 @@ public class UserController extends GenericHasCompanyIdController<User,Integer> 
         if(loggedUser!=null){
             userBean.setLoggedIn(true);
             userBean.setUser(loggedUser);
-            System.out.println("LOGIN"+userBean.getUser().getUsername()+"  "+userBean.getLoggedIn());
             return loggedUser;
         }
         throw new ForbiddenException(forbiddenLogin);

@@ -144,7 +144,7 @@ var connection = {
                 success: function (text, data, xhr) {
                     var retVal = data.json();
                     if (!retVal) {
-                        util.messages.showErrorMessage("Greška prilikom dodavanja podataka!");
+                        util.messages.showErrorMessage("Error while data saving!");
                         return false;
                     }
 
@@ -210,7 +210,7 @@ var connection = {
                         }, success: function (text, data) {
                             //if (!data.json()) {
                             if(text!="Success")
-                            {  util.messages.showErrorMessage("Greška pri izmjeni podataka!");
+                            {  util.messages.showErrorMessage("Error while data updating!");
                                 data[column] = oldValue;
                                 try {
                                     $$(dtId).updateItem(id, data);
@@ -319,7 +319,7 @@ var connection = {
             var deleteLink = link + "/" + id;
             util.preloader.inc();
             webix.ajax().del(deleteLink).then(function (result) {
-                util.messages.showMessage("Uspješno brisanje!");
+                util.messages.showMessage("Delete success!");
             }).fail(function (err) {
                 util.messages.showErrorMessage(err.responseText);
                 return false;

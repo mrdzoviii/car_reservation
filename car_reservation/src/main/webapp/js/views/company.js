@@ -6,7 +6,6 @@ var onCompanyClick=function (id) {
     connection.dettachAjaxEvents("userDT");
     datatable.clearAll();
     connection.attachAjaxEvents("userDT","api/user");
-
     return datatable.load("api/user/company/" + companyId);
 
 };
@@ -53,10 +52,6 @@ var companyView = {
                         editable: true,
                         editaction: "custom",
                         on: {
-                            onItemDblClick: function (id) {
-                                if (id.row !== -1)
-                                    this.editRow(id);
-                            },
                             onItemClick:function(id){
                                 onCompanyClick(id.row);
                             } ,
@@ -291,7 +286,7 @@ var companyView = {
             on: {
                 onItemClick: function (id) {
                     var context = this.getContext();
-                    var delBox = (webix.copy(commonViews.deleteConfirmSerbian("kompanije", "kompaniju")));
+                    var delBox = (webix.copy(commonViews.deleteConfirm("company")));
                     delBox.callback = function (result) {
                         if (result) {
                             $$("companyDT").remove(context.id.row);
