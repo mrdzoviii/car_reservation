@@ -33,9 +33,9 @@ var companyView = {
                                 id: "addCompanyBtn",
                                 view: "button",
                                 type: "iconButton",
-                                label: "Dodajte",
+                                label: "New company",
                                 icon: "plus-circle",
-                                click: 'companyView.showAddCompanyDialog',
+                                click: 'companyView.showAddDialog',
                                 autowidth: true
                             }
                         ]
@@ -85,6 +85,8 @@ var companyView = {
                                 hidden: true
                             },
                             {
+                                minWidth:180,
+                                width:180,
                                 id: "logo",
                                 editable:"false",
                                 template: function (obj) {
@@ -281,8 +283,8 @@ var companyView = {
             data: [
                 {
                     id: "delete",
-                    value: "Obrišite",
-                    icon: "trash"
+                    value: "Delete",
+                    icon: "trash-alt"
                 }
             ],
             master: $$("companyDT"),
@@ -306,8 +308,8 @@ var companyView = {
             data: [
                 {
                     id: "delete",
-                    value: "Obrišite",
-                    icon: "trash"
+                    value: "Delete",
+                    icon: "trash-alt"
                 }
             ],
             master: $$("userDT"),
@@ -329,23 +331,24 @@ var companyView = {
     },
 
     addCompanyDialog: {
-        id: "addCompanyDialog",
         view: "popup",
+        id: "addCompanyDialog",
         modal: true,
         position: "center",
         body: {
+            id: "addCompanyInside",
             rows: [
                 {
                     view: "toolbar",
-                    css: "panelToolbar",
                     cols: [
                         {
                             view: "label",
-                            width: 300,
-                            template: "<span class='fa fa-briefcase'/>New company"
+                            label: "<span class='webix_icon fa-briefcase'></span> Add new company",
+                            width: 400
                         },
                         {},
                         {
+                            hotkey: 'esc',
                             view: "icon",
                             icon: "close",
                             align: "right",
@@ -354,38 +357,143 @@ var companyView = {
                     ]
                 },
                 {
-                    id: "addCompanyForm",
                     view: "form",
+                    id: "addCompanyForm",
+                    width: 600,
                     elementsConfig: {
-                        labelWidth: 100,
+                        labelWidth: 200,
                         bottomPadding: 18
                     },
                     elements: [
                         {
+                            view: "text",
                             id: "name",
                             name: "name",
-                            view: "text",
-                            label: "Naziv:",
-                            required: true,
-                            invalidMessage: "Naziv je obavezan!"
+                            label: "Name:",
+                            invalidMessage: "Please enter company name.",
+                            required: true
                         },
                         {
-                            id: "addCompanyBtn",
-                            view: "button",
-                            value: "Dodajte kompaniju",
-                            type: "form",
-                            click: "companyView.addCompany",
-                            align: "right",
-                            hotkey: "enter",
-                            width: 150
+                            height:50,
+                            cols:[
+                                {
+                                    view:"label",
+                                    width:200,
+                                    bottomPadding:18,
+                                    leftPadding:3,
+                                    required:true,
+                                    label:"Logo : <span style='color:#e32'>*</span>"
+                                },
+                                {
+                                    view:"list",
+                                    name:"companyLogoList",
+                                    rules:{
+                                        content:webix.rules.isNotEmpty
+                                    },
+                                    scroll:false,
+                                    id:"companyLogoList",
+                                    width:290,
+                                    type: {
+                                        height: "auto"
+                                    },
+                                    css:"relative image-upload",
+                                    template:"<img src='data:image/jpg;base64,#content#'/> <span class='delete-file'><span class='webix fa fa-close'/></span>",
+                                    onClick:{
+                                        'delete-file':function (e,id) {
+                                            this.remove(id);
+                                            return false;
+                                        }
+                                    }
+                                },{},
+                                {
+                                    view:"uploader",
+                                    id:"photoUploader",
+                                    width:24,
+                                    height:24,
+                                    css:"upload-photo",
+                                    template:"<span class='webix fa fa-upload' /></span>",
+                                    on: {
+                                        onBeforeFileAdd: function (upload) {
+                                            var type = upload.type.toLowerCase();
+                                            if (type != "jpg" && type != "png"){
+                                                util.messages.showErrorMessage("Only jpg and png formats allowed!")
+                                                return false;
+                                            }
+                                            var file = upload.file;
+                                            var reader = new FileReader();
+                                            reader.onload = function (event) {
+                                                var img=new Image();
+                                                img.onload=function (ev) {
+                                                    if (img.width===220&& img.height===50) {
+                                                        var newDocument = {
+                                                            name: file['name'],
+                                                            content: event.target.result.split("base64,")[1],
+                                                        };
+                                                        $$("companyLogoList").clearAll();
+                                                        $$("companyLogoList").add(newDocument);
+                                                    }else{
+                                                        util.messages.showErrorMessage("220x50 px! dimension only")
+                                                    }
+                                                };
+                                                img.src=event.target.result;
+                                            };
+                                            reader.readAsDataURL(file);
+                                            return false;
+                                        }
+                                    }
+                                },
+                            ]
+                        },
+                        {
+                            height:18,
+                            cols:[
+
+                                {},
+                                {
+                                    id:"invalidLabel",
+                                    view:"label",
+                                    label:"Company logo required!",
+                                    css:" invalid-message-photo-alignment",
+                                    hidden:true
+
+                                },
+                                {}
+                            ]
                         }
-                    ]
+                        ,
+                        {
+                            margin: 5,
+                            cols: [
+                                {},
+                                {
+                                    id: "saveCompany",
+                                    view: "button",
+                                    value: "Save",
+                                    type: "form",
+                                    click: "companyView.addCompany",
+                                    hotkey: "enter",
+                                    width: 150
+                                }
+                            ]
+                        }
+                    ],
+                    rules: {
+                        "name": function (value) {
+                            if (!value)
+                                return false;
+                            if (value.length > 100) {
+                                $$('addCompanyForm').elements.name.config.invalidMessage = 'Name maximum length is 100!';
+                                return false;
+                            }
+                            return true;
+                        }
+                    }
                 }
             ]
         }
     },
 
-    showAddCompanyDialog: function () {
+    showAddDialog: function () {
         if (util.popupIsntAlreadyOpened("addCompanyDialog")) {
             webix.ui(webix.copy(companyView.addCompanyDialog)).show();
             webix.UIManager.setFocus("name");
@@ -394,9 +502,24 @@ var companyView = {
 
     addCompany: function () {
         var form = $$("addCompanyForm");
-        if (form.validate()) {
-            $$("companyDT").add(form.getValues());
-            util.dismissDialog("addCompanyDialog");
+        var logo=$$("companyLogoList");
+        var photoValidation=logo.count()===1;
+        if (!photoValidation){
+            webix.html.addCss(logo.getNode(),"image-upload-invalid");
+            $$("invalidLabel").show();
+        }else{
+            webix.html.removeCss(logo.getNode(),"image-upload-invalid");
+            $$("invalidLabel").hide();
+        }
+        var validation=form.validate();
+        if (validation && photoValidation) {
+            var newCompany = {
+                name: form.getValues().name,
+                logo: logo.getItem(logo.getLastId()).content,
+                deleted: 0
+            };
+            $$("companyDT").add(newCompany);
+            util.dismissDialog('addCompanyDialog');
         }
     },
     addUserDialog: {
@@ -509,7 +632,7 @@ var companyView = {
                             disabled:true,
                         },
                         {
-                            id: "addCompanyBtn",
+                            id: "addUserBtn",
                             view: "button",
                             value: "Dodajte korisnika",
                             type: "form",
