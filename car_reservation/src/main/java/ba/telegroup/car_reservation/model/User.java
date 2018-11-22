@@ -1,6 +1,7 @@
 package ba.telegroup.car_reservation.model;
 
 import ba.telegroup.car_reservation.common.interfaces.HasCompanyId;
+import org.hibernate.annotations.Generated;
 
 import javax.persistence.*;
 import java.sql.Timestamp;
@@ -65,6 +66,7 @@ public class User implements HasCompanyId {
 
     @Id
     @Column(name = "id")
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     public Integer getId() {
         return id;
     }

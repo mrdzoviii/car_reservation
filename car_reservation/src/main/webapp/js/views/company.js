@@ -871,14 +871,14 @@ var companyView = {
                         {
                             id:"locationId",
                             name:"locationId",
-                            label: "Lokacija:",
+                            label: "Location:",
                             view:"richselect",
                             disabled:true,
                         },
                         {
                             id: "addUserBtn",
                             view: "button",
-                            value: "Dodajte korisnika",
+                            value: "Save",
                             type: "form",
                             click: "companyView.addUser",
                             align: "right",
@@ -890,11 +890,11 @@ var companyView = {
                     rules: {
                         "email": function (value) {
                             if (!value) {
-                                $$('addUserForm').elements.email.config.invalidMessage = 'E-mail je obavezan!';
+                                $$('addUserForm').elements.email.config.invalidMessage = 'E-mail required!';
                                 return false;
                             }
                             if (!webix.rules.isEmail(value)) {
-                                $$('addUserForm').elements.email.config.invalidMessage = 'E-mail nije u validnom formatu!';
+                                $$('addUserForm').elements.email.config.invalidMessage = 'E-mail not valid!';
                                 return false;
                             }
                             return true;
