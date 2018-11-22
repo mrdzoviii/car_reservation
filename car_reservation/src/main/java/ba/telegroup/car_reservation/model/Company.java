@@ -7,6 +7,7 @@ import java.util.Arrays;
 import java.util.Objects;
 
 @Entity
+@Inheritance(strategy = InheritanceType.JOINED)
 public class Company implements Deletable {
     private Integer id;
     private String name;

@@ -171,7 +171,7 @@ var companyView = {
                                 id: "username",
                                 fillspace:true,
                                 header: [
-                                    "Korisničko ime",
+                                    "Username",
                                     {
                                         content: "textFilter",
                                         sort: "string"
@@ -179,15 +179,10 @@ var companyView = {
                                 ]
                             },
                             {
-                                id: "name",
-                                template: function(obj) {
-                                    if (obj.firstName){
-                                        return obj.firstName+" "+obj.lastName;
-                                    } else return "";
-                                },
+                                id: "fullName",
                                 fillspace:true,
                                 header: [
-                                    "Ime i prezime",
+                                    "Full name",
                                     {
                                         content: "textFilter",
                                         sort: "string"
@@ -227,7 +222,7 @@ var companyView = {
                                     return dependencyMap['role'][obj.roleId];
                                 },
                                 header: [
-                                    "Tip korisnika",
+                                    "Role",
                                     {
 
                                         content: "richSelectFilter",
@@ -251,7 +246,7 @@ var companyView = {
                                 id:"locationName",
                                 fillspace:true,
                                 header: [
-                                    "Lokacija",
+                                    "Location",
                                     {
                                         content: "richSelectFilter",
                                         fillspace: true,
@@ -785,7 +780,7 @@ var companyView = {
                         {
                             view: "label",
                             width: 300,
-                            template: "<span class='fa fa-user'/> Dodavanje korisnika"
+                            template: "<span class='fa fa-user'/> Create user"
                         },
                         {},
                         {
@@ -810,15 +805,15 @@ var companyView = {
                             view: "text",
                             label: "E-mail:",
                             required: true,
-                            invalidMessage: "E-mail je obavezan!"
+                            invalidMessage: "E-mail required!"
                         },
                         {
                             id:"roleId",
                             name:"roleId",
-                            label: "Uloga:",
+                            label: "Role:",
                             view:"richselect",
                             required:true,
-                            invalidMessage:"Uloga je obavezna!",
+                            invalidMessage:"Role required!",
                             on:{
                                 onChange:function (newv,oldv) {
                                     if (newv===role.systemAdministrator){
@@ -841,21 +836,21 @@ var companyView = {
                         {
                             id:"companyId",
                             name:"companyId",
-                            label: "Kompanija:",
+                            label: "Company:",
                             view:"richselect",
                             required:false,
                             disabled:true,
-                            invalidMessage:"Kompanija je obavezna!",
+                            invalidMessage:"Company required!",
                             on: {
                                 onChange: function (newv, oldv) {
                                     if (newv){
                                         var locations=[];
-                                        webix.ajax().get("api/location/byCompany/"+newv).then(function (data) {
+                                        webix.ajax().get("api/location/company/"+newv).then(function (data) {
                                             var array=data.json();
                                             array.forEach(function (obj) {
                                                 locations.push({
                                                     id:obj.id,
-                                                    value:obj.label
+                                                    value:obj.name
                                                 });
 
                                             });

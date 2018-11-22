@@ -1,14 +1,25 @@
 package ba.telegroup.car_reservation.model;
 
-import javax.persistence.Basic;
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.Id;
+import ba.telegroup.car_reservation.common.interfaces.Deletable;
+import ba.telegroup.car_reservation.common.interfaces.HasCompanyId;
+
+import javax.persistence.*;
 import java.math.BigDecimal;
 import java.util.Objects;
 
+@SqlResultSetMapping(name = "LocationMapping",
+        classes = @ConstructorResult(targetClass = Location.class,columns = {
+                @ColumnResult(name = "id",type = Integer.class),
+                @ColumnResult(name="name",type=String.class),
+                @ColumnResult(name="address",type=String.class),
+                @ColumnResult(name="company_id",type = Integer.class),
+                @ColumnResult(name="latitude",type = BigDecimal.class),
+                @ColumnResult(name="longitude",type=BigDecimal.class),
+                @ColumnResult(name="deleted",type=Byte.class)
+        }))
+
 @Entity
-public class Location {
+public class Location implements HasCompanyId, Deletable {
     private Integer id;
     private String name;
     private String address;
@@ -16,6 +27,19 @@ public class Location {
     private BigDecimal latitude;
     private BigDecimal longitude;
     private Byte deleted;
+
+    public Location(Integer id, String name, String address,  Integer companyId,BigDecimal latitude, BigDecimal longitude, Byte deleted) {
+        this.id = id;
+        this.name = name;
+        this.address = address;
+        this.companyId = companyId;
+        this.latitude = latitude;
+        this.longitude = longitude;
+        this.deleted = deleted;
+    }
+
+    public Location() {
+    }
 
     @Id
     @Column(name = "id")

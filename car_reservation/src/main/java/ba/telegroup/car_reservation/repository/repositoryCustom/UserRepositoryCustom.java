@@ -1,8 +1,14 @@
 package ba.telegroup.car_reservation.repository.repositoryCustom;
 
-import ba.telegroup.car_reservation.model.modelCustom.UserCompany;
+
+import ba.telegroup.car_reservation.model.User;
+import ba.telegroup.car_reservation.model.modelCustom.UserLocationCompany;
+
+import java.util.List;
 
 public interface UserRepositoryCustom {
-    UserCompany login(String username, String password, String companyName);
+    UserLocationCompany login(String username, String password, String companyName);
     Long deleteUsersByCompanyId(Integer companyId);
+    List<User> getAllExtendedByCompanyId(Integer companyId);
+    List<User> getAllExtendedSystemAdmins();
 }

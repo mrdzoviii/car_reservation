@@ -4,13 +4,12 @@ import ba.telegroup.car_reservation.common.exceptions.ForbiddenException;
 import ba.telegroup.car_reservation.controller.genericController.GenericHasCompanyIdController;
 import ba.telegroup.car_reservation.model.LoginBean;
 import ba.telegroup.car_reservation.model.User;
-import ba.telegroup.car_reservation.model.modelCustom.UserCompany;
+import ba.telegroup.car_reservation.model.modelCustom.UserLocationCompany;
 import ba.telegroup.car_reservation.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Scope;
 import org.springframework.web.bind.annotation.*;
-
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 import java.util.List;
@@ -38,13 +37,16 @@ public class UserController extends GenericHasCompanyIdController<User,Integer> 
     }
 
     @Override
-    public List<User> getAll() throws ForbiddenException {
-        return userRepository.getAllByCompanyIdAndDeleted(userBean.getUser().getCompanyId(),notDeleted);
+    public List<User> getAll(){
+        if(userBean.getUser().getRoleId().equals(systemAdmin)){
+            return userRepository.getAllExtendedSystemAdmins();
+        }
+        return userRepository.getAllExtendedByCompanyId(userBean.getUser().getCompanyId());
     }
 
     @RequestMapping(value = "/login",method = RequestMethod.POST)
-    public UserCompany login(@RequestBody LoginBean bean) throws ForbiddenException {
-        UserCompany loggedUser= userRepository.login(bean.getUsername(),bean.getPassword(),bean.getCompany());
+    public UserLocationCompany login(@RequestBody LoginBean bean) throws ForbiddenException {
+        UserLocationCompany loggedUser= userRepository.login(bean.getUsername(),bean.getPassword(),bean.getCompany());
         if(loggedUser!=null){
             userBean.setLoggedIn(true);
             userBean.setUser(loggedUser);
@@ -65,7 +67,7 @@ public class UserController extends GenericHasCompanyIdController<User,Integer> 
     }
 
     @RequestMapping(value="/state",method = RequestMethod.GET)
-    public UserCompany check() throws ForbiddenException {
+    public UserLocationCompany check() throws ForbiddenException {
         if(userBean.getLoggedIn()){
             return userBean.getUser();
         }
@@ -75,7 +77,7 @@ public class UserController extends GenericHasCompanyIdController<User,Integer> 
     @RequestMapping(value="/company/{id}",method = RequestMethod.GET)
     public List<User> getAllUsersByCompany(@PathVariable("id") Integer id){
         if(Integer.valueOf(0).equals(id))
-            return userRepository.getAllByRoleIdAndDeleted(systemAdmin,notDeleted);
-        return userRepository.getAllByCompanyIdAndDeleted(id,notDeleted);
+            return userRepository.getAllExtendedSystemAdmins();
+        return userRepository.getAllExtendedByCompanyId(id);
     }
 }

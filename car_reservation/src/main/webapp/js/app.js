@@ -189,7 +189,8 @@ var preloadDependencies = function () {
         var array = [];
         data.json().forEach(function (obj) {
             roles[obj.id] = obj.role;
-            array.push(obj);
+            var value={id:obj.id,value:obj.role};
+            array.push(value);
         });
         dependencyMap["role"] = roles;
         dependency["role"] = array;
@@ -212,7 +213,8 @@ var preloadDependencies = function () {
 
         data.json().forEach(function (obj) {
             expenseTypes[obj.id] = obj.cost;
-            array.push(obj);
+            var value={id:obj.id,value:obj.cost};
+            array.push(value);
         });
         dependencyMap["cost"] = expenseTypes;
         dependency["cost"] = array;
@@ -222,7 +224,8 @@ var preloadDependencies = function () {
         var array = [];
         data.json().forEach(function (obj) {
             notificationTypes[obj.id] = obj.option;
-            array.push(obj);
+            var value={id:obj.id,value:obj.option};
+            array.push(value);
         });
         dependencyMap["mail-option"] = notificationTypes;
         dependency["mail-option"] = array;
@@ -233,7 +236,8 @@ var preloadDependencies = function () {
         var array = [];
         data.json().forEach(function (obj) {
             fuel[obj.id] = obj.fuel;
-            array.push(obj);
+            var value={id:obj.id,value:obj.fuel};
+            array.push(value);
         });
         dependencyMap['fuel'] = fuel;
         dependency['fuel'] = array;

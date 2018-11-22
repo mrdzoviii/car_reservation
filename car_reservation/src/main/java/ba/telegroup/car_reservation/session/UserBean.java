@@ -1,27 +1,27 @@
 package ba.telegroup.car_reservation.session;
 
 
-import ba.telegroup.car_reservation.model.User;
-import ba.telegroup.car_reservation.model.modelCustom.UserCompany;
+
+import ba.telegroup.car_reservation.model.modelCustom.UserLocationCompany;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
 @Component
 @Scope("session")
 public class UserBean {
-    private UserCompany user;
+    private UserLocationCompany user;
     private Boolean loggedIn;
 
     public UserBean() {
-        user = new UserCompany();
+        user = new UserLocationCompany();
         loggedIn = false;
     }
 
-    public UserCompany getUser() {
+    public UserLocationCompany getUser() {
         return user;
     }
 
-    public void setUser(UserCompany user) {
+    public void setUser(UserLocationCompany user) {
         this.user = user;
     }
 
