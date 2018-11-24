@@ -124,12 +124,12 @@ var companyView = {
                             },
                             {},
                             {
-                                id: "addUserBtn",
+                                id: "addSystemAdminBtn",
                                 view: "button",
                                 type: "iconButton",
-                                label: "New user",
+                                label: "New system admin",
                                 icon: "plus-circle",
-                                click: 'companyView.showAddUserDialog',
+                                click: 'companyView.showAddNewSystemAdminDialog',
                                 autowidth: true
                             }
                         ]
@@ -142,6 +142,7 @@ var companyView = {
                         select: true,
                         navigation: true,
                         fillspace: true,
+                        resizeColumn:true,
                         url:"api/user",
                         on: {
                             onBeforeContextMenu: function (item) {
@@ -158,6 +159,7 @@ var companyView = {
                             {
                                 id: "email",
                                 fillspace:true,
+                                width:350,
                                 header: [
                                     "E-mail",
                                     {
@@ -190,7 +192,6 @@ var companyView = {
                             },
                             {
                                 id: "statusId",
-                                fillspace:true,
                                 template: function (obj) {
                                     return dependencyMap['status'][obj.statusId];
                                 },
@@ -215,7 +216,7 @@ var companyView = {
                             },
                             {
                                 id: "roleId",
-                                width:230,
+                                width:150,
                                 template: function (obj) {
                                     return dependencyMap['role'][obj.roleId];
                                 },
@@ -277,6 +278,11 @@ var companyView = {
                     icon: "pencil"
                 },
                 {
+                    id: "addUser",
+                    value: "Add new user",
+                    icon: "user-plus"
+                },
+                {
                     $template: "Separator"
                 },
                 {
@@ -315,6 +321,10 @@ var companyView = {
                         case "update":
                             companyView.showEditCompanyDialog($$("companyDT").getSelectedItem());
                             break;
+                        case "addUser":
+                            var item = $$("companyDT").getItem(context.id.row);
+                            companyView.showAddNewUserDialog(item.id);
+                            break;
                     }
 
                 }
@@ -328,17 +338,26 @@ var companyView = {
                 {
                     id: "delete",
                     value: "Delete",
-                    icon: "trash-alt"
+                    icon: "trash"
                 }
             ],
             master: $$("userDT"),
             on: {
                 onItemClick: function (id) {
                     var context = this.getContext();
-                    var delBox = (webix.copy(commonViews.deleteConfirmSerbian("korisnika", "korisnika")));
+                    var delBox = (webix.copy(commonViews.deleteConfirm("user", "user")));
                     delBox.callback = function (result) {
                         if (result) {
-                            $$("userDT").remove(context.id.row);
+                            var item = $$("userDT").getItem(context.id.row);
+                            $$("userDT").detachEvent("onBeforeDelete");
+                            connection.sendAjax("DELETE", "api/user/" + item.id, function (text, data, xhr) {
+                                if (text) {
+                                    $$("userDT").remove(context.id.row);
+                                    util.messages.showMessage("Success delete");
+                                }
+                            }, function (text, data, xhr) {
+                                util.messages.showErrorMessage(text);
+                            }, item);
                         }
                     };
                     webix.confirm(delBox);
@@ -764,167 +783,161 @@ var companyView = {
         }
 
     },
-    addUserDialog: {
-        id: "addUserDialog",
+
+    //ADD NEW USER
+
+    addNewUserDialog: {
         view: "popup",
+        id: "addUserDialog",
         modal: true,
         position: "center",
         body: {
-            rows: [
-                {
-                    view: "toolbar",
-                    css: "panelToolbar",
-                    cols: [
-                        {
-                            view: "label",
-                            width: 300,
-                            template: "<span class='fa fa-user'/> Create user"
-                        },
-                        {},
-                        {
-                            view: "icon",
-                            icon: "close",
-                            align: "right",
-                            click: "util.dismissDialog('addUserDialog');"
-                        }
-                    ]
+            id: "addUserInside",
+            rows: [{
+                view: "toolbar",
+                cols: [{
+                    view: "label",
+                    label: "<span class='webix_icon fa-briefcase'></span> New user",
+                    width: 400
+                }, {}, {
+                    hotkey: 'esc',
+                    view: "icon",
+                    icon: "close",
+                    align: "right",
+                    click: "util.dismissDialog('addUserDialog');"
+                }]
+            }, {
+                view: "form",
+                id: "addUserForm",
+                width: 600,
+                elementsConfig: {
+                    labelWidth: 200,
+                    bottomPadding: 18
                 },
-                {
-                    id: "addUserForm",
-                    view: "form",
-                    elementsConfig: {
-                        labelWidth: 100,
-                        bottomPadding: 18
+                elements: [
+                    {
+                        view: "text",
+                        id: "email",
+                        name: "email",
+                        label: "E-mail:",
+                        required: true,
+                        invalidMessage: "Enter valid email"
+                    },{
+                        view: "richselect",
+                        id: "roleId",
+                        name: "roleId",
+                        label: "Role:",
+                        required:true,
+                        invalidMessage:"Select role"
                     },
-                    elements: [
-                        {
-                            id: "email",
-                            name: "email",
-                            view: "text",
-                            label: "E-mail:",
-                            required: true,
-                            invalidMessage: "E-mail required!"
-                        },
-                        {
-                            id:"roleId",
-                            name:"roleId",
-                            label: "Role:",
-                            view:"richselect",
-                            required:true,
-                            invalidMessage:"Role required!",
-                            on:{
-                                onChange:function (newv,oldv) {
-                                    if (newv===role.systemAdministrator){
-                                        $$("companyId").define("required",false);
-                                        $$("companyId").define("disabled",true);
-                                        $$("companyId").setValue(null);
-
-                                    }else{
-                                        $$("companyId").define("required",true);
-                                        $$("companyId").define("disabled",false);
-
-
-                                    }
-                                    $$("companyId").refresh();
-
-
-                                }
-                            }
-                        },
-                        {
-                            id:"companyId",
-                            name:"companyId",
-                            label: "Company:",
-                            view:"richselect",
-                            required:false,
-                            disabled:true,
-                            invalidMessage:"Company required!",
-                            on: {
-                                onChange: function (newv, oldv) {
-                                    if (newv){
-                                        var locations=[];
-                                        webix.ajax().get("api/location/company/"+newv).then(function (data) {
-                                            var array=data.json();
-                                            array.forEach(function (obj) {
-                                                locations.push({
-                                                    id:obj.id,
-                                                    value:obj.name
-                                                });
-
-                                            });
-                                            $$("locationId").define("options",locations);
-                                            $$("locationId").define("disabled",false);
-                                            $$("locationId").refresh();
-                                        });
-
-                                    }else{
-                                        $$("locationId").setValue(null);
-                                        $$("locationId").define("options",[]);
-                                        $$("locationId").define("disabled",true);
-                                    }
-                                    $$("locationId").refresh();
-                                }
-                            }
-                        },
-                        {
-                            id:"locationId",
-                            name:"locationId",
-                            label: "Location:",
-                            view:"richselect",
-                            disabled:true,
-                        },
-                        {
-                            id: "addUserBtn",
+                    {
+                        view: "text",
+                        id: "companyId",
+                        name: "companyId",
+                        hidden:true,
+                    },
+                    {
+                        view: "text",
+                        id: "deleted",
+                        name: "deleted",
+                        hidden:true,
+                        value:0
+                    },
+                    {
+                        view: "text",
+                        id: "statusId",
+                        name: "statusId",
+                        value:2,
+                        hidden:true
+                    },
+                    {
+                        view:"richselect",
+                        id:"locationId",
+                        name:"locationId",
+                        label:"Location",
+                        required:true,
+                        invalidMessage:"Select location"
+                    },
+                    {
+                        margin: 5,
+                        cols: [{}, {
+                            id: "saveUser",
                             view: "button",
                             value: "Save",
                             type: "form",
                             click: "companyView.addUser",
-                            align: "right",
                             hotkey: "enter",
                             width: 150
+                        }]
+                    }],
+                rules: {
+                    "email": function (value) {
+                        if (!value) {
+                            $$('addUserForm').elements.email.config.invalidMessage = 'Enter e-mail!';
+                            return false;
+                        }
+                        if (value.length > 100) {
+                            $$('addUserForm').elements.email.config.invalidMessage = 'Maximum length 100';
+                            return false;
+                        }
+                        if (!webix.rules.isEmail(value)) {
+                            $$('addUserForm').elements.email.config.invalidMessage = 'E-mail not valid.';
+                            return false;
                         }
 
-                    ],
-                    rules: {
-                        "email": function (value) {
-                            if (!value) {
-                                $$('addUserForm').elements.email.config.invalidMessage = 'E-mail required!';
-                                return false;
-                            }
-                            if (!webix.rules.isEmail(value)) {
-                                $$('addUserForm').elements.email.config.invalidMessage = 'E-mail not valid!';
-                                return false;
-                            }
-                            return true;
-                        }
+                        return true;
                     }
                 }
-            ]
+            }]
         }
     },
 
 
-    showAddUserDialog: function () {
+
+    showAddNewUserDialog: function (companyId) {
+        console.log("companyID from showAddNewUserDialog"+companyId)
         if (util.popupIsntAlreadyOpened("addUserDialog")) {
-            webix.ui(webix.copy(companyView.addUserDialog)).show();
-            webix.UIManager.setFocus("username");
-            $$("roleId").define("options",dependency.role);
-            $$("roleId").refresh();
+            webix.ui(webix.copy(companyView.addNewUserDialog)).show();
+            webix.UIManager.setFocus("email");
 
-            var currentCompanies=[];
-            $$("companyDT").eachRow(function (row){
-                if (row!=-1) {
-                    currentCompanies.push({
-                        id: row,
-                        value: $$("companyDT").getItem(row).name
-                    })
-                }
-            });
 
-            $$("roleId").define("options",dependency.role);
-            $$("roleId").refresh();
-            $$("companyId").define("options",currentCompanies);
-            $$("companyId").refresh();
+            var locations=[];
+            connection.sendAjax("GET", "api/location/company/" + companyId,
+                function (text, data, xhr) {
+                    if (text) {
+                        var array = data.json();
+                        array.forEach(function (obj) {
+                            locations.push({
+                                id: obj.id,
+                                value: obj.name
+                            });
+
+                        });
+                        $$("locationId").define("options",locations);
+                        $$("locationId").refresh();
+                        $$("companyId").define("value",companyId);
+                    }
+                }, function (text, data, xhr) {
+                });
+
+            var roles=[];
+            connection.sendAjax("GET", "api/role/user/",
+                function (text, data, xhr) {
+                    if (text) {
+                        var array = data.json();
+                        array.forEach(function (obj) {
+                            roles.push({
+                                id: obj.id,
+                                value: obj.role
+                            });
+
+                        });
+                        $$("roleId").define("options",roles);
+                        $$("roleId").refresh();
+                    }
+                }, function (text, data, xhr) {
+                });
+
         }
     },
 
@@ -932,15 +945,126 @@ var companyView = {
         var form=$$("addUserForm");
         if (form.validate()){
             var user=form.getValues();
-            user.statusId=userStatus.onHold;
-            var companyId=user.companyId?user.companyId:-1;
-            onCompanyClick(companyId).then(function () {
+            onCompanyClick(user.companyId).then(function () {
                 $$("userDT").add(user);
                 util.dismissDialog('addUserDialog');
             });
 
         }
     },
+
+    //ADDING NEW SYSTEM ADMIN
+
+    addNewSystemAdminDialog: {
+        view: "popup",
+        id: "addNewSystemAdminDialog",
+        modal: true,
+        position: "center",
+        body: {
+            id: "addNewSystemAdminInside",
+            rows: [{
+                view: "toolbar",
+                cols: [{
+                    view: "label",
+                    label: "<span class='webix_icon fa-briefcase'></span> Create system admin",
+                    width: 400
+                }, {}, {
+                    hotkey: 'esc',
+                    view: "icon",
+                    icon: "close",
+                    align: "right",
+                    click: "util.dismissDialog('addNewSystemAdminDialog');"
+                }]
+            }, {
+                view: "form",
+                id: "addSystemAdminForm",
+                width: 600,
+                elementsConfig: {
+                    labelWidth: 200,
+                    bottomPadding: 18
+                },
+                elements: [
+                    {
+                        view: "text",
+                        id: "email",
+                        name: "email",
+                        label: "E-mail:",
+                        required: true,
+                        invalidMessage: "Please enter mail"
+                    },
+                    {
+                        view: "text",
+                        id: "roleId",
+                        name: "roleId",
+                        value: 1,
+                        hidden: true,
+                    },
+                    {
+                        view: "text",
+                        id: "deleted",
+                        name: "deleted",
+                        value: 0,
+                        hidden: true,
+                    },
+                    {
+                        view: "text",
+                        id: "statusId",
+                        name: "statusId",
+                        value: 2,
+                        hidden: true,
+                    },
+                    {
+                        margin: 5,
+                        cols: [{}, {
+                            id: "saveSystemAdmin",
+                            view: "button",
+                            value: "Save",
+                            type: "form",
+                            click: "companyView.addSystemAdmin",
+                            hotkey: "enter",
+                            width: 150
+                        }]
+                    }],
+                rules: {
+                    "email": function (value) {
+                        if (!value) {
+                            $$('addSystemAdminForm').elements.email.config.invalidMessage = 'Enter email!';
+                            return false;
+                        }
+                        if (value.length > 100) {
+                            $$('addSystemAdminForm').elements.email.config.invalidMessage = 'Maximum length 100';
+                            return false;
+                        }
+                        if (!webix.rules.isEmail(value)) {
+                            $$('addSystemAdminForm').elements.email.config.invalidMessage = 'E-mail not valid.';
+                            return false;
+                        }
+
+                        return true;
+                    }
+                }
+            }]
+        }
+    },
+
+    showAddNewSystemAdminDialog: function () {
+        if (util.popupIsntAlreadyOpened("addNewSystemAdminDialog")) {
+            webix.ui(webix.copy(companyView.addNewSystemAdminDialog)).show();
+            webix.UIManager.setFocus("email");
+        }
+    },
+
+    addSystemAdmin:function () {
+        var form=$$("addSystemAdminForm");
+        if (form.validate()){
+            var user=form.getValues();
+            onCompanyClick(-1).then(function () {
+                $$("userDT").add(user);
+                util.dismissDialog('addNewSystemAdminDialog');
+            });
+
+        }
+    }
 
     // dwTODO NE UCITA SVE
 };

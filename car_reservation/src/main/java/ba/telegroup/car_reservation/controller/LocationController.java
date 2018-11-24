@@ -1,6 +1,5 @@
 package ba.telegroup.car_reservation.controller;
 
-import ba.telegroup.car_reservation.common.interfaces.Deletable;
 import ba.telegroup.car_reservation.controller.genericController.GenericHasCompanyIdAndDeletableController;
 import ba.telegroup.car_reservation.model.Location;
 import ba.telegroup.car_reservation.repository.LocationRepository;

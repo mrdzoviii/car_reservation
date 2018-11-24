@@ -13,6 +13,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Scope;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
+
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 import java.util.List;
@@ -28,6 +29,8 @@ public class UserController extends GenericHasCompanyIdAndDeletableController<Us
     private String logoutSuccess;
     @Value(value="${forbidden.action}")
     private String forbiddenAction;
+    @Value("${badRequest.user.insert}")
+    private String badRequestUserInsert;
     @Value("${deleted.not}")
     private Byte notDeleted;
     @Value("${role.system_admin}")
@@ -93,7 +96,16 @@ public class UserController extends GenericHasCompanyIdAndDeletableController<Us
     @Transactional
     @Override
     public User insert(@RequestBody User user) throws BadRequestException, ForbiddenException {
-
-        return super.insert(user);
+        if(user!=null && user.getEmail()!=null && user.getStatusId()!=null && user.getRoleId()!=null && user.getDeleted()!=null) {
+            if(userRepository.countAllUsersByEmailAndDeleted(user.getEmail(),notDeleted).equals(0L)){
+                User inserted=super.insert(user);
+                return userRepository.getExtendedById(inserted.getId());
+            }
+        }
+        throw new BadRequestException(badRequestUserInsert);
+    }
+    @RequestMapping(value = "/mail/{mail}",method = RequestMethod.GET)
+    public Boolean checkMail(@PathVariable("mail") String mail){
+        return userRepository.countAllUsersByEmailAndDeleted(mail,notDeleted)>0;
     }
 }

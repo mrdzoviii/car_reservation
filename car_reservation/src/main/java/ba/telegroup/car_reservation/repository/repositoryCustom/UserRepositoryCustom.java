@@ -11,4 +11,5 @@ public interface UserRepositoryCustom {
     Long deleteUsersByCompanyId(Integer companyId);
     List<UserLocationCompany> getAllExtendedByCompanyId(Integer companyId);
     List<UserLocationCompany> getAllExtendedSystemAdmins();
+    UserLocationCompany getExtendedById(Integer id);
 }
