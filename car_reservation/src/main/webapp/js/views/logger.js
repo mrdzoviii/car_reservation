@@ -11,7 +11,7 @@ var loggerView = {
                     {
                         view: "label",
                         width: 400,
-                        template: "<span class='fa fa-history'/> Korisničke akcije"
+                        template: "<span class='fa fa-history'/> Actions logger"
                     },
                     {}
                 ]
@@ -32,9 +32,9 @@ var loggerView = {
                     {
                         id: "actionType",
                         header: [
-                            "Tip akcije",
+                            "Action type",
                             {
-                                content: "textFilter",
+                                content: "richSelectFilter",
                                 sort: "string"
                             }
                         ],
@@ -45,12 +45,11 @@ var loggerView = {
                     {
                         id: "actionDetails",
                         header: [
-                            "Detaljnije",
+                            "Action details",
                             {
                                 content: "textFilter",
                                 sort: "string"
                             }
-                            // TODO Popraviti filter tako da radi range pretraga
                         ],
 
                         fillspace: true,
@@ -59,9 +58,9 @@ var loggerView = {
                     {
                         id: "tableName",
                         header: [
-                            "Tabela",
+                            "Table",
                             {
-                                content: "textFilter",
+                                content: "richSelectFilter",
                                 sort: "string"
                             }
                         ],
@@ -71,10 +70,21 @@ var loggerView = {
                     },
                     {
                         id: "created",
+                        template: function format(value) {
+                            var date = new Date(value.created);
+                            var format = webix.Date.dateToStr("%d.%m.%Y %H:%i");
+                            return format(date);
+                        },
                         header: [
-                            "Datum",
+                            "Date",
                             {
-                                content: "dateRangeFilter",
+                                content: "datepickerFilter",
+                                compare: function customCompare(value, filter) {
+                                    var format = webix.Date.dateToStr("%d.%m.%Y");
+                                    var tempFilter = format(filter);
+                                    var tempValue = format(new Date(value));
+                                    return tempFilter == tempValue;
+                                }
                             }
                         ],
                         width: 225,
@@ -84,7 +94,7 @@ var loggerView = {
                     {
                         id: "username",
                         header: [
-                            "Korisnik",
+                            "Username",
                             {
                                 content: "textFilter",
                                 sort: "string"
@@ -95,11 +105,25 @@ var loggerView = {
 
                     },
                     {
-                        id: "role",
+                        id: "userRole",
+                        template: function (obj) {
+                            return dependencyMap['role'][obj.userRole];
+                        },
                         header: [
-                            "Tip korisnika",
+                            "Role",
                             {
                                 content: "richSelectFilter",
+
+                                suggest: {
+                                    body: {
+                                        template: function (obj) {
+                                            if (obj.$empty)
+                                                return "";
+                                            return dependencyMap['role'][obj.value];
+                                        }
+                                    }
+
+                                },
                                 fillspace: true,
                                 sort: "string"
                             }
@@ -111,11 +135,20 @@ var loggerView = {
                     {
                         id: "companyName",
                         header: [
-                            "Kompanija",
+                            "Company",
                             {
                                 content: "richSelectFilter",
                                 fillspace: true,
-                                sort: "string"
+                                sort: "string",
+                                suggest: {
+                                    body: {
+                                        template: function (obj) {
+                                            if (obj.$empty)
+                                                return "";
+                                            return obj.value;
+                                        }
+                                    }
+                                }
                             }
                         ],
                         tooltip: false,

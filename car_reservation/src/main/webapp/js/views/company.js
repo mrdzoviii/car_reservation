@@ -136,7 +136,6 @@ var companyView = {
 
                     },
                     {
-                        // TODO richSelectFilter treba prepraviti sa integera na podatke,
                         id: "userDT",
                         view: "datatable",
                         css:"webixDatatable",
@@ -197,7 +196,6 @@ var companyView = {
                                 },
                                 header: [
                                     "Status",
-
                                     {
                                         content: "richSelectFilter",
                                         suggest: {
