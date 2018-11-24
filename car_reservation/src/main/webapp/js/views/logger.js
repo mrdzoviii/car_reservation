@@ -13,8 +13,97 @@ var loggerView = {
                         width: 400,
                         template: "<span class='fa fa-history'/> Actions logger"
                     },
-                    {}
+                    {},
+                    {
+                        id: "datePickerFilter",
+                        view:"daterangepicker",
+                        name:"dateRangePicker",
+                        label:"Period:",
+                        suggest:{
+                            view:"daterangesuggest",
+                            body:{
+                                calendarCount:1,
+                                icons:true,
+                                css:"custom_date_picker_report",
+
+                            }
+                        },
+                        on:{
+                            onChange: function (dates) {
+                                if (dates.start != null && dates.end != null){
+                                    $$("loggerDT").filterByAll();
+                                    var startingDate = new Date(dates.start);
+                                    var endingDate = new Date(dates.end.getFullYear(),dates.end.getMonth(),dates.end.getDate()+1);
+                                    $$("loggerDT").filter(function (obj) {
+                                        var dateOfObj= new Date(obj.created);
+                                        if (dateOfObj >= startingDate && dateOfObj <= endingDate)
+                                            return true;
+                                        return false;
+                                    });
+                                    $$("datePickerFilter").getPopup().hide();
+                                }
+                            }
+                        }
+                    },
+                    {
+                        id: "richSelectFilter",
+                        view: "richselect",
+                        label: "Show:",
+                        value: 1,
+                        editable: false,
+                        options: [
+                            {
+                                id: 1,
+                                value: "All"
+                            },
+                            {
+                                id: 2,
+                                value: "Last 24 hours"
+                            },
+                            {
+                                id: 3,
+                                value: "Last week"
+                            }
+                        ],
+                        on: {
+                            onChange: function (id) {
+                                var customFilterForDate = function (days) {
+                                    var today = new Date();
+                                    var startDate;
+                                    var tempDay = today.getDate() - days;
+                                    if (tempDay > 0 && today.getMonth() > 1) {
+                                        startDate = new Date(today.getFullYear(), today.getMonth(), tempDay);
+                                    } else if (tempDay < 0 && today.getMonth() > 1) {
+                                        startDate = new Date(today.getFullYear(), today.getMonth() - 1, tempDay);
+                                    } else if (tempDay < 0 && today.getMonth() == 1) {
+                                        startDate = new Date(today.getFullYear() - 1, 12, tempDay);
+                                    }
+
+                                    $$("loggerDT").filter(function (obj) {
+                                        var dateOfObj = new Date(obj.created);
+                                        if (dateOfObj >= startDate) {
+                                            return true;
+                                        }
+
+                                        return false;
+                                    })
+                                }
+                                switch (id) {
+                                    case 1:
+                                        $$("loggerDT").filterByAll();
+                                        break;
+                                    case 2:
+                                        customFilterForDate(1);
+                                        break;
+                                    case 3:
+                                        customFilterForDate(7);
+                                        break;
+                                }
+                            }
+                        }
+                    }
                 ]
+
             },
             {
                 id: "loggerDT",
@@ -88,7 +177,7 @@ var loggerView = {
                             }
                         ],
                         width: 225,
-                        tooltip: false,
+                        tooltip: false
 
                     },
                     {
