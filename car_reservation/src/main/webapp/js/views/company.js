@@ -274,7 +274,7 @@ var companyView = {
             data: [
                 {
                     id: "update",
-                    value: "Update",
+                    value: "Edit",
                     icon: "pencil"
                 },
                 {
@@ -336,6 +336,11 @@ var companyView = {
             width: "200",
             data: [
                 {
+                    id: "edit",
+                    value: "Edit",
+                    icon: "pencil"
+                },
+                {
                     id: "delete",
                     value: "Delete",
                     icon: "trash"
@@ -345,22 +350,31 @@ var companyView = {
             on: {
                 onItemClick: function (id) {
                     var context = this.getContext();
-                    var delBox = (webix.copy(commonViews.deleteConfirm("user", "user")));
-                    delBox.callback = function (result) {
-                        if (result) {
-                            var item = $$("userDT").getItem(context.id.row);
-                            $$("userDT").detachEvent("onBeforeDelete");
-                            connection.sendAjax("DELETE", "api/user/" + item.id, function (text, data, xhr) {
-                                if (text) {
-                                    $$("userDT").remove(context.id.row);
-                                    util.messages.showMessage("Success delete");
+                    switch (id) {
+                        case "delete":
+                            var delBox = (webix.copy(commonViews.deleteConfirm("user", "user")));
+                            delBox.callback = function (result) {
+                                if (result) {
+                                    var item = $$("userDT").getItem(context.id.row);
+                                    $$("userDT").detachEvent("onBeforeDelete");
+                                    connection.sendAjax("DELETE", "api/user/" + item.id, function (text, data, xhr) {
+                                        if (text) {
+                                            $$("userDT").remove(context.id.row);
+                                            util.messages.showMessage("Success delete");
+                                        }
+                                    }, function (text, data, xhr) {
+                                        util.messages.showErrorMessage(text);
+                                    }, item);
                                 }
-                            }, function (text, data, xhr) {
-                                util.messages.showErrorMessage(text);
-                            }, item);
-                        }
-                    };
-                    webix.confirm(delBox);
+                            };
+                            webix.confirm(delBox);
+                            break;
+                        case "edit":
+                            var item = $$("userDT").getItem(context.id.row);
+                            if(item.roleId==role.systemAdministrator){
+                                companyView.showChangeSystemAdminDialog(item);
+                            }
+                    }
                 }
             }
         });
@@ -1062,6 +1076,150 @@ var companyView = {
                 $$("userDT").add(user);
                 util.dismissDialog('addNewSystemAdminDialog');
             });
+
+        }
+    },
+
+    //change system admin
+
+    changeSystemAdminDialog: {
+        view: "popup",
+        id: "changeSystemAdminDialog",
+        modal: true,
+        position: "center",
+        body: {
+            id: "changeSystemAdminInside",
+            rows: [{
+                view: "toolbar",
+                cols: [{
+                    view: "label",
+                    label: "<span class='webix_icon fa-briefcase'></span> Edit system admin",
+                    width: 400
+                }, {}, {
+                    hotkey: 'esc',
+                    view: "icon",
+                    icon: "close",
+                    align: "right",
+                    click: "util.dismissDialog('changeSystemAdminDialog');"
+                }]
+            }, {
+                view: "form",
+                id: "changeSystemAdminForm",
+                width: 600,
+                elementsConfig: {
+                    labelWidth: 200,
+                    bottomPadding: 18
+                },
+                elements: [
+                    {
+                        view: "text",
+                        id: "email",
+                        name: "email",
+                        label: "E-mail:",
+                        required: true,
+                        invalidMessage: "Please enter mail"
+                    },
+                    {
+                        view: "text",
+                        id: "roleId",
+                        name: "roleId",
+                        value: 1,
+                        hidden: true,
+                    },
+                    {
+                        view: "text",
+                        id: "id",
+                        name: "id",
+                        hidden: true
+                    },
+                    {
+                        view: "text",
+                        id: "deleted",
+                        name: "deleted",
+                        value: 0,
+                        hidden: true,
+                    },
+                    {
+                        view: "richselect",
+                        id: "statusId",
+                        name: "statusId",
+                        label: "Status:",
+                        required: true,
+                        invalidMessage: "Status required!!!"
+                    },
+                    {
+                        margin: 5,
+                        cols: [{}, {
+                            id: "changeSystemAdmin",
+                            view: "button",
+                            value: "Save",
+                            type: "form",
+                            click: "companyView.changeSystemAdmin",
+                            hotkey: "enter",
+                            width: 150
+                        }]
+                    }],
+                rules: {
+                    "email": function (value) {
+                        if (!value) {
+                            $$('addSystemAdminForm').elements.email.config.invalidMessage = 'Enter email!';
+                            return false;
+                        }
+                        if (value.length > 100) {
+                            $$('addSystemAdminForm').elements.email.config.invalidMessage = 'Maximum length 100';
+                            return false;
+                        }
+                        if (!webix.rules.isEmail(value)) {
+                            $$('addSystemAdminForm').elements.email.config.invalidMessage = 'E-mail not valid.';
+                            return false;
+                        }
+
+                        return true;
+                    }
+                }
+            }]
+        }
+    },
+
+    showChangeSystemAdminDialog: function (user) {
+        if (util.popupIsntAlreadyOpened("changeSystemAdminDialog")) {
+            webix.ui(webix.copy(companyView.changeSystemAdminDialog)).show();
+            webix.UIManager.setFocus("email");
+            var form=$$("changeSystemAdminForm");
+            var status=[];
+            dependency.status.forEach(function (obj) {
+                status.push({
+                    id: obj.id,
+                    value: obj.status
+                });
+                });
+            $$("statusId").define("options",status);
+            $$("statusId").define("value",user.statusId);
+            $$("statusId").refresh();
+            form.elements.id.setValue(user.id);
+            form.elements.statusId.setValue(user.statusId);
+            form.elements.roleId.setValue(user.roleId);
+            form.elements.deleted.setValue(user.deleted);
+            form.elements.email.setValue(user.email);
+        }
+    },
+
+    changeSystemAdmin:function () {
+        var form=$$("changeSystemAdminForm");
+        if (form.validate()){
+            var user=form.getValues();
+            connection.sendAjax("PUT", "api/user/" + user.id,
+                function (text, data, xhr) {
+                    if (text) {
+                        util.messages.showMessage("System admin updated successfully.");
+                        $$("userDT").updateItem(user.id, user);
+                    } else
+                        util.messages.showErrorMessage("System admin edit failed.");
+                }, function (text, data, xhr) {
+                    util.messages.showErrorMessage(text);
+                }, user);
+
+                util.dismissDialog('changeSystemAdminDialog');
 
         }
     }
