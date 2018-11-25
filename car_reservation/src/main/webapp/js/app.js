@@ -72,11 +72,11 @@ var init = function () {
     var urlQuery=window.location.search;
     if (urlQuery && urlQuery.startsWith('?q=reg')){
         var token=urlQuery.split('=')[2];
-        webix.ajax().get("api/user/check/"+token).then(function (result) {
+        webix.ajax().get("api/user/token/"+token).then(function (result) {
             var userId=result.json();
             showRegistration(userId);
         }).fail(function (err) {
-            util.messages.showErrorMessage("Token je istekao ili nije validan!");
+            util.messages.showErrorMessage("Token not valid!");
             checkState();
         })
     }else{
@@ -108,14 +108,11 @@ var showLogin = function () {
 };
 
 var showRegistration = function (userId) {
-    var registration=webix.copy(registrationLayout);
-    webix.ui(registration,panel);
-    panel=$$("registration");
-    $$("registrationForm").setValues({
-        id:userId
-    });
-
-};
+    var registration = webix.copy(registrationLayout);
+    webix.ui(registration, panel);
+    panel = $$("registration");
+    $$("registrationForm").elements.id.setValue(userId);
+}
 
 var showApp = function () {
     var promise=preloadDependencies();
@@ -167,7 +164,6 @@ var showApp = function () {
     $$("companyLogo").define("data",companyLogo);
     rightPanel = "emptyRightPanel";
     promise.then(function (value) {
-        console.log("RESULT OF IF:"+(userData.roleId===role.systemAdministrator));
         if (userData.roleId === role.systemAdministrator) {
             companyView.selectPanel();
             $$("mainMenu").select("company");

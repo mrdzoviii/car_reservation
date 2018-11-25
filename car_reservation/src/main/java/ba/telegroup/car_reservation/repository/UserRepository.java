@@ -8,4 +8,6 @@ import org.springframework.data.jpa.repository.JpaRepository;
 public interface UserRepository extends JpaRepository<User,Integer>, HasCompanyIdAndDeletableRepository<User> , UserRepositoryCustom {
     Long countAllByCompanyIdAndDeleted(Integer companyId,Byte deleted);
     Long countAllUsersByEmailAndDeleted(String email,Byte deleted);
+    User getByTokenAndDeleted(String token,Byte deleted);
+    User getByUsernameAndDeleted(String username,Byte deleted);
 }

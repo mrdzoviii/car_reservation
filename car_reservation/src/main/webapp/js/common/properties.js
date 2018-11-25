@@ -6,8 +6,7 @@ var role = {
 
 var userStatus = {
     active: 1,
-    onHold: 2,
-    inactive: 3
+    inactive: 2,
 };
 
 var successMessage = "Success";

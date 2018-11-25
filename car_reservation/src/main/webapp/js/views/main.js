@@ -241,22 +241,22 @@ var registrationLayout = {
         },
         {
             cols: [
-                {},
                 {
                     view: "template",
                     borderless: true,
-                    height: 500,
-                    width: 500,
-                    template: '<img  src="../../img/telegroup-logo.png"/>' +
-                        '<img  src="../../img/app-logo.png"/>'
+                    height: 700,
+                    width: 700,
+                    fillspace:true,
+                    template:'<img  src="../../img/app-logo.png" alt="logo missing"/>'
                 },
+                {},
                 {
                     rows: [
                         {
                             height: 50,
                             view:"label",
                             css:"registration-label",
-                            label:"Registracija"
+                            label:"Registration"
                         },
                         {},
                         {
@@ -267,30 +267,34 @@ var registrationLayout = {
                             elementsConfig: util.elementsConfig,
                             elements: [
                                 {
+                                    id:"id",
+                                    name:"id",
+                                    view:"text",
+                                    hidden: true
 
                                 },
                                 {
                                     id: "username",
                                     name: "username",
                                     view: "text",
-                                    label: "Korisničko ime:",
-                                    invalidMessage: "Korisničke ime je obavezno!",
+                                    label: "Username:",
+                                    invalidMessage: "Username required!",
                                     required: true
                                 },
                                 {
                                     id: "firstName",
                                     name: "firstName",
                                     view: "text",
-                                    label: "Ime:",
-                                    invalidMessage: "Ime je obavezno!",
+                                    label: "First name:",
+                                    invalidMessage: "First name required!",
                                     required: true
                                 },
                                 {
                                     id: "lastName",
                                     name: "lastName",
                                     view: "text",
-                                    label: "Prezime:",
-                                    invalidMessage: "Prezime je obavezno!",
+                                    label: "Last name:",
+                                    invalidMessage: "Last name required!",
                                     required: true
                                 },
                                 {
@@ -298,15 +302,15 @@ var registrationLayout = {
                                     name: "password",
                                     view: "text",
                                     type: "password",
-                                    label: "Lozinka:",
-                                    invalidMessage: "Lozinka je obavezna!",
+                                    label: "Password:",
+                                    invalidMessage: "Password required!",
                                     required: true
                                 },
 
                                 {
                                     id: "registrationBtn",
                                     view: "button",
-                                    value: "Registrujte se",
+                                    value: "Register",
                                     type: "form",
                                     click: "register",
                                     align: "right",
@@ -331,7 +335,7 @@ var register=function () {
         webix.ajax().header({
             "Content-Type": "application/json"
         }).post("api/user/register",form.getValues()).then(function (result) {
-            util.messages.showMessage("Uspješna registracija. Sada se možete prijaviti na sistem.");
+            util.messages.showMessage("Successful registration.Now you can try to log in!");
 
             setTimeout(function () {
                 webix.ajax().get("api/user/state").then(function (data) {

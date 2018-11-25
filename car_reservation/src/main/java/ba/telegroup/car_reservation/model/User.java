@@ -44,7 +44,6 @@ public class User implements HasCompanyId, Deletable {
     private Integer companyId;
     private Integer roleId;
     private String token;
-    private Timestamp tokenValidUntil;
     private byte[] avatar;
 
     public User() {
@@ -196,15 +195,6 @@ public class User implements HasCompanyId, Deletable {
         this.token = token;
     }
 
-    @Basic
-    @Column(name = "token_valid_until")
-    public Timestamp getTokenValidUntil() {
-        return tokenValidUntil;
-    }
-
-    public void setTokenValidUntil(Timestamp tokenValidUntil) {
-        this.tokenValidUntil = tokenValidUntil;
-    }
 
     @Basic
     @Column(name = "avatar")

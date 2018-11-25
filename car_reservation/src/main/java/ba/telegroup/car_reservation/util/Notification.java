@@ -15,12 +15,13 @@ public class Notification {
         this.javaMailSender=javaMailSender;
     }
     @Async
-    public Boolean sendMail(String mailTo,String subject,String message){
+    public Boolean sendLink(String mailTo,String token){
         SimpleMailMessage mail=new SimpleMailMessage();
         mail.setFrom("no-reply@car-reservation.com");
         mail.setTo(mailTo);
-        mail.setSubject(subject);
-        mail.setText(message);
+        mail.setSubject("Car System Reservation");
+        String mailText="Registration form available on link: \n http://localhost:8100/?q=reg&t="+token;
+        mail.setText(mailText);
         javaMailSender.send(mail);
         return true;
     }

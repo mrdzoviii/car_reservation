@@ -8,6 +8,8 @@ import ba.telegroup.car_reservation.model.User;
 import ba.telegroup.car_reservation.model.modelCustom.UserLocationCompany;
 import ba.telegroup.car_reservation.repository.UserRepository;
 import ba.telegroup.car_reservation.util.Notification;
+import org.apache.commons.codec.binary.Hex;
+import org.apache.commons.lang.RandomStringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Scope;
@@ -16,6 +18,8 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 import java.util.List;
 
 
@@ -25,6 +29,8 @@ import java.util.List;
 public class UserController extends GenericHasCompanyIdAndDeletableController<User,Integer> {
     @Value(value = "${forbidden.login}")
     private String forbiddenLogin;
+    @Value("${status.active}")
+    private Integer statusActive;
     @Value(value = "${logout.success}")
     private String logoutSuccess;
     @Value(value="${forbidden.action}")
@@ -37,6 +43,18 @@ public class UserController extends GenericHasCompanyIdAndDeletableController<Us
     private Byte notDeleted;
     @Value("${role.system_admin}")
     private Integer systemAdmin;
+    @Value("${status.inactive}")
+    private Integer statusInactive;
+    @Value("${token.length}")
+    private Integer tokenLength;
+    @Value("${badRequest.user.token}")
+    private String badRequestToken;
+    @Value("${badRequest.user.register}")
+    private String badRequestRegister;
+    @Value("${badRequest.user.register.username}")
+    private String badRequestUsername;
+    @Value("${action.success}")
+    private String success;
     private UserRepository userRepository;
     private Notification notification;
     @Autowired
@@ -68,7 +86,6 @@ public class UserController extends GenericHasCompanyIdAndDeletableController<Us
     @RequestMapping(value="/logout",method = RequestMethod.GET)
     public String logout(HttpServletRequest request) throws ForbiddenException {
             HttpSession session=request.getSession(false);
-        System.out.println("LOGOUT CALLED:"+userBean.getUser().getUsername()+"  "+userBean.getLoggedIn());
             if(session!=null && userBean.getLoggedIn()){
                 session.invalidate();
                 return logoutSuccess;
@@ -90,39 +107,86 @@ public class UserController extends GenericHasCompanyIdAndDeletableController<Us
             return userRepository.getAllExtendedSystemAdmins();
         return userRepository.getAllExtendedByCompanyId(id);
     }
-    @RequestMapping(value="/mail/{mailTo}")
-    public Boolean sendMail(@PathVariable("mailTo") String mailTo){
-        return notification.sendMail(mailTo,"TEST MAIL","DJUKA JE MAJMUN");
-    }
+
 
     @Transactional
     @Override
     public User insert(@RequestBody User user) throws BadRequestException, ForbiddenException {
         if(user!=null && user.getEmail()!=null && user.getStatusId()!=null && user.getRoleId()!=null && user.getDeleted()!=null) {
             if(userRepository.countAllUsersByEmailAndDeleted(user.getEmail(),notDeleted).equals(0L)){
+                user.setStatusId(statusInactive);
+                user.setToken(RandomStringUtils.randomAlphanumeric(tokenLength));
+                notification.sendLink(user.getEmail(),user.getToken());
                 User inserted=super.insert(user);
                 return userRepository.getExtendedById(inserted.getId());
             }
         }
         throw new BadRequestException(badRequestUserInsert);
     }
-    @RequestMapping(value = "/mail/{mail}",method = RequestMethod.GET)
-    public Boolean checkMail(@PathVariable("mail") String mail){
-        return userRepository.countAllUsersByEmailAndDeleted(mail,notDeleted)>0;
-    }
 
     @Transactional
     @Override
     public String update(@PathVariable Integer id,@RequestBody User user) throws BadRequestException, ForbiddenException {
         User dbUser=userRepository.findById(id).orElse(null);
-        if(dbUser!=null && user!=null && user.getCompanyId()!=null && user.getRoleId() !=null && user.getStatusId() !=null && user.getEmail()!=null) {
-           dbUser.setEmail(user.getEmail());
-           dbUser.setCompanyId(user.getCompanyId());
-           dbUser.setLocationId(user.getLocationId());
-           dbUser.setRoleId(user.getRoleId());
-           dbUser.setStatusId(user.getStatusId());
+        if(dbUser!=null && user!=null && user.getRoleId() !=null && user.getStatusId() !=null && user.getEmail()!=null){
+            //if company or location changed
+            if (user.getCompanyId() != null && user.getLocationId() != null) {
+                dbUser.setCompanyId(user.getCompanyId());
+                dbUser.setLocationId(user.getLocationId());
+            }
+            dbUser.setRoleId(user.getRoleId());
+            dbUser.setStatusId(user.getStatusId());
+            if (!dbUser.getEmail().equals(user.getEmail()) && userRepository.countAllUsersByEmailAndDeleted(user.getEmail(), notDeleted) > 0)
+                throw new BadRequestException(badRequestUserUpdate);
+            dbUser.setEmail(user.getEmail());
             return super.update(id, dbUser);
         }
         throw new BadRequestException(badRequestUserUpdate);
     }
+
+    @RequestMapping(value = "/token/{token}",method = RequestMethod.GET)
+    public Integer getUserByToken(@PathVariable("token") String token) throws BadRequestException {
+        User user=userRepository.getByTokenAndDeleted(token,notDeleted);
+        if(user!=null){
+            return user.getId();
+        }
+        throw new BadRequestException(badRequestToken);
+    }
+
+    @RequestMapping(value = "/register",method = RequestMethod.POST)
+    public String registerUser(@RequestBody User data) throws BadRequestException, ForbiddenException {
+        User user=userRepository.findById(data.getId()).orElse(null);
+        if(user!=null && data.getUsername()!=null && data.getFirstName()!=null && data.getLastName()!=null && data.getPassword()!=null){
+                if(userRepository.getByUsernameAndDeleted(data.getUsername(),notDeleted)!=null){
+                    throw new BadRequestException(badRequestUsername);
+                }
+                user.setStatusId(statusActive);
+                user.setToken(null);
+                user.setUsername(data.getUsername());
+                user.setFirstName(data.getFirstName());
+                user.setLastName(data.getLastName());
+                user.setPassword(hashPassword(data.getPassword()));
+                UserLocationCompany temp=userBean.getUser();
+                if(temp==null)
+                userBean.setUser(userRepository.getExtendedById(user.getId()));
+                super.update(user.getId(),user);
+                userBean.setUser(temp);
+                return success;
+        }
+        throw new BadRequestException(badRequestRegister);
+    }
+
+
+    private String hashPassword( String plainText)  {
+        MessageDigest digest= null;
+        try {
+            digest = MessageDigest.getInstance("SHA-512");
+            return Hex.encodeHexString(digest.digest(plainText.getBytes()));
+        } catch (NoSuchAlgorithmException e) {
+            e.printStackTrace();
+            return null;
+        }
+
+    }
+
 }
