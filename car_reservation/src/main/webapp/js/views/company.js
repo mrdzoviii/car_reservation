@@ -371,9 +371,10 @@ var companyView = {
                             break;
                         case "edit":
                             var item = $$("userDT").getItem(context.id.row);
-                            if(item.roleId==role.systemAdministrator){
+                            if(item.roleId===role.systemAdministrator){
                                 companyView.showChangeSystemAdminDialog(item);
-                            }
+                            }else
+                                companyView.showChangeUserDialog(item);
                     }
                 }
             }
@@ -1150,7 +1151,7 @@ var companyView = {
                     {
                         margin: 5,
                         cols: [{}, {
-                            id: "changeSystemAdmin",
+                            id: "changeSystemAdminBtn",
                             view: "button",
                             value: "Save",
                             type: "form",
@@ -1162,15 +1163,15 @@ var companyView = {
                 rules: {
                     "email": function (value) {
                         if (!value) {
-                            $$('addSystemAdminForm').elements.email.config.invalidMessage = 'Enter email!';
+                            $$('changeSystemAdminForm').elements.email.config.invalidMessage = 'Enter email!';
                             return false;
                         }
                         if (value.length > 100) {
-                            $$('addSystemAdminForm').elements.email.config.invalidMessage = 'Maximum length 100';
+                            $$('changeSystemAdminForm').elements.email.config.invalidMessage = 'Maximum length 100';
                             return false;
                         }
                         if (!webix.rules.isEmail(value)) {
-                            $$('addSystemAdminForm').elements.email.config.invalidMessage = 'E-mail not valid.';
+                            $$('changeSystemAdminForm').elements.email.config.invalidMessage = 'E-mail not valid.';
                             return false;
                         }
 
@@ -1222,7 +1223,232 @@ var companyView = {
                 util.dismissDialog('changeSystemAdminDialog');
 
         }
+    },
+
+    changeUserDialog: {
+        view: "popup",
+        id: "changeUserDialog",
+        modal: true,
+        position: "center",
+        body: {
+            id: "changeUserInside",
+            rows: [{
+                view: "toolbar",
+                cols: [{
+                    view: "label",
+                    label: "<span class='webix_icon fa-briefcase'></span> Edit user",
+                    width: 400
+                }, {}, {
+                    hotkey: 'esc',
+                    view: "icon",
+                    icon: "close",
+                    align: "right",
+                    click: "util.dismissDialog('changeUserDialog');"
+                }]
+            }, {
+                view: "form",
+                id: "changeUserForm",
+                width: 600,
+                elementsConfig: {
+                    labelWidth: 200,
+                    bottomPadding: 18
+                },
+                elements: [
+                    {
+                        view: "text",
+                        id: "email",
+                        name: "email",
+                        label: "E-mail:",
+                        required: true,
+                        invalidMessage: "Please enter mail"
+                    },
+                    {
+                        view: "richselect",
+                        id: "roleId",
+                        name: "roleId",
+                        label: "Role:",
+                        required: true,
+                        invalidMessage: "Role required!"
+                    },
+                    {
+                        view: "text",
+                        id: "id",
+                        name: "id",
+                        hidden: true
+                    },
+                    {
+                        view: "text",
+                        id: "deleted",
+                        name: "deleted",
+                        value: 0,
+                        hidden: true,
+                    },
+                    {
+                        view: "richselect",
+                        id: "statusId",
+                        name: "statusId",
+                        label: "Status:",
+                        required: true,
+                        invalidMessage: "Status required!!!"
+                    },
+                    {
+                        view: "richselect",
+                        id: "companyId",
+                        name: "companyId",
+                        label: "Company:",
+                        required: true,
+                        invalidMessage: "Company required!!!",
+                        on: {
+                            onChange: function (newv, oldv) {
+                                if (newv){
+                                    var locations=[];
+                                    webix.ajax().get("api/location/company/"+newv).then(function (data) {
+                                        var array=data.json();
+                                        array.forEach(function (obj) {
+                                            locations.push({
+                                                id:obj.id,
+                                                value:obj.name
+                                            });
+
+                                        });
+                                        $$("locationId").define("options",locations);
+                                        $$("locationId").define("value",null);
+                                        $$("locationId").refresh();
+                                    });
+
+                                }
+                            }
+                        }
+                    },
+                    {
+                        view: "richselect",
+                        id: "locationId",
+                        name: "locationId",
+                        label: "Location:",
+                        required: true,
+                        invalidMessage: "Location required!!!"
+                    },
+                    {
+                        margin: 5,
+                        cols: [{}, {
+                            id: "changeUserBtn",
+                            view: "button",
+                            value: "Save",
+                            type: "form",
+                            click: "companyView.changeUser",
+                            hotkey: "enter",
+                            width: 150
+                        }]
+                    }],
+                rules: {
+                    "email": function (value) {
+                        if (!value) {
+                            $$('changeUserForm').elements.email.config.invalidMessage = 'Enter email!';
+                            return false;
+                        }
+                        if (value.length > 100) {
+                            $$('changeUserForm').elements.email.config.invalidMessage = 'Maximum length 100';
+                            return false;
+                        }
+                        if (!webix.rules.isEmail(value)) {
+                            $$('changeUserForm').elements.email.config.invalidMessage = 'E-mail not valid.';
+                            return false;
+                        }
+
+                        return true;
+                    }
+                }
+            }]
+        }
+    },
+
+    showChangeUserDialog: function (user) {
+        if (util.popupIsntAlreadyOpened("changeUserDialog")) {
+            webix.ui(webix.copy(companyView.changeUserDialog)).show();
+            webix.UIManager.setFocus("email");
+            var form=$$("changeUserForm");
+            var status=[];
+            dependency.status.forEach(function (obj) {
+                status.push({
+                    id: obj.id,
+                    value: obj.status
+                });
+            });
+            $$("statusId").define("options",status);
+            $$("statusId").define("value",user.statusId);
+            $$("statusId").refresh();
+            var roles=[];
+            connection.sendAjax("GET", "api/role/user/",
+                function (text, data, xhr) {
+                    if (text) {
+                        var array = data.json();
+                        array.forEach(function (obj) {
+                            roles.push({
+                                id: obj.id,
+                                value: obj.role
+                            });
+
+                        });
+                        $$("roleId").define("options",roles);
+                        $$("roleId").refresh();
+                    }
+                }, function (text, data, xhr) {
+                });
+            var currentCompanies=[];
+            $$("companyDT").eachRow(function (row){
+                if (row!=-1) {
+                    currentCompanies.push({
+                        id: row,
+                        value: $$("companyDT").getItem(row).name
+                    })
+                }
+            });
+            $$("companyId").define("options",currentCompanies);
+            $$("companyId").define("value",user.companyId);
+            $$("companyId").refresh();
+            var locations=[];
+            webix.ajax().get("api/location/company/"+user.companyId).then(function (data) {
+                var array=data.json();
+                array.forEach(function (obj) {
+                    locations.push({
+                        id:obj.id,
+                        value:obj.name
+                    });
+
+                });
+                $$("locationId").define("options",locations);
+                $$("locationId").define("value",user.locationId);
+                $$("locationId").refresh();
+            });
+            form.elements.id.setValue(user.id);
+            form.elements.statusId.setValue(user.statusId);
+            form.elements.roleId.setValue(user.roleId);
+            form.elements.deleted.setValue(user.deleted);
+            form.elements.email.setValue(user.email);
+        }
+    },
+
+    changeUser:function () {
+        var form=$$("changeUserForm");
+        if (form.validate()){
+            var user=form.getValues();
+            connection.sendAjax("PUT", "api/user/" + user.id,
+                function (text, data, xhr) {
+                    if (text) {
+                        util.messages.showMessage("User updated successfully.");
+                        var item=$$("companyDT").getSelectedItem();
+                        if(item.id!==user.companyId)
+                        onCompanyClick(user.companyId);
+                        $$("userDT").updateItem(user.id, user);
+                    } else
+                        util.messages.showErrorMessage("User edit failed.");
+                }, function (text, data, xhr) {
+                    util.messages.showErrorMessage(text);
+                }, user);
+
+            util.dismissDialog('changeUserDialog');
+
+        }
     }
 
-    // dwTODO NE UCITA SVE
 };

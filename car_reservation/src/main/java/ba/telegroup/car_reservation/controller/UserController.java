@@ -31,6 +31,8 @@ public class UserController extends GenericHasCompanyIdAndDeletableController<Us
     private String forbiddenAction;
     @Value("${badRequest.user.insert}")
     private String badRequestUserInsert;
+    @Value("${badRequest.user.update}")
+    private String badRequestUserUpdate;
     @Value("${deleted.not}")
     private Byte notDeleted;
     @Value("${role.system_admin}")
@@ -107,5 +109,20 @@ public class UserController extends GenericHasCompanyIdAndDeletableController<Us
     @RequestMapping(value = "/mail/{mail}",method = RequestMethod.GET)
     public Boolean checkMail(@PathVariable("mail") String mail){
         return userRepository.countAllUsersByEmailAndDeleted(mail,notDeleted)>0;
+    }
+
+    @Transactional
+    @Override
+    public String update(@PathVariable Integer id,@RequestBody User user) throws BadRequestException, ForbiddenException {
+        User dbUser=userRepository.findById(id).orElse(null);
+        if(dbUser!=null && user!=null && user.getCompanyId()!=null && user.getRoleId() !=null && user.getStatusId() !=null && user.getEmail()!=null) {
+           dbUser.setEmail(user.getEmail());
+           dbUser.setCompanyId(user.getCompanyId());
+           dbUser.setLocationId(user.getLocationId());
+           dbUser.setRoleId(user.getRoleId());
+           dbUser.setStatusId(user.getStatusId());
+            return super.update(id, dbUser);
+        }
+        throw new BadRequestException(badRequestUserUpdate);
     }
 }

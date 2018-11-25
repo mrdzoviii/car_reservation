@@ -164,6 +164,7 @@ var loggerView = {
                             var format = webix.Date.dateToStr("%d.%m.%Y %H:%i");
                             return format(date);
                         },
+                        sort: "date",
                         header: [
                             "Date",
                             {
