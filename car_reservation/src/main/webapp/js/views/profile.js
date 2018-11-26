@@ -323,6 +323,103 @@ var profileView={
 
 
         }
+    },
+    notificationSettingsDialog: {
+        id: "notificationSettingsDialog",
+        view: "popup",
+        modal: true,
+        position: "center",
+        body: {
+            id: "notificationSettingsInside",
+            rows: [
+                {
+                    view: "toolbar",
+                    cols: [
+                        {
+                            view: "label",
+                            label: "<span class='fa fa-bell'></span> Notifications settings",
+                            width: 400
+                        },
+                        {},
+                        {
+                            hotkey: 'esc',
+                            view: "icon",
+                            icon: "close",
+                            align: "right",
+                            click: "util.dismissDialog('notificationSettingsDialog');"
+                        }]
+                }, {
+                    id: "notificationSettingsForm",
+                    view: "form",
+                    width: 800,
+                    elementsConfig: {
+                        labelWidth: 350,
+                        bottomPadding: 18
+                    },
+                    elements: [
+                        {
+                            id: "mailOptionId",
+                            name: "mailOptionId",
+                            view: "radio",
+                            label: "Please chose your mail notification option:",
+                            required: true,
+                            invalidMessage: "Must choose one option.",
+                            options: [
+                                {
+                                    id: 1,
+                                    value: "Only location",
+                                    newline: true
+                                },
+                                {
+                                    id: 2,
+                                    value: "Only company",
+                                    newline: true
+                                },
+                                {
+                                    id: 3,
+                                    value: "Turn off notifications",
+                                    newline: true
+                                }
+                            ]
+                        },
+                        {
+                            margin: 5,
+                            cols: [
+                                {},
+                                {
+                                    id: "saveNotificationSettings",
+                                    view: "button",
+                                    value: "Save",
+                                    type: "form",
+                                    click: "profileView.saveNotificationSettings",
+                                    hotkey: "enter",
+                                    width: 150
+                                }
+                            ]
+                        }
+                    ]
+                }
+            ]
+        }
+    },
+
+    saveNotificationSettings:function () {
+        if ($$("notificationSettingsForm").validate()) {
+            var status = $$("notificationSettingsForm").getValues().mailOptionId;
+            webix.ajax().header({"Content-type": "application/x-www-form-urlencoded"})
+                .post("api/user/mail-option/" + status).then(function (data) {
+                if (data.text()) {
+                    userData.mailOptionId = status;
+                    util.messages.showMessage("Notification settings changed.")
+                } else {
+                    util.messages.showErrorMessage("Notification settings change failed.");
+                }
+            }).fail(function (error) {
+                util.messages.showErrorMessage(error.responseText);
+            });
+        }
+
+        util.dismissDialog('notificationSettingsDialog');
     }
 };
 webix.ui(

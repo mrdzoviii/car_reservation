@@ -4,8 +4,10 @@ import ba.telegroup.car_reservation.common.exceptions.BadRequestException;
 import ba.telegroup.car_reservation.common.exceptions.ForbiddenException;
 import ba.telegroup.car_reservation.controller.genericController.GenericHasCompanyIdAndDeletableController;
 import ba.telegroup.car_reservation.model.LoginBean;
+import ba.telegroup.car_reservation.model.MailOption;
 import ba.telegroup.car_reservation.model.User;
 import ba.telegroup.car_reservation.model.modelCustom.UserLocationCompany;
+import ba.telegroup.car_reservation.repository.MailOptionRepository;
 import ba.telegroup.car_reservation.repository.UserRepository;
 import ba.telegroup.car_reservation.util.Notification;
 import ba.telegroup.car_reservation.util.PasswordInfo;
@@ -58,15 +60,19 @@ public class UserController extends GenericHasCompanyIdAndDeletableController<Us
     private String success;
     @Value("${deleted.yes}")
     private Byte deleted;
-    @Value("${badRequest.password}")
+    @Value("${badRequest.user.mail}")
+    private String badRequestMailOption;
+    @Value("${badRequest.user.password}")
     private String badRequestPassword;
     private UserRepository userRepository;
     private Notification notification;
+    private MailOptionRepository mailOptionRepository;
     @Autowired
-    public UserController(UserRepository userRepository, Notification notification){
+    public UserController(UserRepository userRepository, Notification notification,MailOptionRepository mailOptionRepository){
         super(userRepository);
         this.userRepository=userRepository;
         this.notification = notification;
+        this.mailOptionRepository=mailOptionRepository;
     }
 
     @Override
@@ -221,6 +227,22 @@ public class UserController extends GenericHasCompanyIdAndDeletableController<Us
         }
         throw new BadRequestException(badRequestPassword);
     }
+
+    @RequestMapping(value = "/mail-option/{option}", method = RequestMethod.POST)
+    public String changeMailOption(@PathVariable("option") Integer option) throws BadRequestException, ForbiddenException {
+        if (option != null && option >= 0) {
+            User user = userRepository.findById(userBean.getUser().getId()).orElse(null);
+            if (user != null) {
+                MailOption mailOption=mailOptionRepository.findById(option).orElse(null);
+                if(mailOption!=null){
+                    user.setMailOptionId(mailOption.getId());
+                    return super.update(user.getId(),user);
+                }
+            }
+        }
+        throw new BadRequestException(badRequestMailOption);
+    }
+
 
     private String hashPassword( String plainText)  {
         MessageDigest digest= null;

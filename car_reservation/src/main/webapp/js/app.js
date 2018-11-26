@@ -52,7 +52,7 @@ var menuUser = [
                 {
                     id: "changeMailOption",
                     icon: "fas fa-envelope",
-                    value: "Change mail option"
+                    value: "Notification settings"
                 },
                 {
                     $template: "Separator"
@@ -76,6 +76,9 @@ var menuActions = function (id) {
             break;
         case "changePassword":
             clickPassword();
+            break;
+        case "changeMailOption":
+            clickNotificationSettings();
             break;
     }
 };
@@ -116,6 +119,18 @@ var clickPassword = function () {
     }
 
 };
+
+function clickNotificationSettings() {
+    if (util.popupIsntAlreadyOpened("notificationSettingsDialog")) {
+        webix.ui(webix.copy(profileView.notificationSettingsDialog));
+
+        setTimeout(function () {
+            $$("notificationSettingsDialog").show();
+            $$("mailOptionId").define("value", userData.mailOptionId);
+            $$("mailOptionId").refresh();
+        }, 0)
+    }
+}
 
 var mainMenuCompanyAdmin = [
     {
@@ -215,7 +230,8 @@ var showRegistration = function (userId) {
     var registration = webix.copy(registrationLayout);
     webix.ui(registration, panel);
     panel = $$("registration");
-    $$("registrationForm").elements.id.setValue(userId);
+    $$("registrationForm").elements.id.setValue(userId)
+
 }
 
 var showApp = function () {
