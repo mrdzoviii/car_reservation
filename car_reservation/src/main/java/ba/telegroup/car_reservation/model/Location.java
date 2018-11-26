@@ -43,6 +43,7 @@ public class Location implements HasCompanyId, Deletable {
 
     @Id
     @Column(name = "id")
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     public Integer getId() {
         return id;
     }

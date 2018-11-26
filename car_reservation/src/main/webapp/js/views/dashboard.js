@@ -62,7 +62,7 @@ var locationView={
 
                     }
                 },
-                zoom:8
+                zoom:8,
                 //key:"AIzaSyDLrWtIdZaoYBiQlrvI8V_4gKFH6TBJ4c4"
             }
         ]

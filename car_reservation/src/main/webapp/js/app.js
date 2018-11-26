@@ -134,9 +134,14 @@ function clickNotificationSettings() {
 
 var mainMenuCompanyAdmin = [
     {
-        id: "dashboard",
+        id: "home",
         icon: "home",
         value: "Home"
+    },
+    {
+        id: "location",
+        icon: "map",
+        value:"Locations"
     },
     {
         id: "vehicle",
@@ -173,6 +178,10 @@ var mainMenuActions = function (id) {
         case "user":
             userView.selectPanel();
             break;
+        case "home":
+            homeView.selectPanel();
+        case "location":
+            locationView.selectPanel();
     }
 };
 
@@ -295,10 +304,9 @@ var showApp = function () {
         if (userData.roleId === role.systemAdministrator) {
             companyView.selectPanel();
             $$("mainMenu").select("company");
-            console.log("selected company")
         } else {
             locationView.selectPanel();
-            $$("mainMenu").select("dashboard");
+            $$("mainMenu").select("location");
         }
     }).fail(function (err) {
         //connection.reload();
