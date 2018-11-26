@@ -55,6 +55,8 @@ public class UserController extends GenericHasCompanyIdAndDeletableController<Us
     private String badRequestUsername;
     @Value("${action.success}")
     private String success;
+    @Value("${deleted.yes}")
+    private Byte deleted;
     private UserRepository userRepository;
     private Notification notification;
     @Autowired
@@ -62,6 +64,14 @@ public class UserController extends GenericHasCompanyIdAndDeletableController<Us
         super(userRepository);
         this.userRepository=userRepository;
         this.notification = notification;
+    }
+
+    @Override
+    public User findById(@PathVariable Integer id) {
+        User object=userRepository.getExtendedById(id);
+        if (object == null || object.getDeleted().equals(deleted) || (!userBean.getUser().getRoleId().equals(systemAdmin) && !userBean.getUser().getCompanyId().equals(object.getCompanyId())))
+            object = null;
+        return object;
     }
 
     @Override
@@ -94,7 +104,7 @@ public class UserController extends GenericHasCompanyIdAndDeletableController<Us
     }
 
     @RequestMapping(value="/state",method = RequestMethod.GET)
-    public UserLocationCompany check() throws ForbiddenException {
+    public User check() throws ForbiddenException {
         if(userBean.getLoggedIn()){
             return userBean.getUser();
         }
@@ -102,7 +112,7 @@ public class UserController extends GenericHasCompanyIdAndDeletableController<Us
     }
 
     @RequestMapping(value="/company/{id}",method = RequestMethod.GET)
-    public List<UserLocationCompany> getAllUsersByCompany(@PathVariable("id") Integer id){
+    public List getAllUsersByCompany(@PathVariable("id") Integer id){
         if(Integer.valueOf(0).equals(id))
             return userRepository.getAllExtendedSystemAdmins();
         return userRepository.getAllExtendedByCompanyId(id);
@@ -134,11 +144,28 @@ public class UserController extends GenericHasCompanyIdAndDeletableController<Us
                 dbUser.setCompanyId(user.getCompanyId());
                 dbUser.setLocationId(user.getLocationId());
             }
+            if(user.getLastName()!=null){
+                    dbUser.setLastName(user.getLastName());
+            }
+            if(user.getFirstName()!=null){
+                dbUser.setFirstName(user.getFirstName());
+            }
+            if(user.getAvatar()!=null){
+                dbUser.setAvatar(user.getAvatar());
+            }
             dbUser.setRoleId(user.getRoleId());
             dbUser.setStatusId(user.getStatusId());
             if (!dbUser.getEmail().equals(user.getEmail()) && userRepository.countAllUsersByEmailAndDeleted(user.getEmail(), notDeleted) > 0)
                 throw new BadRequestException(badRequestUserUpdate);
             dbUser.setEmail(user.getEmail());
+            if(super.update(id,dbUser).equals(success)){
+                System.out.println(userBean.getUser().getId()+"  "+dbUser.getId());
+                if(userBean.getUser().getId().equals(dbUser.getId())){
+                    userBean.setUser(userRepository.getExtendedById(dbUser.getId()));
+                    System.out.println("UPDATED USER BEAN");
+                }
+                return success;
+            }
             return super.update(id, dbUser);
         }
         throw new BadRequestException(badRequestUserUpdate);
@@ -167,7 +194,6 @@ public class UserController extends GenericHasCompanyIdAndDeletableController<Us
                 user.setLastName(data.getLastName());
                 user.setPassword(hashPassword(data.getPassword()));
                 UserLocationCompany temp=userBean.getUser();
-                if(temp==null)
                 userBean.setUser(userRepository.getExtendedById(user.getId()));
                 super.update(user.getId(),user);
                 userBean.setUser(temp);

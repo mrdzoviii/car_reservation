@@ -58,6 +58,6 @@ public class UserRepositoryImpl extends CustomRepositoryImpl implements UserRepo
 
     @Override
     public UserLocationCompany getExtendedById(Integer id) {
-        return (UserLocationCompany) entityManager.createNativeQuery(SQL_GET_EXTENDED_BY_ID,"UserLocationCompanyMapping").setParameter(1,id).getSingleResult();
+        return (UserLocationCompany) entityManager.createNativeQuery(SQL_GET_EXTENDED_BY_ID,"UserLocationCompanyMapping").setParameter(1,id).getResultStream().findFirst().orElse(null);
     }
 }

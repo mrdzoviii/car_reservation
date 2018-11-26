@@ -219,3 +219,10 @@
 .logoInside > div:first-child{
     padding: 0px !important;
 }
+.photo-alignment{
+    width: 100%;
+    height: 100%;
+    max-width:100%;
+    alignment: right;
+    max-height:100%;
+}

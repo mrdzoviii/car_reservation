@@ -40,6 +40,8 @@ public class GenericController<T, ID extends Serializable> extends GenericLogger
     @Value("${badRequest.delete}")
     private String badRequestDelete;
 
+    @Value("${action.success}")
+    private String success;
     @Autowired
     protected UserBean userBean;
     public GenericController(JpaRepository<T, ID> repo) {
@@ -80,7 +82,7 @@ public class GenericController<T, ID extends Serializable> extends GenericLogger
         T oldObject = cloner.deepClone(repo.findById(id).orElse(null));
         if (repo.saveAndFlush(object) != null) {
             logUpdateAction(object, oldObject);
-            return "Success";
+            return success;
         }
         throw new BadRequestException(badRequestUpdate);
     }
@@ -93,7 +95,7 @@ public class GenericController<T, ID extends Serializable> extends GenericLogger
             // repo.delete(id);
             repo.deleteById(id);
             logDeleteAction(object);
-            return "Success";
+            return success;
         } catch (Exception ex) {
             ex.printStackTrace();
             throw new BadRequestException(badRequestDelete);

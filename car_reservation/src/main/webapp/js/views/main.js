@@ -6,14 +6,14 @@ var mainLayout = {
         {
             cols: [
                 {
-                    id:"companyLogo",
+                    id: "companyLogo",
                     view: "template",
                     width: 240,
                     css: "logoInside",
-                    adjust:true,
+                    adjust: true,
                     template: function (obj) {
-                        if(obj.companyLogo!==null){
-                            return '<img src="data:image/jpeg;charset=utf-8;base64, '+obj.companyLogo+'" width="240px" height="50px">'
+                        if (obj.companyLogo !== null) {
+                            return '<img src="data:image/jpeg;charset=utf-8;base64, ' + obj.companyLogo + '" width="240px" height="50px">'
                         }
                         return '<img  src="../../img/system-admin.jpg" width="240px" height="50px"/>'
 
@@ -33,22 +33,22 @@ var mainLayout = {
                         {},
 
                         {
-                            id:"userLabel",
+                            id: "userLabel",
                             view: "label",
                             align: "right",
                             label: ""
                         },
                         {
-                            id:"userAvatar",
-                            view:"template",
-                            align:"right",
-                            css:"profile-image",
-                            borderless:"true",
-                            height:40,
-                            width:40,
-                            template:  function (obj) {
-                                if(obj.avatar!==null){
-                                    return '<img src="data:image/jpeg;charset=utf-8;base64, '+obj.avatar+'" width="40px" height="40px">';
+                            id: "userAvatar",
+                            view: "template",
+                            align: "right",
+                            css: "profile-image",
+                            borderless: "true",
+                            height: 40,
+                            width: 40,
+                            template: function (obj) {
+                                if (obj.avatar !== null) {
+                                    return '<img src="data:image/jpeg;charset=utf-8;base64, ' + obj.avatar + '" width="40px" height="40px">';
                                 }
                                 return '<img  src="../../img/avatar-default.png" width="40px" height="40px">'
                             }
@@ -59,27 +59,8 @@ var mainLayout = {
                             id: "userMenu",
                             width: 60,
                             openAction: "click",
-                            data: [
-                                {
-                                    value: "<span class='fa fa-angle-down'/>",
-                                    icon: "cog",
-                                    submenu: [
-                                        {
-                                            id: "1",
-                                            icon: "sign-out",
-                                            value: "Sign out",
-                                        }
-                                    ]
-                                }
-                            ],
-                            on: {
-                                onMenuItemClick: function (id) {
-                                    switch (id) {
-                                        case "1":
-                                            logout();
-                                            break;
-                                    }
-                                }
+                            submenuConfig: {
+                                width: 200
                             }
                         }
                     ]
@@ -191,7 +172,7 @@ var loginLayout = {
                     height: 500,
                     width: 700,
                     template: '<img  height="500" width="500" src="../../img/app-logo.png"/>'
-                } ,
+                },
                 {}
             ]
         },
@@ -216,25 +197,11 @@ var login = function () {
 };
 
 
-var logout = function () {
-
-    webix.ajax().get("/api/user/logout", function (xhr) {
-        if (xhr.status = "200") {
-            userData = null;
-            util.messages.showLogoutMessage();
-            connection.reload();
-        } else {
-            util.messages.showLogoutErrorMessage();
-            connection.reload();
-        }
-    });
-};
-
 var registrationLayout = {
     id: "registration",
     width: "auto",
     height: "auto",
-    userId:null,
+    userId: null,
     rows: [
         {
             height: 50
@@ -246,17 +213,17 @@ var registrationLayout = {
                     borderless: true,
                     height: 700,
                     width: 700,
-                    fillspace:true,
-                    template:'<img  src="../../img/app-logo.png" alt="logo missing"/>'
+                    fillspace: true,
+                    template: '<img  src="../../img/app-logo.png" alt="logo missing"/>'
                 },
                 {},
                 {
                     rows: [
                         {
                             height: 50,
-                            view:"label",
-                            css:"registration-label",
-                            label:"Registration"
+                            view: "label",
+                            css: "registration-label",
+                            label: "Registration"
                         },
                         {},
                         {
@@ -267,9 +234,9 @@ var registrationLayout = {
                             elementsConfig: util.elementsConfig,
                             elements: [
                                 {
-                                    id:"id",
-                                    name:"id",
-                                    view:"text",
+                                    id: "id",
+                                    name: "id",
+                                    view: "text",
                                     hidden: true
 
                                 },
@@ -329,23 +296,23 @@ var registrationLayout = {
     ]
 };
 
-var register=function () {
-    var form=$$("registrationForm");
-    if (form.validate()){
+var register = function () {
+    var form = $$("registrationForm");
+    if (form.validate()) {
         webix.ajax().header({
             "Content-Type": "application/json"
-        }).post("api/user/register",form.getValues()).then(function (result) {
+        }).post("api/user/register", form.getValues()).then(function (result) {
             util.messages.showMessage("Successful registration.Now you can try to log in!");
 
             setTimeout(function () {
                 webix.ajax().get("api/user/state").then(function (data) {
                     return webix.ajax().get("/api/user/logout");
                 }).then(function (value) {
-                    var url=window.location;
-                    url.replace(url.protocol+"//"+url.host);
+                    var url = window.location;
+                    url.replace(url.protocol + "//" + url.host);
                 }).fail(function (err) {
-                        var url=window.location;
-                        url.replace(url.protocol+"//"+url.host);
+                    var url = window.location;
+                    url.replace(url.protocol + "//" + url.host);
                 });
                 /*if (userData)
                     logout();
@@ -353,7 +320,7 @@ var register=function () {
                     var url=window.location;
                     url.replace(url.protocol+"//"+url.host);
                 }*/
-            },2000);
+            }, 2000);
 
         }).fail(function (err) {
             util.messages.showErrorMessage(err.responseText);
@@ -361,20 +328,18 @@ var register=function () {
     }
 };
 
-var userView={
-    panel:{
-        id:"userDialog",
-        view:"popup",
-        modal:true,
-        position:"center",
-        body:{
-            rows:[
+var userView = {
+    panel: {
+        id: "userDialog",
+        view: "popup",
+        modal: true,
+        position: "center",
+        body: {
+            rows: [
                 {
-                    view:"toolbar",
-                    css:"panelToolbar",
-                    cols:[
-
-                    ]
+                    view: "toolbar",
+                    css: "panelToolbar",
+                    cols: []
                 },
                 {
                     view: "form",
@@ -384,9 +349,9 @@ var userView={
                     elementsConfig: util.elementsConfig,
                     elements: [
                         {
-                            id:"id",
-                            name:"id",
-                            hidden:true
+                            id: "id",
+                            name: "id",
+                            hidden: true
                         },
                         {
                             id: "username",
@@ -428,3 +393,19 @@ var userView={
 
     }
 };
+
+var logout = function () {
+
+    webix.ajax().get("/api/user/logout", function (xhr) {
+        if (xhr.status = "200") {
+            userData = null;
+            util.messages.showLogoutMessage();
+            connection.reload();
+        } else {
+            util.messages.showLogoutErrorMessage();
+            connection.reload();
+        }
+    });
+};
+
+

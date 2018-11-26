@@ -9,6 +9,74 @@ var rightPanel = null;
 
 var menuSystemAdmin = [
     {
+        value: "<span class='fa fa-angle-down'/>",
+        icon: "cog",
+        submenu: [
+            {
+                id: "editProfile",
+                icon: "fas fa-edit",
+                value: "Edit profile",
+            },
+            {
+                id: "changePassword",
+                icon: "fas fa-edit",
+                value: "Change password",
+            },
+            {
+                $template: "Separator"
+            },
+            {
+                id: "signOut",
+                icon: "sign-out",
+                value: "Sign out",
+            }]
+    }
+];
+
+var menuUser = [
+    {
+        value: "<span class='fa fa-angle-down'/>",
+        icon: "cog",
+        submenu:
+            [
+                {
+                    id: "editProfile",
+                    icon: "fas fa-edit",
+                    value: "Edit profile"
+                },
+                {
+                    id: "changePassword",
+                    icon: "fas fa-edit",
+                    value: "Change password"
+                },
+                {
+                    id: "changeMailOption",
+                    icon: "fas fa-envelope",
+                    value: "Change mail option"
+                },
+                {
+                    $template: "Separator"
+                },
+                {
+                    id: "signOut",
+                    icon: "sign-out",
+                    value: "Sign out",
+                }
+            ]
+    }
+];
+
+var menuActions = function (id) {
+    switch (id) {
+        case "signOut":
+            logout();
+            break;
+        case "editProfile":clickProfile();break;
+    }
+};
+
+var mainMenuSystemAdmin = [
+    {
         id: "company",
         icon: "briefcase",
         value: "Company"
@@ -20,16 +88,30 @@ var menuSystemAdmin = [
     }
 ];
 
-var menuCompanyAdmin=[
+var clickProfile=function(){
+    if(util.popupIsntAlreadyOpened("changeProfileDialog")) {
+        webix.ui(webix.copy(profileView.changeProfileDialog));
+        $$("profileForm").load("api/user/" + userData.id);
+        if(userData.avatar)
+        $$("photo").setValues({src: "data:image/png;base64," + userData.avatar});
+        else
+            $$("photo").setValues({src: "../../img/avatar-default.png"});
+        setTimeout(function () {
+            $$("changeProfileDialog").show();
+        }, 0);
+    }
+};
+
+var mainMenuCompanyAdmin = [
     {
-        id:"dashboard",
-        icon:"home",
-        value:"Home"
+        id: "dashboard",
+        icon: "home",
+        value: "Home"
     },
     {
-        id:"vehicle",
-        icon:"car",
-        value:"Vehicles"
+        id: "vehicle",
+        icon: "car",
+        value: "Vehicles"
     },
     {
         id: "logger",
@@ -37,13 +119,14 @@ var menuCompanyAdmin=[
         value: "User logs"
     },
     {
-        id:"user",
-        icon:"user",
-        value:"Users"
+        id: "user",
+        icon: "user",
+        value: "Users"
     }
 ];
 
-var menuActions = function (id) {
+
+var mainMenuActions = function (id) {
     switch (id) {
         case "logger":
             loggerView.selectPanel();
@@ -65,27 +148,27 @@ var menuActions = function (id) {
 
 var init = function () {
     if (!webix.env.touch && webix.ui.scrollSize) webix.CustomScroll.init();
-    webix.i18n.setLocale("sr-SP");
+    webix.i18n.setLocale("en-US");
     webix.Date.startOnMonday = true;
     webix.ui(panel);
     panel = $$("empty");
-    var urlQuery=window.location.search;
-    if (urlQuery && urlQuery.startsWith('?q=reg')){
-        var token=urlQuery.split('=')[2];
-        webix.ajax().get("api/user/token/"+token).then(function (result) {
-            var userId=result.json();
+    var urlQuery = window.location.search;
+    if (urlQuery && urlQuery.startsWith('?q=reg')) {
+        var token = urlQuery.split('=')[2];
+        webix.ajax().get("api/user/token/" + token).then(function (result) {
+            var userId = result.json();
             showRegistration(userId);
         }).fail(function (err) {
             util.messages.showErrorMessage("Token not valid!");
             checkState();
         })
-    }else{
+    } else {
         checkState();
     }
 
 };
 
-var checkState=function(){
+var checkState = function () {
     webix.ajax().get("api/user/state").then(function (data) {
         userData = data.json();
         showApp();
@@ -94,11 +177,17 @@ var checkState=function(){
     })
 };
 
-var menuEvents = {
+var mainMenuEvents = {
     onItemClick: function (item) {
-        menuActions(item);
+        mainMenuActions(item);
     }
 };
+
+var menuEvents = {
+    onMenuItemClick: function (item) {
+        menuActions(item);
+    }
+}
 
 var showLogin = function () {
     var login = webix.copy(loginLayout);
@@ -115,10 +204,11 @@ var showRegistration = function (userId) {
 }
 
 var showApp = function () {
-    var promise=preloadDependencies();
+    var promise = preloadDependencies();
     var main = webix.copy(mainLayout);
     webix.ui(main, panel);
     panel = $$("app");
+    var localMainMenuData = null;
     var localMenuData = null;
     webix.ui({
         id: "menu-collapse",
@@ -145,30 +235,37 @@ var showApp = function () {
     });
     switch (userData.roleId) {
         case role.systemAdministrator:
+            localMainMenuData = mainMenuSystemAdmin;
             localMenuData = menuSystemAdmin;
             break;
         case role.companyAdministrator:
-            localMenuData=menuCompanyAdmin;
+            localMainMenuData = mainMenuCompanyAdmin;
+            localMenuData = menuUser;
+            break;
+        case role.user:
+            localMenuData = menuUser;
             break;
     }
-    if(userData.roleId===1)
-        $$("userLabel").setHTML("<p style='margin-top:2px;display: table-cell; line-height: 13px; vertical-align: text-top; horizontal-align:right;font-size: 14px; margin-left: auto;margin-right: 0;}'>"+userData.firstName+" "+userData.lastName+"<br> System admin</p>");
-    else if(userData.roleId===2)
-        $$("userLabel").setHTML("<p style='margin-top:2px;display: table-cell; line-height: 13px; vertical-align: text-top; horizontal-align:right;font-size: 14px; margin-left: auto;margin-right: 0;}'>"+userData.firstName+" "+userData.lastName+"<br> Company admin</p>");
-    else $$("userLabel").setHTML("<p style='margin-top:2px;display: table-cell; line-height: 13px; vertical-align: text-top; horizontal-align:right;font-size: 14px; margin-left: auto;margin-right: 0;}'>"+userData.firstName+" "+userData.lastName+"<br>User</p>");
-    var avatar={"avatar":userData.avatar};
-    var companyLogo={"companyLogo":userData.companyLogo};
-    $$("userAvatar").define("data",avatar);
-    $$("mainMenu").define("data", localMenuData);
-    $$("mainMenu").define("on", menuEvents);
-    $$("companyLogo").define("data",companyLogo);
+    if (userData.roleId === role.systemAdministrator)
+        $$("userLabel").setHTML("<p style='margin-top:2px;display: table-cell; line-height: 13px; vertical-align: text-top; horizontal-align:right;font-size: 14px; margin-left: auto;margin-right: 0;}'>" + userData.firstName + " " + userData.lastName + "<br> System admin</p>");
+    else if (userData.roleId === role.companyAdministrator)
+        $$("userLabel").setHTML("<p style='margin-top:2px;display: table-cell; line-height: 13px; vertical-align: text-top; horizontal-align:right;font-size: 14px; margin-left: auto;margin-right: 0;}'>" + userData.firstName + " " + userData.lastName + "<br> Company admin</p>");
+    else $$("userLabel").setHTML("<p style='margin-top:2px;display: table-cell; line-height: 13px; vertical-align: text-top; horizontal-align:right;font-size: 14px; margin-left: auto;margin-right: 0;}'>" + userData.firstName + " " + userData.lastName + "<br>User</p>");
+    var avatar = {"avatar": userData.avatar};
+    var companyLogo = {"companyLogo": userData.companyLogo};
+    $$("userAvatar").define("data", avatar);
+    $$("mainMenu").define("data", localMainMenuData);
+    $$("mainMenu").define("on", mainMenuEvents);
+    $$("userMenu").define("data", localMenuData);
+    $$("userMenu").define("on", menuEvents);
+    $$("companyLogo").define("data", companyLogo);
     rightPanel = "emptyRightPanel";
     promise.then(function (value) {
         if (userData.roleId === role.systemAdministrator) {
             companyView.selectPanel();
             $$("mainMenu").select("company");
             console.log("selected company")
-        }else{
+        } else {
             locationView.selectPanel();
             $$("mainMenu").select("dashboard");
         }
@@ -179,13 +276,13 @@ var showApp = function () {
 };
 
 var preloadDependencies = function () {
-    var promises=[];
+    var promises = [];
     promises.push(webix.ajax().get("api/role").then(function (data) {
         var roles = [];
         var array = [];
         data.json().forEach(function (obj) {
             roles[obj.id] = obj.role;
-            var value={id:obj.id,value:obj.role};
+            var value = {id: obj.id, value: obj.role};
             array.push(value);
         });
         dependencyMap["role"] = roles;
@@ -209,7 +306,7 @@ var preloadDependencies = function () {
 
         data.json().forEach(function (obj) {
             expenseTypes[obj.id] = obj.cost;
-            var value={id:obj.id,value:obj.cost};
+            var value = {id: obj.id, value: obj.cost};
             array.push(value);
         });
         dependencyMap["cost"] = expenseTypes;
@@ -220,7 +317,7 @@ var preloadDependencies = function () {
         var array = [];
         data.json().forEach(function (obj) {
             notificationTypes[obj.id] = obj.option;
-            var value={id:obj.id,value:obj.option};
+            var value = {id: obj.id, value: obj.option};
             array.push(value);
         });
         dependencyMap["mail-option"] = notificationTypes;
@@ -232,7 +329,7 @@ var preloadDependencies = function () {
         var array = [];
         data.json().forEach(function (obj) {
             fuel[obj.id] = obj.fuel;
-            var value={id:obj.id,value:obj.fuel};
+            var value = {id: obj.id, value: obj.fuel};
             array.push(value);
         });
         dependencyMap['fuel'] = fuel;
@@ -242,6 +339,7 @@ var preloadDependencies = function () {
     return webix.promise.all(promises);
 
 };
+
 
 //main call
 window.onload = function () {
