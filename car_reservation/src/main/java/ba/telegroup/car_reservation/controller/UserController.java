@@ -8,6 +8,7 @@ import ba.telegroup.car_reservation.model.User;
 import ba.telegroup.car_reservation.model.modelCustom.UserLocationCompany;
 import ba.telegroup.car_reservation.repository.UserRepository;
 import ba.telegroup.car_reservation.util.Notification;
+import ba.telegroup.car_reservation.util.PasswordInfo;
 import org.apache.commons.codec.binary.Hex;
 import org.apache.commons.lang.RandomStringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -57,6 +58,8 @@ public class UserController extends GenericHasCompanyIdAndDeletableController<Us
     private String success;
     @Value("${deleted.yes}")
     private Byte deleted;
+    @Value("${badRequest.password}")
+    private String badRequestPassword;
     private UserRepository userRepository;
     private Notification notification;
     @Autowired
@@ -153,6 +156,9 @@ public class UserController extends GenericHasCompanyIdAndDeletableController<Us
             if(user.getAvatar()!=null){
                 dbUser.setAvatar(user.getAvatar());
             }
+            if(user.getMailOptionId()!=null){
+                dbUser.setMailOptionId(user.getMailOptionId());
+            }
             dbUser.setRoleId(user.getRoleId());
             dbUser.setStatusId(user.getStatusId());
             if (!dbUser.getEmail().equals(user.getEmail()) && userRepository.countAllUsersByEmailAndDeleted(user.getEmail(), notDeleted) > 0)
@@ -162,7 +168,6 @@ public class UserController extends GenericHasCompanyIdAndDeletableController<Us
                 System.out.println(userBean.getUser().getId()+"  "+dbUser.getId());
                 if(userBean.getUser().getId().equals(dbUser.getId())){
                     userBean.setUser(userRepository.getExtendedById(dbUser.getId()));
-                    System.out.println("UPDATED USER BEAN");
                 }
                 return success;
             }
@@ -202,6 +207,20 @@ public class UserController extends GenericHasCompanyIdAndDeletableController<Us
         throw new BadRequestException(badRequestRegister);
     }
 
+    @RequestMapping(value = "/password",method = RequestMethod.POST)
+    public String changePassword(@RequestBody PasswordInfo passwordInfo) throws BadRequestException, ForbiddenException {
+        User user=userRepository.findById(userBean.getUser().getId()).orElse(null);
+        if(user!=null && passwordInfo !=null) {
+            if(passwordInfo.getOldPassword()!=null &&user.getPassword().toLowerCase().equals(hashPassword(passwordInfo.getOldPassword().trim().toLowerCase()))){
+                if(passwordInfo.getNewPassword()!=null && passwordInfo.getNewPasswordRepeated()!=null
+                        && passwordInfo.getNewPassword().trim().equals(passwordInfo.getNewPasswordRepeated().trim())){
+                    user.setPassword(hashPassword(passwordInfo.getNewPassword()));
+                    return super.update(user.getId(),user);
+                }
+            }
+        }
+        throw new BadRequestException(badRequestPassword);
+    }
 
     private String hashPassword( String plainText)  {
         MessageDigest digest= null;

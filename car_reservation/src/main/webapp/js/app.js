@@ -71,7 +71,12 @@ var menuActions = function (id) {
         case "signOut":
             logout();
             break;
-        case "editProfile":clickProfile();break;
+        case "editProfile":
+            clickProfile();
+            break;
+        case "changePassword":
+            clickPassword();
+            break;
     }
 };
 
@@ -88,18 +93,28 @@ var mainMenuSystemAdmin = [
     }
 ];
 
-var clickProfile=function(){
-    if(util.popupIsntAlreadyOpened("changeProfileDialog")) {
+var clickProfile = function () {
+    if (util.popupIsntAlreadyOpened("changeProfileDialog")) {
         webix.ui(webix.copy(profileView.changeProfileDialog));
         $$("profileForm").load("api/user/" + userData.id);
-        if(userData.avatar)
-        $$("photo").setValues({src: "data:image/png;base64," + userData.avatar});
+        if (userData.avatar)
+            $$("photo").setValues({src: "data:image/png;base64," + userData.avatar});
         else
             $$("photo").setValues({src: "../../img/avatar-default.png"});
         setTimeout(function () {
             $$("changeProfileDialog").show();
         }, 0);
     }
+};
+var clickPassword = function () {
+    if (util.popupIsntAlreadyOpened("changePasswordDialog")) {
+        webix.ui(webix.copy(profileView.changePasswordDialog));
+
+        setTimeout(function () {
+            $$("changePasswordDialog").show();
+        }, 0);
+    }
+
 };
 
 var mainMenuCompanyAdmin = [

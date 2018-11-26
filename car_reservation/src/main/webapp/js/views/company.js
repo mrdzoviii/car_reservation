@@ -853,6 +853,13 @@ var companyView = {
                     },
                     {
                         view: "text",
+                        id: "mailOptionId",
+                        name: "mailOptionId",
+                        value: 3,
+                        hidden: true
+                    },
+                    {
+                        view: "text",
                         id: "deleted",
                         name: "deleted",
                         hidden:true,
@@ -1284,6 +1291,12 @@ var companyView = {
                         hidden: true,
                     },
                     {
+                        view: "text",
+                        id: "mailOptionId",
+                        name: "mailOptionId",
+                        hidden: true,
+                    },
+                    {
                         view: "richselect",
                         id: "statusId",
                         name: "statusId",
@@ -1424,6 +1437,7 @@ var companyView = {
             form.elements.statusId.setValue(user.statusId);
             form.elements.roleId.setValue(user.roleId);
             form.elements.deleted.setValue(user.deleted);
+            form.elements.mailOptionId.setValue(user.mailOptionId);
             form.elements.email.setValue(user.email);
         }
     },

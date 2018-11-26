@@ -191,7 +191,7 @@ var profileView={
                 view: "toolbar",
                 cols: [{
                     view: "label",
-                    label: "<span class='fa fa-key'></span> Izmjena lozinke",
+                    label: "<span class='fa fa-key'></span> Change password",
                     width: 400
                 }, {}, {
                     hotkey: 'esc',
@@ -213,33 +213,33 @@ var profileView={
                     type:"password",
                     id: "oldPassword",
                     name: "oldPassword",
-                    label: "Lozinka: ",
-                    invalidMessage: "Unesite lozinku!",
+                    label: "Old password: ",
+                    invalidMessage: "Enter password!",
                     required: true
 
                 },
                     {
-                        id: "newPassword1",
-                        name: "newPassword1",
+                        id: "newPassword",
+                        name: "newPassword",
                         view: "text",
                         type:"password",
-                        label: "Nova lozinka: ",
-                        invalidMessage: "Unesite lozinku!",
+                        label: "New password: ",
+                        invalidMessage: "Enter password!",
                         required: true
                     }, {
-                        id: "newPassword2",
-                        name: "newPassword2",
+                        id: "newPasswordRepeated",
+                        name: "newPasswordRepeated",
                         view: "text",
                         type:"password",
-                        label: "Potvrdite novu lozinku: ",
-                        invalidMessage: "Unesite lozinku!",
+                        label: "Re-enter password: ",
+                        invalidMessage: "Password mismatch!",
                         required: true
                     }, {
                         margin: 5,
                         cols: [{}, {
                             id: "savePassword",
                             view: "button",
-                            value: "Sačuvajte",
+                            value: "Save",
                             type: "form",
                             click: "profileView.save",
                             hotkey: "enter",
@@ -252,7 +252,7 @@ var profileView={
                             return false;
                         return true;
                     },
-                    "newPassword1":function (value) {
+                    "newPassword":function (value) {
                         var re1 = /[0-9]/;
                         var re2 = /[a-z]/;
                         var re3 = /[A-Z]/;
@@ -260,34 +260,34 @@ var profileView={
                         if (!value)
                             return false;
                         if(value.length<8) {
-                            $$('changePasswordForm').elements.newPassword1.config.invalidMessage = 'Lozinka mora da ima više od 8 karaktera!';
+                            $$('changePasswordForm').elements.newPassword.config.invalidMessage = 'Password must be at lease 8 characters!';
                             return false;
                         }
                         if(!re1.test(value)){
-                            $$('changePasswordForm').elements.newPassword1.config.invalidMessage = 'Lozinka mora da sadrži bar jedan broj!';
+                            $$('changePasswordForm').elements.newPassword.config.invalidMessage = 'Password must contains digit!';
                             return false;
                         }
                         if(!re2.test(value)){
-                            $$('changePasswordForm').elements.newPassword1.config.invalidMessage = 'Lozinka mora da sadrži bar jedno malo slovo!';
+                            $$('changePasswordForm').elements.newPassword.config.invalidMessage = 'Password must contains lowercase letter!';
                             return false;
                         }
                         if(!re3.test(value)){
-                            $$('changePasswordForm').elements.newPassword1.config.invalidMessage = 'Lozinka mora da sadrži bar jedno veliko slovo!';
+                            $$('changePasswordForm').elements.newPassword.config.invalidMessage = 'Password must contains uppercase letter!';
                             return false;
                         }
                         if(!re4.test(value)){
-                            $$('changePasswordForm').elements.newPassword1.config.invalidMessage = 'Lozinka mora da sadrži specijalni karakter: (@ # $ % ^ & + =) !';
+                            $$('changePasswordForm').elements.newPassword.config.invalidMessage = 'Password must contains special character: (@ # $ % ^ & + =) !';
                             return false;
                         }
 
                         return true;
                     },
-                    "newPassword2":function (value) {
+                    "newPasswordRepeated":function (value) {
                         if (!value)
                             return false;
-                        if(value!=$$("changePasswordForm").getValues().newPassword1)
+                        if(value!=$$("changePasswordForm").getValues().newPassword)
                         {
-                            $$('changePasswordForm').elements.newPassword2.config.invalidMessage = 'Unešene lozinke nisu iste!';
+                            $$('changePasswordForm').elements.newPassword.config.invalidMessage = 'Password mismatch!';
                             return false;}
 
                         return true;
@@ -306,16 +306,16 @@ var profileView={
         if ($$("changePasswordForm").validate()) {
             var passwordInformation={
                 oldPassword:$$("changePasswordForm").getValues().oldPassword,
-                newPassword:$$("changePasswordForm").getValues().newPassword1,
-                repeatedNewPassword:$$("changePasswordForm").getValues().newPassword2,
+                newPassword:$$("changePasswordForm").getValues().newPassword,
+                newPasswordRepeated:$$("changePasswordForm").getValues().newPasswordRepeated,
             };
 
-            connection.sendAjax("POST", "user/updatePassword",
+            connection.sendAjax("POST", "api/user/password",
                 function (text, data, xhr) {
                     if (text) {
-                        util.messages.showMessage("Uspješna izmjena lozinke.");
+                        util.messages.showMessage("Password changed.");
                     } else
-                        util.messages.showErrorMessage("Neuspješna izmjena lozinke.");
+                        util.messages.showErrorMessage("Password not changed.");
                 }, function (text, data, xhr) {
                     util.messages.showErrorMessage(text);
                 }, passwordInformation);
