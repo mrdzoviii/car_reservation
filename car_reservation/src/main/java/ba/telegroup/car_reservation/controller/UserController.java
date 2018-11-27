@@ -46,6 +46,8 @@ public class UserController extends GenericHasCompanyIdAndDeletableController<Us
     private Byte notDeleted;
     @Value("${role.system_admin}")
     private Integer systemAdmin;
+    @Value("${role.company_admin}")
+    private Integer companyAdmin;
     @Value("${status.inactive}")
     private Integer statusInactive;
     @Value("${token.length}")
@@ -149,7 +151,7 @@ public class UserController extends GenericHasCompanyIdAndDeletableController<Us
         User dbUser=userRepository.findById(id).orElse(null);
         if(dbUser!=null && user!=null && user.getRoleId() !=null && user.getStatusId() !=null && user.getEmail()!=null){
             //if company or location changed
-            if (user.getCompanyId() != null && user.getLocationId() != null) {
+            if (user.getCompanyId() != null || user.getLocationId() != null) {
                 dbUser.setCompanyId(user.getCompanyId());
                 dbUser.setLocationId(user.getLocationId());
             }

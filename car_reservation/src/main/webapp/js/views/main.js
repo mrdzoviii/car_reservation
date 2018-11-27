@@ -311,8 +311,8 @@ var register = function () {
                     var url = window.location;
                     url.replace(url.protocol + "//" + url.host);
                 }).fail(function (err) {
-                    var url = window.location;
-                    url.replace(url.protocol + "//" + url.host);
+                   /* var url = window.location;
+                    url.replace(url.protocol + "//" + url.host);*/
                 });
                 /*if (userData)
                     logout();

@@ -7,7 +7,7 @@ var userData = null;
 var panel = {id: "empty"};
 var rightPanel = null;
 
-var menuSystemAdmin = [
+var menuAdmin = [
     {
         value: "<span class='fa fa-angle-down'/>",
         icon: "cog",
@@ -276,11 +276,11 @@ var showApp = function () {
     switch (userData.roleId) {
         case role.systemAdministrator:
             localMainMenuData = mainMenuSystemAdmin;
-            localMenuData = menuSystemAdmin;
+            localMenuData = menuAdmin;
             break;
         case role.companyAdministrator:
             localMainMenuData = mainMenuCompanyAdmin;
-            localMenuData = menuUser;
+            localMenuData = menuAdmin;
             break;
         case role.user:
             localMenuData = menuUser;

@@ -843,7 +843,19 @@ var companyView = {
                         name: "roleId",
                         label: "Role:",
                         required:true,
-                        invalidMessage:"Select role"
+                        invalidMessage:"Select role",
+                        on:{
+                            onChange: function (newv, oldv) {
+                                if (newv===role.companyAdministrator){
+                                        $$("locationId").define("disabled",true);
+                                }else{
+                                    $$("locationId").define("disabled",false);
+
+
+                                }
+                                $$("locationId").refresh();
+                            }
+                        }
                     },
                     {
                         view: "text",
@@ -967,6 +979,10 @@ var companyView = {
         var form=$$("addUserForm");
         if (form.validate()){
             var user=form.getValues();
+            if(user.roleId===role.companyAdministrator) {
+                delete user.mailOptionId;
+                delete user.locationId;
+            }
             onCompanyClick(user.companyId).then(function () {
                 $$("userDT").add(user);
                 util.dismissDialog('addUserDialog');
@@ -1275,7 +1291,19 @@ var companyView = {
                         name: "roleId",
                         label: "Role:",
                         required: true,
-                        invalidMessage: "Role required!"
+                        invalidMessage: "Role required!",
+                        on:{
+                            onChange: function (newv, oldv) {
+                                if (newv===role.companyAdministrator){
+                                    $$("locationId").define("disabled",true);
+                                    $$("locationId").define("value",null);
+                                }else{
+                                    $$("locationId").define("disabled",false);
+                                }
+                                $$("locationId").refresh();
+
+                            }
+                        }
                     },
                     {
                         view: "text",
@@ -1446,11 +1474,20 @@ var companyView = {
         var form=$$("changeUserForm");
         if (form.validate()){
             var user=form.getValues();
+            var locationName;
+            if(user.roleId===role.companyAdministrator){
+                delete user.locationId;
+                delete user.mailOptionId;
+                locationName="";
+            }else{
+                locationName=form.elements.locationId.getText();
+            }
             connection.sendAjax("PUT", "api/user/" + user.id,
                 function (text, data, xhr) {
                     if (text) {
                         util.messages.showMessage("User updated successfully.");
                         var item=$$("companyDT").getSelectedItem();
+                        user.locationName=locationName;
                         if(item.id!==user.companyId)
                         onCompanyClick(user.companyId);
                         $$("userDT").updateItem(user.id, user);
