@@ -171,7 +171,6 @@ public class UserController extends GenericHasCompanyIdAndDeletableController<Us
                 throw new BadRequestException(badRequestUserUpdate);
             dbUser.setEmail(user.getEmail());
             if(super.update(id,dbUser).equals(success)){
-                System.out.println(userBean.getUser().getId()+"  "+dbUser.getId());
                 if(userBean.getUser().getId().equals(dbUser.getId())){
                     userBean.setUser(userRepository.getExtendedById(dbUser.getId()));
                 }

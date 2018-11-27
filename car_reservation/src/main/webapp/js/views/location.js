@@ -150,10 +150,10 @@ var locationView = {
                             };
                             webix.confirm(delBox);
                             break;
-                            /*
+
                         case "3":
-                            locationView.showMapDetailsDialog($$("locationTable").getItem(context.id.row));
-                            break;*/
+                            locationView.showMapDialog($$("locationDT").getItem(context.id.row));
+                            break;
                     }
                 }
             }
@@ -180,13 +180,51 @@ var locationView = {
     },
 
 
-    /*
-    showMapDetailsDialog: function (location) {
-        if (util.popupIsntAlreadyOpened("showMapDialog")) {
-            webix.ui(webix.copy(locationView.showMapDialog));
-            $$("mapLabel").data.label = "<span class='webix_icon fa fa-map-marker'></span> Lokacija";
-            $$("saveMap").data.hidden = true;
+    mapDialog: {
+        view: "popup",
+        id: "mapDialog",
+        modal: true,
+        position: "center",
+        body: {
+            id: "showMapDialogInside",
+            rows: [
+                {
+                    view: "toolbar",
+                    cols: [
+                        {
+                            id: "mapLabel",
+                            view: "label",
+                            label: "<span class='webix_icon fa fa-map-marker '></span> Location",
+                            width: 600,
+                        },
+                        {},
+                        {
+                            hotkey: 'esc',
+                            view: "icon",
+                            icon: "close",
+                            align: "right",
+                            click: "util.dismissDialog('mapDialog');"
+                        }
+                    ]
+                },
+                {
+                    key: "",
+                    view: "google-map",
+                    id: "map",
+                    zoom: 15,
+                    width: 600,
+                    height: 500,
+                    //center: tableCenter,
+                    //data: tableData
+                }
+            ]
+        }
+    },
 
+    showMapDialog: function (location) {
+        if (util.popupIsntAlreadyOpened("mapDialog")) {
+            webix.ui(webix.copy(locationView.mapDialog));
+            $$("mapLabel").data.label = "<span class='webix_icon fa fa-map-marker'></span>"+location.name;
             $$("map").getMap("waitMap").then(function(mapObj) {
                 var geocoder = new google.maps.Geocoder();
 
@@ -208,17 +246,17 @@ var locationView = {
                                 map: mapObj,
                             });
                         } else {
-                            window.alert("Lokacija " + location.name + " ne može biti locirana.");
+                            util.messages.showErrorMessage("Location " + location.name + " cannot be found.");
                         }
                     } else {
-                        window.alert("Lokacija " + location.name + " ne može biti locirana.");
+                        util.messages.showErrorMessage("Location " + location.name + " cannot be found.");
                     }
                 });
             });
 
-            $$("showMapDialog").show();
+            $$("mapDialog").show();
         }
-    },*/
+    },
 
 
 

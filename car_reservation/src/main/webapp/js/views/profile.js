@@ -166,15 +166,19 @@ var profileView={
                         util.messages.showMessage("User data changed.");
                         userData = newUser;
                         $$("userAvatar").define("data", {avatar:userData.avatar});
-                        $$("userDT").updateItem(userData.id, userData);
-                        if (userData.roleId === role.systemAdministrator)
+                        if (userData.roleId === role.systemAdministrator) {
                             $$("userLabel").setHTML("<p style='margin-top:2px;display: table-cell; line-height: 13px; vertical-align: text-top; horizontal-align:right;font-size: 14px; margin-left: auto;margin-right: 0;}'>" + userData.firstName + " " + userData.lastName + "<br> System admin</p>");
-
-                            else if (userData.roleId === role.companyAdministrator)
+                            $$("userDT").updateItem(userData.id, userData);
+                        }
+                        else if (userData.roleId === role.companyAdministrator) {
                             $$("userLabel").setHTML("<p style='margin-top:2px;display: table-cell; line-height: 13px; vertical-align: text-top; horizontal-align:right;font-size: 14px; margin-left: auto;margin-right: 0;}'>" + userData.firstName + " " + userData.lastName + "<br> Company admin</p>");
-                        else $$("userLabel").setHTML("<p style='margin-top:2px;display: table-cell; line-height: 13px; vertical-align: text-top; horizontal-align:right;font-size: 14px; margin-left: auto;margin-right: 0;}'>" + userData.firstName + " " + userData.lastName + "<br>User</p>");
+                        } else $$("userLabel").setHTML("<p style='margin-top:2px;display: table-cell; line-height: 13px; vertical-align: text-top; horizontal-align:right;font-size: 14px; margin-left: auto;margin-right: 0;}'>" + userData.firstName + " " + userData.lastName + "<br>User</p>");
+                    $$("userLabel").refresh();
+
+
                     } else
                         util.messages.showErrorMessage("Profile update failed.");
+
                 }, function (text, data, xhr) {
                     util.messages.showErrorMessage(text);
                 }, newUser);
