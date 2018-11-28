@@ -363,6 +363,26 @@ var vehicleView = {
                                             }
                                         },
                                     },
+                                    {},
+                                    {
+                                        marginTop: 20,
+                                        cols: [
+                                            {},
+                                            {
+                                                id: "saveVehicle",
+                                                view: "button",
+                                                value: "Save",
+                                                type: "form",
+                                                click: "vehicleView.save",
+                                                hotkey: "enter",
+                                                width: 270,
+                                                height:70
+                                            },
+                                            {}
+                                        ]
+                                    },
+                                    {},
+                                    {}
                                 ]
                             },
                             {
@@ -526,21 +546,6 @@ var vehicleView = {
                                         name:"latitude",
                                         hidden:true,
                                         view:"text"
-                                    },
-                                    {
-                                        margin: 5,
-                                        cols: [
-                                            {},
-                                            {
-                                                id: "saveVehicle",
-                                                view: "button",
-                                                value: "Save",
-                                                type: "form",
-                                                click: "vehicleView.save",
-                                                hotkey: "enter",
-                                                width: 170
-                                            }
-                                        ]
                                     }
                                 ],
                                 rules: {
