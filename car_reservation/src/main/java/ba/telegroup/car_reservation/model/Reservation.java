@@ -1,5 +1,8 @@
 package ba.telegroup.car_reservation.model;
 
+import ba.telegroup.car_reservation.common.interfaces.Deletable;
+import ba.telegroup.car_reservation.common.interfaces.HasCompanyId;
+
 import javax.persistence.Basic;
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -8,7 +11,7 @@ import java.sql.Timestamp;
 import java.util.Objects;
 
 @Entity
-public class Reservation {
+public class Reservation implements Deletable, HasCompanyId {
     private Integer id;
     private Timestamp createdTime;
     private Integer userId;
@@ -18,8 +21,9 @@ public class Reservation {
     private String direction;
     private Timestamp startTime;
     private Timestamp endTime;
-    private Byte status;
+    private Integer stateId;
     private Byte deleted;
+    private Integer companyId;
 
     @Id
     @Column(name = "id")
@@ -112,13 +116,13 @@ public class Reservation {
     }
 
     @Basic
-    @Column(name = "status")
-    public Byte getStatus() {
-        return status;
+    @Column(name = "state_id")
+    public Integer getStateId() {
+        return stateId;
     }
 
-    public void setStatus(Byte status) {
-        this.status = status;
+    public void setStateId(Integer stateId) {
+        this.stateId = stateId;
     }
 
     @Basic
@@ -131,16 +135,26 @@ public class Reservation {
         this.deleted = deleted;
     }
 
+    @Basic
+    @Column(name="company_id")
+    public Integer getCompanyId(){
+        return companyId;
+    }
+
+    public void setCompanyId(Integer companyId) {
+        this.companyId = companyId;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         Reservation that = (Reservation) o;
-        return Objects.equals(id, that.id);
+        return Objects.equals(getId(), that.getId());
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(id);
+        return Objects.hash(getId());
     }
 }

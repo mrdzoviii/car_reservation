@@ -411,7 +411,7 @@ var profileView={
         if ($$("notificationSettingsForm").validate()) {
             var status = $$("notificationSettingsForm").getValues().mailOptionId;
             webix.ajax().header({"Content-type": "application/x-www-form-urlencoded"})
-                .post("api/user/mail-option/" + status).then(function (data) {
+                .put("api/user/mail-option/" + status).then(function (data) {
                 if (data.text()) {
                     userData.mailOptionId = status;
                     util.messages.showMessage("Notification settings changed.")

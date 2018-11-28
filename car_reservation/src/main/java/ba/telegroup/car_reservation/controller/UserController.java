@@ -229,7 +229,7 @@ public class UserController extends GenericHasCompanyIdAndDeletableController<Us
         throw new BadRequestException(badRequestPassword);
     }
 
-    @RequestMapping(value = "/mail-option/{option}", method = RequestMethod.POST)
+    @RequestMapping(value = "/mail-option/{option}", method = RequestMethod.PUT)
     public String changeMailOption(@PathVariable("option") Integer option) throws BadRequestException, ForbiddenException {
         if (option != null && option >= 0) {
             User user = userRepository.findById(userBean.getUser().getId()).orElse(null);

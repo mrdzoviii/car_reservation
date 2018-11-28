@@ -170,6 +170,11 @@ var mainMenuUser = [
         id: "vehicle",
         icon: "car",
         value: "Vehicles"
+    },
+    {
+        id: "reservation",
+        icon: "bookmark",
+        value:"Reservation"
     }
 ];
 
@@ -193,6 +198,9 @@ var mainMenuActions = function (id) {
             break;
         case "location":
             locationView.selectPanel();
+            break;
+        case "reservation":
+            reservationView.selectPanel();
             break;
     }
 };
@@ -257,7 +265,6 @@ var showRegistration = function (userId) {
 
 var showApp = function () {
     var promise = preloadDependencies();
-    vehicleView.preloadDependencies();
     var main = webix.copy(mainLayout);
     webix.ui(main, panel);
     panel = $$("app");
@@ -292,10 +299,12 @@ var showApp = function () {
             localMenuData = menuAdmin;
             break;
         case role.companyAdministrator:
+            vehicleView.preloadDependencies();
             localMainMenuData = mainMenuCompanyAdmin;
             localMenuData = menuAdmin;
             break;
         case role.user:
+            vehicleView.preloadDependencies();
             localMainMenuData = mainMenuUser;
             localMenuData = menuUser;
             break;
