@@ -1,5 +1,6 @@
 package ba.telegroup.car_reservation.model.modelCustom;
 
+import ba.telegroup.car_reservation.common.interfaces.Deletable;
 import ba.telegroup.car_reservation.model.Car;
 
 import javax.persistence.*;
@@ -13,10 +14,8 @@ import java.math.BigDecimal;
                 @ColumnResult(name = "location_id", type = Integer.class),
                 @ColumnResult(name = "plate_number", type = String.class),
                 @ColumnResult(name = "deleted", type = Byte.class),
-                @ColumnResult(name = "body_style", type = String.class),
                 @ColumnResult(name = "engine", type = String.class),
                 @ColumnResult(name = "model", type = String.class),
-                @ColumnResult(name = "type", type = String.class),
                 @ColumnResult(name = "transmission", type = String.class),
                 @ColumnResult(name = "year", type = String.class),
                 @ColumnResult(name = "image", type = byte[].class),
@@ -34,16 +33,12 @@ import java.math.BigDecimal;
 
 
 @MappedSuperclass
-public class CarManufacturerModelFuelLocationCompany extends Car {
+public class CarManufacturerModelFuelLocationCompany extends Car implements Deletable {
 
-    @Column(name = "body_style")
-    private String bodyStyle;
     @Column(name="engine")
     private String engine;
     @Column(name="model")
     private String model;
-    @Column(name="type")
-    private String type;
     @Column(name="transmission")
     private String transmission;
     @Column(name = "year")
@@ -69,14 +64,12 @@ public class CarManufacturerModelFuelLocationCompany extends Car {
     @Column(name="latitude")
     private BigDecimal latitude;
     public CarManufacturerModelFuelLocationCompany(Integer id, Integer modelId, Integer locationId, String plateNumber, Byte deleted,
-                                                   String bodyStyle,String engine,String model,String type,String transmission,String year,byte[] image,
+                                                  String engine,String model,String transmission,String year,byte[] image,
                                                    String fuelName,Integer fuelId,Integer manufacturerId,String manufacturerName,String locationName,
                                                    BigDecimal longitude,BigDecimal latitude,String companyName,Integer companyId) {
         super(id,modelId,locationId,plateNumber,deleted);
-        this.bodyStyle = bodyStyle;
         this.engine = engine;
         this.model = model;
-        this.type = type;
         this.transmission = transmission;
         this.year = year;
         this.image = image;
@@ -115,13 +108,6 @@ public class CarManufacturerModelFuelLocationCompany extends Car {
         this.companyId = companyId;
     }
 
-    public String getBodyStyle() {
-        return bodyStyle;
-    }
-
-    public void setBodyStyle(String bodyStyle) {
-        this.bodyStyle = bodyStyle;
-    }
 
     public String getEngine() {
         return engine;
@@ -161,14 +147,6 @@ public class CarManufacturerModelFuelLocationCompany extends Car {
 
     public void setManufacturerId(Integer manufacturerId) {
         this.manufacturerId = manufacturerId;
-    }
-
-    public String getType() {
-        return type;
-    }
-
-    public void setType(String type) {
-        this.type = type;
     }
 
     public String getTransmission() {
@@ -218,4 +196,5 @@ public class CarManufacturerModelFuelLocationCompany extends Car {
     public void setLongitude(BigDecimal longitude) {
         this.longitude = longitude;
     }
+
 }

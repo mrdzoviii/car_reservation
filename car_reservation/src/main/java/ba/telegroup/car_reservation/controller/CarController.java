@@ -27,6 +27,10 @@ public class CarController extends GenericDeletableController<Car,Integer> {
     private Integer allLocations;
     @Value("${badRequest.car.insert}")
     private String badRequestInsert;
+    @Value("${badRequest.car.update}")
+    private String badRequestUpdate;
+    @Value("${action.success}")
+    private String actionSuccess;
     private CarRepository carRepository;
     private ManufacturerRepository manufacturerRepository;
     private ModelRepository modelRepository;
@@ -47,11 +51,7 @@ public class CarController extends GenericDeletableController<Car,Integer> {
     public List getAll() throws ForbiddenException {
         return carRepository.getAllExtendedByCompanyId(userBean.getUser().getCompanyId());
     }
-
-    @Override
-    public Car findById(@PathVariable Integer id) throws ForbiddenException {
-        return carRepository.getExtendedById(id);
-    }
+    
 
     @RequestMapping(value = "/company/{id}",method = RequestMethod.GET)
     public List getAllExtendedByCompanyId(@PathVariable("id") Integer id){
@@ -68,63 +68,101 @@ public class CarController extends GenericDeletableController<Car,Integer> {
 
     @Transactional(rollbackFor = Exception.class)
     @RequestMapping(value = "/custom", method = RequestMethod.POST)
-    public Car insertCarExtended(@RequestBody CarManufacturerModelFuelLocationCompany car) throws BadRequestException, ForbiddenException {
-        if (car != null && car.getBodyStyle() != null && car.getCompanyId() != null && car.getCompanyName() != null && car.getLocationId() != null &&
-                car.getLatitude() != null && car.getLongitude() != null && car.getLocationName() != null && car.getManufacturerName() != null &&
-                car.getModel() != null && car.getEngine() != null && car.getType() != null && car.getTransmission() != null && car.getDeleted() != null && car.getPlateNumber() != null &&
-                car.getYear() != null && car.getImage() != null && car.getFuelId() != null) {
-            Manufacturer manufacturer;
-            Model model;
+    public CarManufacturerModelFuelLocationCompany insertCarExtended(@RequestBody CarManufacturerModelFuelLocationCompany car) throws BadRequestException, ForbiddenException {
+        if (checkCustom(car)) {
+            car.setManufacturerId(getManufacturerId(car.getManufacturerName()));
+            car.setModelId(getModelId(car.getModel(),car.getEngine(),car.getTransmission(),car.getYear(),car.getManufacturerId(),car.getImage(),car.getFuelId()));
             Car item = new Car();
-            if (manufacturerRepository.countAllByName(car.getManufacturerName()) == 0L) {
-                manufacturer = new Manufacturer();
-                manufacturer.setName(car.getManufacturerName());
-                manufacturer = manufacturerController.insert(manufacturer);
-                if (manufacturer == null) {
+            item.setModelId(car.getModelId());
+            item.setDeleted(car.getDeleted());
+            item.setPlateNumber(car.getPlateNumber());
+            item.setLocationId(car.getLocationId());
+            item.setDeleted(car.getDeleted());
+            item = insert(item);
+            if (item != null) {
+                        return carRepository.getExtendedById(item.getId());
+                    }
+                }
+        throw new BadRequestException(badRequestInsert);
+    }
+    @Transactional(rollbackFor = Exception.class)
+    @RequestMapping(value = "/custom/{id}",method = RequestMethod.PUT)
+    public CarManufacturerModelFuelLocationCompany updateExtended(@PathVariable("id") Integer id,@RequestBody CarManufacturerModelFuelLocationCompany car) throws BadRequestException, ForbiddenException {
+        Car dbCar=carRepository.findById(id).orElse(null);
+        if (dbCar!=null && checkCustom(car)) {
+            car.setManufacturerId(getManufacturerId(car.getManufacturerName()));
+            car.setModelId(getModelId(car.getModel(),car.getEngine(),car.getTransmission(),car.getYear(),car.getManufacturerId(),car.getImage(),car.getFuelId()));
+                    if (dbCar.getModelId() != car.getModelId()) {
+                        dbCar.setModelId(car.getModelId());
+                    }
+                    if(dbCar.getPlateNumber()!=car.getPlateNumber()){
+                        dbCar.setPlateNumber(car.getPlateNumber());
+                    }
+                    if(dbCar.getDeleted()!= car.getDeleted()){
+                        dbCar.setDeleted(car.getDeleted());
+                    }
+                    if(dbCar.getLocationId()!=car.getLocationId()){
+                        dbCar.setLocationId(car.getLocationId());
+                    }
+                    if(update(id,dbCar).equals(actionSuccess)){
+                        return carRepository.getExtendedById(id);
+                    }
+            }
+        throw new BadRequestException(badRequestUpdate);
+    }
+    private Integer getManufacturerId(String manufacturerName) throws BadRequestException, ForbiddenException {
+        if (manufacturerRepository.countAllByName(manufacturerName) == 0L) {
+            Manufacturer manufacturer = new Manufacturer();
+            manufacturer.setName(manufacturerName);
+            manufacturer = manufacturerController.insert(manufacturer);
+            if (manufacturer == null) {
+                throw new BadRequestException(badRequestInsert);
+            }
+            return manufacturer.getId();
+        }
+        return manufacturerRepository.getByName(manufacturerName).getId();
+    }
+    private Integer getModelId(String model,String engine,String transmission,String year,Integer manufacturerId,byte[] image,Integer fuelId) throws BadRequestException, ForbiddenException {
+        Model item = new Model();
+        item.setEngine(engine);
+        item.setFuelId(fuelId);
+        item.setImage(image);
+        item.setTransmission(transmission);
+        item.setYear(year);
+        item.setModel(model);
+        item.setManufacturerId(manufacturerId);
+        if (modelRepository.countAllByModelAndManufacturerId(model, manufacturerId) == 0L) {
+            item = modelController.insert(item);
+            if (item == null) {
+                throw new BadRequestException(badRequestInsert);
+            }
+            return item.getId();
+        }else{
+            final Model target=item;
+            List<Model> models=modelRepository.getAllByModel(model);
+            if(models.stream().filter(m->m.equalsData(target)).count()==0){
+                item=modelController.insert(item);
+                if(item==null){
                     throw new BadRequestException(badRequestInsert);
                 }
-                car.setManufacturerId(manufacturer.getId());
-            }
-            if (car.getManufacturerId() != null) {
-
-                if (modelRepository.countAllByModelAndManufacturerId(car.getModel(), car.getManufacturerId()) == 0L) {
-                    model = new Model();
-                    model.setBodyStyle(car.getBodyStyle());
-                    model.setEngine(car.getEngine());
-                    model.setFuelId(car.getFuelId());
-                    model.setImage(car.getImage());
-                    model.setTransmission(car.getTransmission());
-                    model.setType(car.getType());
-                    model.setYear(car.getYear());
-                    model.setModel(car.getModel());
-                    model.setManufacturerId(car.getManufacturerId());
-                    model = modelController.insert(model);
-                    if (model == null) {
-                        throw new BadRequestException(badRequestInsert);
-                    }
-                    car.setModelId(model.getId());
+                return item.getId();
+            }else{
+                Model ret= models.stream().filter(m->m.equalsData(target)).findFirst().orElse(null);
+                if(ret==null){
+                    throw new BadRequestException(badRequestInsert);
                 }
-            }
-            if (car.getModelId() != null) {
-                if (car.getImage() != null) {
-                    model = modelRepository.getOne(car.getModelId());
-                    if (!Arrays.equals(model.getImage(), car.getImage())) {
-                        model.setImage(car.getImage());
-                        modelController.update(model.getId(), model);
-                    }
+                if(!Arrays.equals(ret.getImage(),target.getImage())){
+                    ret.setImage(image);
+                    modelController.update(ret.getId(),ret);
                 }
-                item.setModelId(car.getModelId());
-                item.setDeleted(car.getDeleted());
-                item.setPlateNumber(car.getPlateNumber());
-                item.setLocationId(car.getLocationId());
-                item.setDeleted(car.getDeleted());
-                item = carRepository.saveAndFlush(item);
-                if (item != null) {
-                    logCreateAction(item);
-                    return carRepository.getExtendedById(item.getId());
-                }
+                return ret.getId();
             }
         }
-        throw new BadRequestException(badRequestInsert);
+    }
+    private Boolean checkCustom(CarManufacturerModelFuelLocationCompany car){
+        return car != null  && car.getCompanyId() != null && car.getCompanyName() != null && car.getLocationId() != null &&
+                car.getLatitude() != null && car.getLongitude() != null && car.getLocationName() != null && car.getManufacturerName() != null &&
+                car.getModel() != null && car.getEngine() != null && car.getTransmission() != null && car.getDeleted() != null && car.getPlateNumber() != null &&
+                car.getYear() != null && car.getImage() != null && car.getFuelId() != null;
     }
 }

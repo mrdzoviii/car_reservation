@@ -6,4 +6,5 @@ import org.springframework.data.jpa.repository.JpaRepository;
 
 public interface ManufacturerRepository extends JpaRepository<Manufacturer,Integer>{
     Long countAllByName(String name);
+    Manufacturer getByName(String name);
 }

@@ -8,4 +8,5 @@ import java.util.List;
 public interface ModelRepository extends JpaRepository<Model,Integer> {
     List<Model>  getAllByManufacturerId(Integer id);
     Long countAllByModelAndManufacturerId(String model,Integer manufacturerId);
+    List<Model> getAllByModel(String model);
 }

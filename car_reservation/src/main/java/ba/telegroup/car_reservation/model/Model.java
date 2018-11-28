@@ -9,8 +9,6 @@ public class Model {
     private Integer id;
     private Integer manufacturerId;
     private String model;
-    private String type;
-    private String bodyStyle;
     private String engine;
     private String transmission;
     private String year;
@@ -47,25 +45,9 @@ public class Model {
         this.model = model;
     }
 
-    @Basic
-    @Column(name = "type")
-    public String getType() {
-        return type;
-    }
 
-    public void setType(String type) {
-        this.type = type;
-    }
 
-    @Basic
-    @Column(name = "body_style")
-    public String getBodyStyle() {
-        return bodyStyle;
-    }
 
-    public void setBodyStyle(String bodyStyle) {
-        this.bodyStyle = bodyStyle;
-    }
 
     @Basic
     @Column(name = "engine")
@@ -118,6 +100,7 @@ public class Model {
     }
 
 
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
@@ -130,4 +113,17 @@ public class Model {
     public int hashCode() {
         return Objects.hash(id);
     }
+
+
+    public boolean equalsData(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Model model = (Model) o;
+        return Objects.equals(getEngine(), model.getEngine()) &&
+                Objects.equals(getTransmission(), model.getTransmission()) &&
+                Objects.equals(getYear(), model.getYear()) &&
+                Objects.equals(getFuelId(), model.getFuelId());
+    }
+
+
 }

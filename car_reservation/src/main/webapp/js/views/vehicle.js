@@ -2,8 +2,7 @@ var manufacturers = [];
 var models = [];
 var firstLocation;
 var locations = [];
-var locationFull=[];
-var selectedVehicleId;
+var locationFull = [];
 
 var vehicleView = {
         panel: {
@@ -25,14 +24,14 @@ var vehicleView = {
                             id: "locationFilter",
                             name: "locationFilter",
                             view: "select",
-                            value:0,
+                            value: 0,
                             options: locations,
-                            width:400,
+                            width: 400,
                             on: {
                                 onChange: function (newv, oldv) {
                                     $$("vehicleDV").filter(function (obj) {
-                                        if(newv===undefined)
-                                            newv=oldv;
+                                        if (newv === undefined)
+                                            newv = oldv;
                                         if (newv != 0) {
                                             return obj.locationId == newv;
                                         }
@@ -71,19 +70,17 @@ var vehicleView = {
                     template: "<div><div style='height: 13px'></div><div align='center'><img src='data:image/png;base64, #image#' alt='No photo' width='300' height='300' align='center'/></div><br/>" +
                         "<div style='height: 1px' align='center'>Manufacturer: #manufacturerName#</div><br/>" +
                         "<div style='height: 1px' align='center'>Model: #model#</div><br/>" +
-                        "<div style='height: 1px' align='center'>Type: #type#</div><br/>" +
-                        "<div style='height: 1px' align='center'>Body style: #bodyStyle#</div><br/>" +
                         "<div style='height: 1px' align='center'>Transmission: #transmission#</div><br/>" +
                         "<div style='height: 1px' align='center'>Year: #year#</div><br/>" +
                         "<div style='height: 1px' align='center'>Engine: #engine#</div><br/>" +
                         "<div style='height: 1px' align='center'>Fuel: #fuelName#</div><br/>" +
-                        "<div style='height: 1px' align='center'>Plate number: #plateNumber#</div><br/>"+
+                        "<div style='height: 1px' align='center'>Plate number: #plateNumber#</div><br/>" +
                         "</div>",
-                   /* on: {
-                        onItemDblClick: function (id) {
-                            vehicleView.showVehicleDetailsDialog($$("vehicleDataView").getSelectedItem().id);
-                        }
-                    }*/
+                    /* on: {
+                         onItemDblClick: function (id) {
+                             vehicleView.showVehicleDetailsDialog($$("vehicleDataView").getSelectedItem().id);
+                         }
+                     }*/
                 }
             ]
         },
@@ -122,36 +119,30 @@ var vehicleView = {
                     onItemClick: function (id) {
                         var context = this.getContext();
                         switch (id) {
-                            /*
                             case "1":
-                                selectedVehicleId = $$("vehicleDataView").getSelectedItem().id;
-                                vehicleView.showChangeDialog($$("vehicleDataView").getSelectedItem());
+                                vehicleView.showEditDialog($$("vehicleDV").getSelectedItem());
                                 break;
-                            case "2":
-                                var delBox = (webix.copy(commonViews.brisanjePotvrda("vozila", "vozilo")));
-                                var newItem = $$("vehicleDataView").getSelectedItem();
+                        case "2":
+                            var delBox = (webix.copy(commonViews.deleteConfirm("vehicle", "vehicle")));
+                            var item = $$("vehicleDV").getSelectedItem();
 
-                                delBox.callback = function (result) {
-                                    if (result == 1) {
-                                        webix.ajax().del("hub/vehicle/" + newItem.id).then(function (data) {
-                                            if (data.text() === "Success") {
-                                                util.messages.showMessage("Uspješno brisanje vozila.");
-                                                $$("vehicleDataView").remove(newItem.id);
-                                            }
-                                            else {
-                                                util.messages.showErrorMessage("Neuspješno brisanje vozila.");
-                                            }
-                                        }).fail(function (error) {
-                                            util.messages.showErrorMessage(error.responseText);
-                                        });
-                                    }
-                                };
-                                webix.confirm(delBox);
-                                break;
-                                */
+                            delBox.callback = function (result) {
+                                if (result == 1) {
+                                    connection.sendAjax("DELETE", "api/car/" + item.id, function (text, data, xhr) {
+                                        if (text) {
+                                            $$("vehicleDV").remove(item.id);
+                                            util.messages.showMessage("Vehicle removed");
+                                        }
+                                    }, function (text, data, xhr) {
+                                        util.messages.showErrorMessage(text);
+                                    });
+                                }
+                            };
+                            webix.confirm(delBox);
+                            break;
                             case "3":
                                 var item = $$("vehicleDV").getSelectedItem();
-                                vehicleView.showMapDetailsDialog(item.latitude, item.longitude,item.locationName);
+                                vehicleView.showMapDetailsDialog(item.latitude, item.longitude, item.locationName);
                                 break;
 
                         }
@@ -177,10 +168,10 @@ var vehicleView = {
                 $$("vehicleContextMenu").refresh();
             }
         },
-        showMapDetailsDialog: function (latitude, longitude,locationName) {
+        showMapDetailsDialog: function (latitude, longitude, locationName) {
             if (util.popupIsntAlreadyOpened("showMapDialog")) {
                 webix.ui(webix.copy(vehicleView.showMapDialog));
-                $$("mapLabel").data.label = "<span class='webix_icon fa fa-map-marker'></span>"+locationName;
+                $$("mapLabel").data.label = "<span class='webix_icon fa fa-map-marker'></span>" + locationName;
                 $$("map").getMap("waitMap").then(function (mapObj) {
                     var geocoder = new google.maps.Geocoder();
                     var latlng = {
@@ -252,7 +243,7 @@ var vehicleView = {
                 manufacturers.length = 0;
                 var manufacturersTemp = data.json();
                 manufacturersTemp.forEach(function (obj) {
-                    manufacturers.push({id:obj.id,value:obj.name});
+                    manufacturers.push({id: obj.id, value: obj.name});
                 });
             }).fail(function (error) {
                 util.messages.showErrorMessage(error.responseText);
@@ -260,7 +251,7 @@ var vehicleView = {
 
             webix.ajax().get("api/location").then(function (data) {
                 locations.length = 0;
-                locations.push({id:0,value:"All locations"});
+                locations.push({id: 0, value: "All locations"});
                 var locationsTemp = data.json();
                 firstLocation = 0;
                 locationsTemp.forEach(function (obj) {
@@ -278,32 +269,30 @@ var vehicleView = {
                     models.length = 0;
                     var modelsTemp = data.json();
                     modelsTemp.forEach(function (obj) {
-                        models.push({id:obj.id,value:obj.model,data:obj});
+                        models.push({id: obj.id, value: obj.model, data: obj});
                     });
-                    $$("model").define("suggest",{
+                    $$("model").define("suggest", {
                         data: models,
-                        on:{
+                        on: {
                             onValueSuggest: function (obj) {
                                 console.log(obj);
-                                $$("modelId").define("value",obj.id);
-                                $$("engine").define("value",obj.data.engine);
-                                $$("type").define("value",obj.data.type);
-                                $$("bodyStyle").define("value",obj.data.bodyStyle);
-                                $$("transmission").define("value",obj.data.transmission);
-                                $$("year").define("value",obj.data.year);
-                                $$("fuelId").define("value",obj.data.fuelId);
-                                $$("image").setValues({src: "data:image/png;base64," + obj.data.image
+                                $$("modelId").define("value", obj.id);
+                                $$("engine").define("value", obj.data.engine);
+                                $$("transmission").define("value", obj.data.transmission);
+                                $$("year").define("value", obj.data.year);
+                                $$("fuelId").define("value", obj.data.fuelId);
+                                $$("image").setValues({
+                                    src: "data:image/png;base64," + obj.data.image
                                 });
                                 $$("image").refresh();
                                 $$("fuelId").refresh();
                                 $$("year").refresh();
                                 $$("transmission").refresh();
-                                $$("bodyStyle").refresh();
-                                $$("type").refresh();
                                 $$("engine").refresh();
                                 $$("modelId").refresh();
                             }
-                        }});
+                        }
+                    });
                     $$("model").refresh();
                 }).fail(function (error) {
                     util.messages.showErrorMessage(error.responseText);
@@ -320,6 +309,8 @@ var vehicleView = {
                 id: "addVehicleInside",
                 rows: [
                     {
+                        margin: 5,
+                        bottomPadding: 5,
                         view: "toolbar",
                         cols: [
                             {
@@ -340,53 +331,10 @@ var vehicleView = {
                     {
                         cols: [
                             {
-                                rows: [
-                                    {
-                                        view: "label",
-                                        borderless: true,
-                                        height: 50,
-                                        label: "Photo",
-                                        align: "center"
-                                    },
-                                    {
-                                        view: "template",
-                                        borderless: true,
-                                        id: "image",
-                                        name: "image",
-                                        width: 300,
-                                        height: 300,
-                                        template: "<img src='#src#' width='300' height='300' class='photo-alignment'/>",
-                                        onClick: {
-                                            "photo-alignment": function (e, id, trg) {
-                                                $$("vehicleUploadAPI").fileDialog();
-                                                return false;
-                                            }
-                                        },
-                                    },
-                                    {},
-                                    {
-                                        marginTop: 20,
-                                        cols: [
-                                            {},
-                                            {
-                                                id: "saveVehicle",
-                                                view: "button",
-                                                value: "Save",
-                                                type: "form",
-                                                click: "vehicleView.save",
-                                                hotkey: "enter",
-                                                width: 270,
-                                                height:70
-                                            },
-                                            {}
-                                        ]
-                                    },
-                                    {},
-                                    {}
-                                ]
-                            },
-                            {
-                                width: 20
+                                "view": "template",
+                                borderless: true,
+                                width: 30,
+                                "template": "<p></p>"
                             },
                             {
                                 view: "form",
@@ -399,10 +347,10 @@ var vehicleView = {
                                 },
                                 elements: [
                                     {
-                                        view:"text",
-                                        id:"manufacturerId",
-                                        name:"manufacturerId",
-                                        hidden:true,
+                                        view: "text",
+                                        id: "manufacturerId",
+                                        name: "manufacturerId",
+                                        hidden: true,
                                     },
                                     {
                                         view: "text",
@@ -426,7 +374,7 @@ var vehicleView = {
                                         view: "text",
                                         id: "modelId",
                                         name: "modelId",
-                                        hidden:true
+                                        hidden: true
                                     },
                                     {
                                         view: "text",
@@ -442,22 +390,6 @@ var vehicleView = {
                                         name: "plateNumber",
                                         label: "Plate number:",
                                         invalidMessage: "Enter plate number.",
-                                        required: true
-                                    },
-                                    {
-                                        view: "text",
-                                        id: "type",
-                                        name: "type",
-                                        label: "Vehicle type:",
-                                        invalidMessage: "Enter vehicle type.",
-                                        required: true
-                                    },
-                                    {
-                                        view: "text",
-                                        id: "bodyStyle",
-                                        name: "bodyStyle",
-                                        label: "Vehicle style:",
-                                        invalidMessage: "Enter vehicle style.",
                                         required: true
                                     },
                                     {
@@ -497,13 +429,13 @@ var vehicleView = {
                                         name: "locationId",
                                         view: "richselect",
                                         label: "Location:",
-                                        invalidMessage:"Select location",
-                                        required:true,
-                                        on:{
-                                            onChange:function(newv,old){
-                                               var obj=locationFull.filter(function(item){
-                                                   return item.id===newv;
-                                               })[0];
+                                        invalidMessage: "Select location",
+                                        required: true,
+                                        on: {
+                                            onChange: function (newv, old) {
+                                                var obj = locationFull.filter(function (item) {
+                                                    return item.id === newv;
+                                                })[0];
                                                 $$("addVehicleForm").elements.locationName.setValue(obj.name);
                                                 $$("addVehicleForm").elements.longitude.setValue(obj.latitude);
                                                 $$("addVehicleForm").elements.latitude.setValue(obj.longitude);
@@ -511,41 +443,41 @@ var vehicleView = {
                                         }
                                     },
                                     {
-                                        id:"deleted",
-                                        name:"deleted",
-                                        view:"text",
-                                        value:0,
-                                        hidden:true
+                                        id: "deleted",
+                                        name: "deleted",
+                                        view: "text",
+                                        value: 0,
+                                        hidden: true
                                     },
                                     {
-                                        id:"companyId",
-                                        name:"companyId",
-                                        view:"text",
-                                        hidden:true
+                                        id: "companyId",
+                                        name: "companyId",
+                                        view: "text",
+                                        hidden: true
                                     },
                                     {
-                                        view:"text",
-                                        id:"companyName",
-                                        name:"companyName",
-                                        hidden:true
+                                        view: "text",
+                                        id: "companyName",
+                                        name: "companyName",
+                                        hidden: true
                                     },
                                     {
-                                        view:"text",
-                                        id:"locationName",
-                                        name:"locationName",
-                                        hidden:true
+                                        view: "text",
+                                        id: "locationName",
+                                        name: "locationName",
+                                        hidden: true
                                     },
                                     {
-                                        id:"longitude",
-                                        name:"longitude",
-                                        hidden:true,
-                                        view:"text"
+                                        id: "longitude",
+                                        name: "longitude",
+                                        hidden: true,
+                                        view: "text"
                                     },
                                     {
-                                        id:"latitude",
-                                        name:"latitude",
-                                        hidden:true,
-                                        view:"text"
+                                        id: "latitude",
+                                        name: "latitude",
+                                        hidden: true,
+                                        view: "text"
                                     }
                                 ],
                                 rules: {
@@ -574,22 +506,6 @@ var vehicleView = {
 
                                         return true;
                                     },
-                                    "bodyStyle": function (value) {
-                                        if (value.length > 100) {
-                                            $$('addVehicleForm').elements.bodyStyle.config.invalidMessage = 'Maximum length is 1000.';
-                                            return false;
-                                        }
-
-                                        return true;
-                                    },
-                                    "type": function (value) {
-                                        if (value.length > 100) {
-                                            $$('addVehicleForm').elements.type.config.invalidMessage = 'Maximum length is 1000.';
-                                            return false;
-                                        }
-
-                                        return true;
-                                    },
                                     "transmission": function (value) {
                                         if (value.length > 100) {
                                             $$('addVehicleForm').elements.transmission.config.invalidMessage = 'Maximum length is 1000.';
@@ -597,8 +513,78 @@ var vehicleView = {
                                         }
 
                                         return true;
+                                    },
+                                    "manufacturerName": function (value) {
+                                        if (value.length > 100) {
+                                            $$('editVehicleForm').elements.manufacturerName.config.invalidMessage = 'Maximum length is 1000.';
+                                            return false;
+                                        }
+
+                                        return true;
+                                    },
+                                    "model": function (value) {
+                                        if (value.length > 100) {
+                                            $$('editVehicleForm').elements.model.config.invalidMessage = 'Maximum length is 1000.';
+                                            return false;
+                                        }
+
+                                        return true;
                                     }
                                 }
+                            },
+                            {
+                                "view": "template",
+                                borderless: true,
+                                width: 30,
+                                height: 30,
+                                "template": "<p></p>"
+                            },
+                            {
+                                rows: [
+                                    {
+                                        "view": "template",
+                                        borderless: true,
+                                        height: 50,
+                                        "template": "<p>Photo</p>"
+                                    },
+                                    {
+                                        view: "template",
+                                        borderless: true,
+                                        id: "image",
+                                        name: "image",
+                                        width: 300,
+                                        height: 300,
+                                        template: "<img src='#src#' width='300' height='300' class='photo-alignment'/>",
+                                        onClick: {
+                                            "photo-alignment": function (e, id, trg) {
+                                                $$("vehicleUploadAPI").fileDialog();
+                                                return false;
+                                            }
+                                        },
+                                    },
+                                    {
+                                        height: 90,
+                                    },
+                                    {
+                                        marginTop: 20,
+                                        cols: [
+                                            {},
+                                            {
+                                                id: "saveVehicle",
+                                                view: "button",
+                                                value: "Save",
+                                                type: "form",
+                                                click: "vehicleView.save",
+                                                hotkey: "enter",
+                                                width: 270,
+                                                height: 70
+                                            },
+                                            {}
+                                        ]
+                                    },
+                                    {},
+                                    {}
+                                ]
                             }
                         ]
                     }
@@ -610,16 +596,16 @@ var vehicleView = {
             if (util.popupIsntAlreadyOpened("addVehicleDialog")) {
                 webix.ui(webix.copy(vehicleView.addVehicleDialog)).show();
                 webix.UIManager.setFocus("manufacturerId");
-                $$("fuelId").define("options",dependency.fuel);
+                $$("fuelId").define("options", dependency.fuel);
                 $$("image").setValues({src: "../../img/car-default.jpg"});
-                var locationData=[];
+                var locationData = [];
                 webix.ajax().get("api/location").then(function (data) {
                     var locationsTemp = data.json();
-                    locationFull=locationsTemp;
+                    locationFull = locationsTemp;
                     locationsTemp.forEach(function (obj) {
-                        locationData.push({id: obj.id, value: obj.name + " @" + obj.address,data:obj});
+                        locationData.push({id: obj.id, value: obj.name + " @" + obj.address, data: obj});
                     });
-                    $$("locationId").define("options",locationData);
+                    $$("locationId").define("options", locationData);
                     $$("locationId").refresh();
                 }).fail(function (error) {
                     util.messages.showErrorMessage(error.responseText);
@@ -635,8 +621,8 @@ var vehicleView = {
 
         save: function () {
             if ($$("addVehicleForm").validate()) {
-                var newCar=$$("addVehicleForm").getValues();
-                newCar.image=$$("image").getValues()["src"].split("base64,")[1];
+                var newCar = $$("addVehicleForm").getValues();
+                newCar.image = $$("image").getValues()["src"].split("base64,")[1];
                 console.log(newCar);
                 webix.ajax().header({"Content-type": "application/json"})
                     .post("api/car/custom", newCar).then(function (data) {
@@ -651,7 +637,367 @@ var vehicleView = {
                 util.dismissDialog('addVehicleDialog');
             }
         },
+        editVehicleDialog: {
+            view: "popup",
+            id: "editVehicleDialog",
+            modal: true,
+            position: "center",
+            body: {
+                id: "editVehicleInside",
+                rows: [
+                    {
+                        margin: 5,
+                        bottomPadding: 5,
+                        view: "toolbar",
+                        cols: [
+                            {
+                                view: "label",
+                                label: "<span class='webix_icon fa fa-car'></span>Edit vehicle",
+                                width: 400
+                            },
+                            {},
+                            {
+                                hotkey: 'esc',
+                                view: "icon",
+                                icon: "close",
+                                align: "right",
+                                click: "util.dismissDialog('editVehicleDialog');"
+                            }
+                        ]
+                    },
+                    {
+                        cols: [
+                            {
+                                "view": "template",
+                                borderless: true,
+                                width: 30,
+                                "template": "<p></p>"
+                            },
+                            {
+                                view: "form",
+                                id: "editVehicleForm",
+                                borderless: true,
+                                width: 600,
+                                elementsConfig: {
+                                    labelWidth: 200,
+                                    bottomPadding: 18
+                                },
+                                elements: [
+                                    {
+                                        view: "text",
+                                        id: "id",
+                                        name: "id",
+                                        hidden: true,
+                                    },
+                                    {
+                                        view: "text",
+                                        id: "manufacturerId",
+                                        name: "manufacturerId",
+                                        hidden: true,
+                                    },
+                                    {
+                                        view: "text",
+                                        id: "manufacturerName",
+                                        name: "manufacturerName",
+                                        label: "Manufacturer:",
+                                        invalidMessage: "Please enter manufacturer.",
+                                        required: true,
+                                        suggest: {
+                                            data: manufacturers,
+                                            on: {
+                                                onValueSuggest: function (obj) {
+                                                    $$("editVehicleForm").elements.manufacturerId.setValue(obj.id);
+                                                    vehicleView.loadModels(obj.id);
+                                                }
+                                            }
+                                        }
 
+                                    },
+                                    {
+                                        view: "text",
+                                        id: "modelId",
+                                        name: "modelId",
+                                        hidden: true
+                                    },
+                                    {
+                                        view: "text",
+                                        id: "model",
+                                        name: "model",
+                                        label: "Model:",
+                                        invalidMessage: "Enter vehicle model.",
+                                        required: true,
+                                    },
+                                    {
+                                        view: "text",
+                                        id: "plateNumber",
+                                        name: "plateNumber",
+                                        label: "Plate number:",
+                                        invalidMessage: "Enter plate number.",
+                                        required: true
+                                    },
+                                    {
+                                        view: "text",
+                                        id: "transmission",
+                                        name: "transmission",
+                                        label: "Vehicle transmission:",
+                                        invalidMessage: "Enter vehicle transmission.",
+                                        required: true
+                                    },
+                                    {
+                                        view: "text",
+                                        id: "year",
+                                        name: "year",
+                                        label: "Year:",
+                                        invalidMessage: "Enter year.",
+                                        required: true,
+                                    },
+                                    {
+                                        view: "text",
+                                        id: "engine",
+                                        name: "engine",
+                                        label: "Engine:",
+                                        invalidMessage: "Enter engine description.",
+                                        required: true
+                                    },
+                                    {
+                                        view: "richselect",
+                                        id: "fuelId",
+                                        name: "fuelId",
+                                        label: "Fuel type:",
+                                        invalidMessage: "Select fuel type.",
+                                        required: true
+                                    },
+                                    {
+                                        id: "locationId",
+                                        name: "locationId",
+                                        view: "richselect",
+                                        label: "Location:",
+                                        invalidMessage: "Select location",
+                                        required: true,
+                                        on: {
+                                            onChange: function (newv, old) {
+                                                var obj = locationFull.filter(function (item) {
+                                                    return item.id === newv;
+                                                })[0];
+                                                $$("editVehicleForm").elements.locationName.setValue(obj.name);
+                                                $$("editVehicleForm").elements.longitude.setValue(obj.latitude);
+                                                $$("editVehicleForm").elements.latitude.setValue(obj.longitude);
+                                            }
+                                        }
+                                    },
+                                    {
+                                        id: "deleted",
+                                        name: "deleted",
+                                        view: "text",
+                                        value: 0,
+                                        hidden: true
+                                    },
+                                    {
+                                        id: "companyId",
+                                        name: "companyId",
+                                        view: "text",
+                                        hidden: true
+                                    },
+                                    {
+                                        view: "text",
+                                        id: "companyName",
+                                        name: "companyName",
+                                        hidden: true
+                                    },
+                                    {
+                                        view: "text",
+                                        id: "locationName",
+                                        name: "locationName",
+                                        hidden: true
+                                    },
+                                    {
+                                        id: "longitude",
+                                        name: "longitude",
+                                        hidden: true,
+                                        view: "text"
+                                    },
+                                    {
+                                        id: "latitude",
+                                        name: "latitude",
+                                        hidden: true,
+                                        view: "text"
+                                    }
+                                ],
+                                rules: {
+                                    "plateNumber": function (value) {
+                                        if (value.length > 10) {
+                                            $$('editVehicleForm').elements.plateNumber.config.invalidMessage = 'Maximum length is 10.';
+                                            return false;
+                                        }
+
+                                        return true;
+                                    },
+                                    "year": function (value) {
+                                        var regex = /[0-9]{4}/;
+                                        if (!regex.test(value)) {
+                                            $$('editVehicleForm').elements.year.config.invalidMessage = 'Incorrect year.';
+                                            return false;
+                                        }
+
+                                        return true;
+                                    },
+                                    "engine": function (value) {
+                                        if (value.length > 100) {
+                                            $$('editVehicleForm').elements.engine.config.invalidMessage = 'Maximum length is 1000.';
+                                            return false;
+                                        }
+
+                                        return true;
+                                    },
+                                    "transmission": function (value) {
+                                        if (value.length > 100) {
+                                            $$('editVehicleForm').elements.transmission.config.invalidMessage = 'Maximum length is 1000.';
+                                            return false;
+                                        }
+
+                                        return true;
+                                    },
+                                    "manufacturerName": function (value) {
+                                        if (value.length > 100) {
+                                            $$('editVehicleForm').elements.manufacturerName.config.invalidMessage = 'Maximum length is 1000.';
+                                            return false;
+                                        }
+
+                                        return true;
+                                    },
+                                    "model": function (value) {
+                                        if (value.length > 100) {
+                                            $$('editVehicleForm').elements.model.config.invalidMessage = 'Maximum length is 1000.';
+                                            return false;
+                                        }
+
+                                        return true;
+                                    }
+                                }
+                            },
+                            {
+                                "view": "template",
+                                borderless: true,
+                                width: 30,
+                                height: 30,
+                                "template": "<p></p>"
+                            },
+                            {
+                                rows: [
+                                    {
+                                        "view": "template",
+                                        borderless: true,
+                                        height: 50,
+                                        "template": "<p>Photo</p>"
+                                    },
+                                    {
+                                        view: "template",
+                                        borderless: true,
+                                        id: "image",
+                                        name: "image",
+                                        width: 300,
+                                        height: 300,
+                                        template: "<img src='#src#' width='300' height='300' class='photo-alignment'/>",
+                                        onClick: {
+                                            "photo-alignment": function (e, id, trg) {
+                                                $$("vehicleUploadAPI").fileDialog();
+                                                return false;
+                                            }
+                                        },
+                                    },
+                                    {
+                                        height: 90,
+                                    },
+                                    {
+                                        marginTop: 20,
+                                        cols: [
+                                            {},
+                                            {
+                                                id: "saveVehicle",
+                                                view: "button",
+                                                value: "Save",
+                                                type: "form",
+                                                click: "vehicleView.saveChanges",
+                                                hotkey: "enter",
+                                                width: 270,
+                                                height: 70
+                                            },
+                                            {}
+                                        ]
+                                    },
+                                    {},
+                                    {}
+                                ]
+                            }
+                        ]
+                    }
+                ]
+            }
+        },
+
+        showEditDialog: function (item) {
+            if (util.popupIsntAlreadyOpened("editVehicleDialog")) {
+                var dialog = webix.ui(webix.copy(vehicleView.editVehicleDialog))
+                webix.UIManager.setFocus("manufacturerId");
+                $$("fuelId").define("options", dependency.fuel);
+                $$("fuelId").define("value", item.fuelId);
+                $$("image").setValues({src: "data:image/png;base64," + item.image});
+                var locationData = [];
+                webix.ajax().get("api/location").then(function (data) {
+                    var locationsTemp = data.json();
+                    locationFull = locationsTemp;
+                    locationsTemp.forEach(function (obj) {
+                        locationData.push({id: obj.id, value: obj.name + " @" + obj.address, data: obj});
+                    });
+                    $$("locationId").define("options", locationData);
+                    $$("locationId").define("value", item.locationId);
+                    $$("locationId").refresh();
+                }).fail(function (error) {
+                    util.messages.showErrorMessage(error.responseText);
+                });
+                var form = $$("editVehicleForm");
+                form.elements.companyName.setValue(item.companyName);
+                form.elements.companyId.setValue(item.companyId);
+                form.elements.model.setValue(item.model);
+                form.elements.modelId.setValue(item.modelId);
+                form.elements.deleted.setValue(item.deleted);
+                form.elements.locationName.setValue(item.locationName);
+                form.elements.longitude.setValue(item.longitude);
+                form.elements.latitude.setValue(item.latitude);
+                form.elements.id.setValue(item.id);
+                form.elements.plateNumber.setValue(item.plateNumber);
+                form.elements.year.setValue(item.year);
+                form.elements.transmission.setValue(item.transmission);
+                form.elements.engine.setValue(item.engine);
+                form.elements.manufacturerName.setValue(item.manufacturerName);
+                form.elements.manufacturerId.setValue(item.manufacturerId);
+
+                $$("companyId").refresh();
+                $$("fuelId").refresh();
+                $$("image").refresh();
+                dialog.show();
+            }
+        },
+
+
+        saveChanges: function () {
+            if ($$("editVehicleForm").validate()) {
+                var newCar = $$("editVehicleForm").getValues();
+                newCar.image = $$("image").getValues()["src"].split("base64,")[1];
+                webix.ajax().header({"Content-type": "application/json"})
+                    .put("api/car/custom/"+newCar.id, newCar).then(function (data) {
+                        newCar=data.json();
+                    $$("vehicleDV").updateItem(newCar.id,newCar);
+                    $$("vehicleDV").refresh();
+                    $$("locationFilter").setValue(newCar.locationId);
+                    $$("locationFilter").refresh();
+                    util.messages.showMessage("Vehicle changes made.");
+                }).fail(function (error) {
+                    util.messages.showErrorMessage(error.responseText);
+                });
+                util.dismissDialog('editVehicleDialog');
+            }
+        },
 
     }
 ;
