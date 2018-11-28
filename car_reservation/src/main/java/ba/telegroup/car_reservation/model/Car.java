@@ -1,13 +1,13 @@
 package ba.telegroup.car_reservation.model;
 
-import javax.persistence.Basic;
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.Id;
+import ba.telegroup.car_reservation.common.interfaces.Deletable;
+
+import javax.persistence.*;
 import java.util.Objects;
 
 @Entity
-public class Car {
+@Inheritance(strategy = InheritanceType.JOINED)
+public class Car implements Deletable {
     private Integer id;
     private Integer modelId;
     private Integer locationId;
@@ -16,6 +16,7 @@ public class Car {
 
     @Id
     @Column(name = "id")
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     public Integer getId() {
         return id;
     }
@@ -70,6 +71,17 @@ public class Car {
         if (o == null || getClass() != o.getClass()) return false;
         Car car = (Car) o;
         return Objects.equals(id, car.id);
+    }
+
+    public Car(Integer id, Integer modelId, Integer locationId, String plateNumber, Byte deleted) {
+        this.id = id;
+        this.modelId = modelId;
+        this.locationId = locationId;
+        this.plateNumber = plateNumber;
+        this.deleted = deleted;
+    }
+
+    public Car() {
     }
 
     @Override

@@ -87,6 +87,9 @@ var locationView = {
                 on: {
                     onAfterContextMenu: function (item) {
                         this.select(item.row);
+                    },
+                    onItemDblClick:function(id,e,node){
+                        locationView.showMapDialog(this.getSelectedItem());
                     }
                 }
             }

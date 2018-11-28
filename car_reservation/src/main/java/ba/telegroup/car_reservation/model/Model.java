@@ -1,16 +1,13 @@
 package ba.telegroup.car_reservation.model;
 
-import javax.persistence.Basic;
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.Id;
+import javax.persistence.*;
 import java.util.Arrays;
 import java.util.Objects;
 
 @Entity
 public class Model {
     private Integer id;
-    private Integer manufacturer;
+    private Integer manufacturerId;
     private String model;
     private String type;
     private String bodyStyle;
@@ -19,10 +16,9 @@ public class Model {
     private String year;
     private Integer fuelId;
     private byte[] image;
-    private Byte deleted;
-
     @Id
     @Column(name = "id")
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     public Integer getId() {
         return id;
     }
@@ -32,13 +28,13 @@ public class Model {
     }
 
     @Basic
-    @Column(name = "manufacturer")
-    public Integer getManufacturer() {
-        return manufacturer;
+    @Column(name = "manufacturer_id")
+    public Integer getManufacturerId() {
+        return manufacturerId;
     }
 
-    public void setManufacturer(Integer manufacturer) {
-        this.manufacturer = manufacturer;
+    public void setManufacturerId(Integer manufacturerId) {
+        this.manufacturerId = manufacturerId;
     }
 
     @Basic
@@ -121,15 +117,6 @@ public class Model {
         this.image = image;
     }
 
-    @Basic
-    @Column(name = "deleted")
-    public Byte getDeleted() {
-        return deleted;
-    }
-
-    public void setDeleted(Byte deleted) {
-        this.deleted = deleted;
-    }
 
     @Override
     public boolean equals(Object o) {

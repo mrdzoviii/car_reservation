@@ -428,23 +428,38 @@ var profileView={
 };
 webix.ui(
     {
-        view:"uploader",
-        id:"uploadAPI",
-        accept:"image/jpeg, image/png",
-        autosend:false,
-        width:200,
+        id: "uploadAPI",
+        view: "uploader",
+        accept: "image/jpeg, image/png",
+        autosend: false,
+        width: 200,
         apiOnly: true,
-        align:"center",
-        multiple:false,
-        on:{
-            onBeforeFileAdd: function(upload){
+        align: "center",
+        multiple: false,
+        on: {
+            onBeforeFileAdd: function (upload) {
+                var type = upload.type.toLowerCase();
+                if (type != "jpg" && type != "png") {
+                    util.messages.showErrorMessage("Allowed extensions .jpg and.png!")
+                    return false;
+                }
                 var file = upload.file;
                 var reader = new FileReader();
-                reader.onload = function(event) {
-                    $$("photo").setValues({src:event.target.result});
-
+                reader.onload = function (event) {
+                    var img = new Image();
+                    img.onload = function (ev) {
+                        if (img.width === 300 && img.height === 300) {
+                            $$("photo").setValues({
+                                src: event.target.result
+                            });
+                        } else {
+                            util.messages.showErrorMessage("Image dimension must be 300x300 px!")
+                        }
+                    };
+                    img.src = event.target.result;
                 };
-                reader.readAsDataURL(file)
+                reader.readAsDataURL(file);
+
                 return false;
             }
         }

@@ -15,6 +15,11 @@ import java.util.List;
 
 public class GenericDeletableController<T extends Deletable, ID extends Serializable> extends GenericController<T, ID> {
 
+    @Value("${deleted.not}")
+    private Byte notDeleted;
+    @Value("${action.success}")
+    private String success;
+
     private DeletableRepository<T> repo;
     @Value("${badRequest.update}")
     private String badRequestUpdate;
@@ -32,7 +37,7 @@ public class GenericDeletableController<T extends Deletable, ID extends Serializ
 
     @Override
     public List<T> getAll() throws ForbiddenException {
-        return repo.getAllByDeletedIs((byte) 0);
+        return repo.getAllByDeletedIs(notDeleted);
     }
 
     @Override
@@ -58,6 +63,6 @@ public class GenericDeletableController<T extends Deletable, ID extends Serializ
             throw new BadRequestException(badRequestDelete);
         object.setDeleted((byte) 1);
         logDeleteAction(object);
-        return "Success";
+        return success;
     }
 }

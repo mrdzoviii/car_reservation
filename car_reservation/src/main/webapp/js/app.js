@@ -245,6 +245,7 @@ var showRegistration = function (userId) {
 
 var showApp = function () {
     var promise = preloadDependencies();
+    vehicleView.preloadDependencies();
     var main = webix.copy(mainLayout);
     webix.ui(main, panel);
     panel = $$("app");
