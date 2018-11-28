@@ -51,7 +51,7 @@ public class CarController extends GenericDeletableController<Car,Integer> {
     public List getAll() throws ForbiddenException {
         return carRepository.getAllExtendedByCompanyId(userBean.getUser().getCompanyId());
     }
-    
+
 
     @RequestMapping(value = "/company/{id}",method = RequestMethod.GET)
     public List getAllExtendedByCompanyId(@PathVariable("id") Integer id){

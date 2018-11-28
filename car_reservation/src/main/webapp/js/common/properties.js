@@ -9,7 +9,11 @@ var userStatus = {
     inactive: 2,
 };
 
-var successMessage = "Success";
+var mapProperties={
+    longitude:44.772337,
+    latitude:17.1811044,
+    zoom:13.5};
 
 var dependencyMap = [];
 var dependency = [];
+

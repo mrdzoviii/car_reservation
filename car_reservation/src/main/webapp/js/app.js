@@ -152,11 +152,24 @@ var mainMenuCompanyAdmin = [
         id: "logger",
         icon: "history",
         value: "User logs"
+    }
+];
+
+var mainMenuUser = [
+    {
+        id: "home",
+        icon: "home",
+        value: "Home"
     },
     {
-        id: "user",
-        icon: "user",
-        value: "Users"
+        id: "location",
+        icon: "map",
+        value:"Locations"
+    },
+    {
+        id: "vehicle",
+        icon: "car",
+        value: "Vehicles"
     }
 ];
 
@@ -175,13 +188,12 @@ var mainMenuActions = function (id) {
         case "dashboard":
             locationView.selectPanel();
             break;
-        case "user":
-            userView.selectPanel();
-            break;
         case "home":
             homeView.selectPanel();
+            break;
         case "location":
             locationView.selectPanel();
+            break;
     }
 };
 
@@ -284,6 +296,7 @@ var showApp = function () {
             localMenuData = menuAdmin;
             break;
         case role.user:
+            localMainMenuData = mainMenuUser;
             localMenuData = menuUser;
             break;
     }
@@ -306,8 +319,8 @@ var showApp = function () {
             companyView.selectPanel();
             $$("mainMenu").select("company");
         } else {
-            locationView.selectPanel();
-            $$("mainMenu").select("location");
+            homeView.selectPanel();
+            $$("mainMenu").select("home");
         }
     }).fail(function (err) {
         //connection.reload();

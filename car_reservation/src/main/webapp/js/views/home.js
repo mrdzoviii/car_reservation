@@ -1,3 +1,4 @@
+
 var homeView = {
     panel: {
         id: "homePanel",
@@ -11,7 +12,7 @@ var homeView = {
                     {
                         view: "label",
                         width: 400,
-                        template: "<span class='fa fa-home'></span> Home"
+                        template: "<span class='fa fa-home'></span>Home"
                     },
                     {}
                 ]
@@ -19,30 +20,30 @@ var homeView = {
             {
                 key: "",
                 view: "google-map",
-                id: "map",
-                zoom: 14,
-                center: [44.7717627, 17.1805658]
+                id: "homeMap",
+                zoom: mapProperties.zoom,
+                center: [mapProperties.longitude,mapProperties.latitude]
             }
         ]
     },
 
-    homeVehicleDialog: {
+    homeDialog: {
         view: "popup",
-        id: "homeVehicleDialog",
+        id: "homeDialog",
         modal: true,
         position: "center",
         width: 1008,
         height: 586,
         body: {
-            id: "homeVehicleInside",
+            id: "homeInside",
             rows: [
                 {
                     view: "toolbar",
                     cols: [
                         {
-                            id: "homeDialogLabel",
+                            id: "homeLabel",
                             view: "label",
-                            label: "<span class='webix_icon fa fa-car'></span> Lokacija",
+                            label: "<span class='webix_icon fa fa-car'></span> Location",
                             width: 900
                         },
                         {},
@@ -51,7 +52,7 @@ var homeView = {
                             view: "icon",
                             icon: "close",
                             align: "right",
-                            click: "util.dismissDialog('homeVehicleDialog');"
+                            click: "util.dismissDialog('homeDialog');"
                         }
                     ]
                 },
@@ -59,7 +60,7 @@ var homeView = {
                     cols: [
                         {
                             view: "dataview",
-                            id: "homeDataView",
+                            id: "homeDV",
                             container: "dataA",
                             select: true,
                             url: "",
@@ -67,13 +68,14 @@ var homeView = {
                                 height: 520,
                                 width: 330
                             },
-                            template: "<div><div style='height: 13px'></div><div align='center'><img src='data:image/png;base64, #photo#' alt='Nema slike' width='300' height='300' align='center'/></div><br/>" +
-                                "<div style='height: 1px' align='center'>Proizvođač: #manufacturerName#</div><br/>" +
+                            template: "<div><div style='height: 13px'></div><div align='center'><img src='data:image/png;base64, #image#' alt='No picture' width='300' height='300' align='center'/></div><br/>" +
+                                "<div style='height: 1px' align='center'>Manufacturer: #manufacturerName#</div><br/>" +
                                 "<div style='height: 1px' align='center'>Model: #modelName#</div><br/>" +
-                                "<div style='height: 1px' align='center'>Registarske tablice: #licensePlate#</div><br/>" +
-                                "<div style='height: 1px' align='center'>Godina proizvodnje: #year#</div><br/>" +
-                                "<div style='height: 1px' align='center'>Motor: #engine#</div><br/>" +
-                                "<div style='height: 1px' align='center'>Gorivo: #fuel#</div><br/>" +
+                                "<div style='height: 1px' align='center'>Plate number: #plateNumber#</div><br/>" +
+                                "<div style='height: 1px' align='center'>Year: #year#</div><br/>" +
+                                "<div style='height: 1px' align='center'>Engine: #engine#</div><br/>" +
+                                "<div style='height: 1px' align='center'>Transmission: #transmission#</div><br/>" +
+                                "<div style='height: 1px' align='center'>Fuel: #fuelName#</div><br/>" +
                                 "</div>"
                         }
                     ]
@@ -82,17 +84,16 @@ var homeView = {
         }
     },
 
-    showHomeVehicleDialog: function(selectedItem){
-        if (util.popupIsntAlreadyOpened("homeVehicleDialog")) {
-            webix.ui(webix.copy(homeView.homeVehicleDialog)).show();
+    showHomeDialog: function(selectedItem){
+        if (util.popupIsntAlreadyOpened("homeDialog")) {
+            webix.ui(webix.copy(homeView.homeDialog)).show();
+            $$("homeLabel").define("label", "<span class='webix_icon fa fa-car'></span> " + selectedItem.name+" @"+selectedItem.address);
+            $$("homeDV").clearAll();
+            $$("homeDV").load("api/car/location/" + selectedItem.id).then(function () {
+                $$("homeLabel").refresh();
+                $$("homeDV").refresh();
 
-            $$("homeDialogLabel").define("label", "<span class='webix_icon fa fa-car'></span> " + selectedItem.name);
-            $$("homeDataView").clearAll();
-            $$("homeDataView").load("hub/vehicle/custom/" + selectedItem.id).then(function () {
-                $$("homeDialogLabel").refresh();
-                $$("homeDataView").refresh();
-
-                $$("homeVehicleDialog").show();
+                $$("homeDialog").show();
             });
         }
     },
@@ -100,14 +101,11 @@ var homeView = {
     selectPanel: function () {
         $$("main").removeView(rightPanel);
         rightPanel = "homePanel";
-
         var panelCopy = webix.copy(this.panel);
-
         $$("main").addView(webix.copy(panelCopy));
 
-        $$("map").getMap("waitMap").then(function(mapObj){
+        $$("homeMap").getMap("waitMap").then(function (mapObj) {
             var geocoder = new google.maps.Geocoder();
-
             webix.ajax().get("api/location").then(function (data) {
                 var locations = data.json();
                 locations.forEach(function (obj) {
@@ -125,13 +123,13 @@ var homeView = {
                                     item: obj
                                 });
                                 marker.addListener('click', function() {
-                                    homeView.showHomeVehicleDialog(obj);
+                                    homeView.showHomeDialog(obj);
                                 });
                             } else {
-                                window.alert("Lokacija " + obj.name + " ne može biti locirana.");
+                                util.messages.showErrorMessage("Location " + obj.name + " not found.");
                             }
                         } else {
-                            window.alert("Lokacija " + obj.name + " ne može biti locirana.");
+                            util.messages.showErrorMessage("Location " + obj.name + " not found.");
                         }
                     });
                 })
@@ -139,5 +137,6 @@ var homeView = {
                 util.messages.showErrorMessage(error.responseText);
             });
         });
+
     }
 };
