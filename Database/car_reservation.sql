@@ -297,7 +297,7 @@ CREATE TABLE `reservation` (
   CONSTRAINT `FK_RESERVATION_COMPANY` FOREIGN KEY (`company_id`) REFERENCES `company` (`id`),
   CONSTRAINT `FK_RESERVATION_RESERVATION_STATUS` FOREIGN KEY (`state_id`) REFERENCES `state` (`id`),
   CONSTRAINT `FK_RESERVATION_USER` FOREIGN KEY (`user_id`) REFERENCES `user` (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_croatian_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=3 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_croatian_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -306,6 +306,7 @@ CREATE TABLE `reservation` (
 
 LOCK TABLES `reservation` WRITE;
 /*!40000 ALTER TABLE `reservation` DISABLE KEYS */;
+INSERT INTO `reservation` (`id`, `created_time`, `user_id`, `car_id`, `start_mileage`, `finish_mileage`, `direction`, `start_time`, `end_time`, `state_id`, `deleted`, `company_id`) VALUES (1,'2018-11-28 19:27:15',4,8,150000,NULL,'Beograd-Banja Luka-Beograd','2018-11-30 15:00:00','2018-01-08 15:26:58',1,0,3),(2,'2018-11-28 19:27:15',4,1,150000,NULL,'Beograd-Banja Luka-Beograd','2018-11-30 15:00:00','2018-01-08 15:26:58',1,0,3);
 /*!40000 ALTER TABLE `reservation` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -374,7 +375,7 @@ DROP TABLE IF EXISTS `state`;
 /*!40101 SET character_set_client = utf8 */;
 CREATE TABLE `state` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
-  `status` varchar(50) COLLATE utf8mb4_croatian_ci NOT NULL,
+  `state` varchar(50) COLLATE utf8mb4_croatian_ci NOT NULL,
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=4 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_croatian_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
@@ -385,7 +386,7 @@ CREATE TABLE `state` (
 
 LOCK TABLES `state` WRITE;
 /*!40000 ALTER TABLE `state` DISABLE KEYS */;
-INSERT INTO `state` (`id`, `status`) VALUES (1,'reserved'),(2,'running'),(3,'finished');
+INSERT INTO `state` (`id`, `state`) VALUES (1,'reserved'),(2,'running'),(3,'finished');
 /*!40000 ALTER TABLE `state` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -470,4 +471,4 @@ UNLOCK TABLES;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2018-11-28 17:28:13
+-- Dump completed on 2018-11-29  0:42:00

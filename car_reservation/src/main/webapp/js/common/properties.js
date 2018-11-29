@@ -9,6 +9,12 @@ var userStatus = {
     inactive: 2,
 };
 
+var reservationState={
+    reserved:1,
+    running:2,
+    finished:3
+}
+
 var mapProperties={
     longitude:44.772337,
     latitude:17.1811044,

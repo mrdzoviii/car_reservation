@@ -3,14 +3,13 @@ package ba.telegroup.car_reservation.model;
 import ba.telegroup.car_reservation.common.interfaces.Deletable;
 import ba.telegroup.car_reservation.common.interfaces.HasCompanyId;
 
-import javax.persistence.Basic;
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.Id;
+import javax.persistence.*;
 import java.sql.Timestamp;
+import java.util.Date;
 import java.util.Objects;
 
 @Entity
+@Inheritance(strategy = InheritanceType.JOINED)
 public class Reservation implements Deletable, HasCompanyId {
     private Integer id;
     private Timestamp createdTime;
@@ -27,6 +26,7 @@ public class Reservation implements Deletable, HasCompanyId {
 
     @Id
     @Column(name = "id")
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     public Integer getId() {
         return id;
     }
@@ -156,5 +156,23 @@ public class Reservation implements Deletable, HasCompanyId {
     @Override
     public int hashCode() {
         return Objects.hash(getId());
+    }
+
+    public Reservation() {
+    }
+
+    public Reservation(Integer id, Date createdTime, Integer userId, Integer carId, Integer startMileage, Integer finishMileage, String direction, Date startTime, Date endTime, Integer stateId, Byte deleted, Integer companyId) {
+        this.id = id;
+        this.createdTime = new Timestamp(createdTime.getTime());
+        this.userId = userId;
+        this.carId = carId;
+        this.startMileage = startMileage;
+        this.finishMileage = finishMileage;
+        this.direction = direction;
+        this.startTime = new Timestamp(startTime.getTime());
+        this.endTime = new Timestamp(endTime.getTime());
+        this.stateId = stateId;
+        this.deleted = deleted;
+        this.companyId = companyId;
     }
 }

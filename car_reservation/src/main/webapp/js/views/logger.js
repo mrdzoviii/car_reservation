@@ -30,6 +30,10 @@ var loggerView = {
                         },
                         on:{
                             onChange: function (dates) {
+                                if (dates == undefined) {
+                                    $$("loggerDT").filterByAll();
+                                    return true;
+                                }
                                 if (dates.start != null && dates.end != null){
                                     $$("loggerDT").filterByAll();
                                     var startingDate = new Date(dates.start);

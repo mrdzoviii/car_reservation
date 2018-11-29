@@ -9,7 +9,7 @@ import java.util.Objects;
 @Entity
 public class State {
     private Integer id;
-    private String status;
+    private String state;
 
     @Id
     @Column(name = "id")
@@ -22,13 +22,13 @@ public class State {
     }
 
     @Basic
-    @Column(name = "status")
-    public String getStatus() {
-        return status;
+    @Column(name = "state")
+    public String getState() {
+        return state;
     }
 
-    public void setStatus(String status) {
-        this.status = status;
+    public void setState(String state) {
+        this.state = state;
     }
 
     @Override

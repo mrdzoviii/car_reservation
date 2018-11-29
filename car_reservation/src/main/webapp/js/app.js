@@ -398,6 +398,17 @@ var preloadDependencies = function () {
         dependency['fuel'] = array;
 
     }));
+    promises.push(webix.ajax().get("api/state").then(function (data) {
+            var state = [];
+            var array = [];
+            data.json().forEach(function (obj) {
+                state[obj.id] = obj.state;
+                var value = {id: obj.id, value: obj.state};
+                array.push(value);
+            });
+            dependencyMap['state'] = state;
+            dependency['state'] = array;
+    }));
     return webix.promise.all(promises);
 
 };
