@@ -1,9 +1,5 @@
 var freeVehicles = [];
 var firstFreeVehicle;
-var selectedReservation;
-var vehicleMaintenances = [];
-var endKmTemp;
-
 var reservationView = {
     panel: {
         id: "reservationPanel",
@@ -153,6 +149,14 @@ var reservationView = {
                             if (selectedItem.stateId === reservationState.finished) {
                                 contextMenuData.push(
                                     {
+                                        id: "6",
+                                        value: "Expenses",
+                                        icon: "fas fa-wrench"
+                                    },
+                                    {
+                                        $template: "Separator"
+                                    },
+                                    {
                                         id: "3",
                                         value: "More details",
                                         icon: "info-circle"
@@ -165,6 +169,14 @@ var reservationView = {
 
                         }else{
                             contextMenuData.push(
+                                {
+                                    id: "6",
+                                    value: "Expenses",
+                                    icon: "fas fa-wrench"
+                                },
+                                {
+                                    $template: "Separator"
+                                },
                                 {
                                     id: "3",
                                     value: "More details",
@@ -346,6 +358,9 @@ var reservationView = {
                             break;
                         case "5":
                             reservationView.showFinishDialog();
+                            break;
+                        case "6":
+                            expenseView.selectPanel($$("reservationDT").getSelectedItem());
                             break;
 
                     }
@@ -1406,12 +1421,10 @@ var reservationView = {
         if ($$("startForm").validate()) {
             var item=$$("reservationDT").getSelectedItem();
             item.startMileage = $$("startForm").getValues().startMileage;
-            console.log(item);
             webix.ajax().header({"Content-type": "application/json"})
                 .put("api/reservation/start/" + item.id+"/"+item.startMileage).then(function (data) {
                 if (data) {
                     var updated=data.json();
-                    console.log(item);
                     $$("reservationDT").updateItem(updated.id,updated);
                     util.messages.showMessage("Reservation running.");
                 } else {
@@ -1475,6 +1488,7 @@ var reservationView = {
                                 {
                                     margin: 5,
                                     cols: [
+                                        {},
                                         {
                                             id: "saveFinishTrip",
                                             view: "button",
@@ -1482,16 +1496,11 @@ var reservationView = {
                                             type: "form",
                                             click: "reservationView.finish",
                                             hotkey: "enter",
+                                            align:"right",
                                             width: 275
-                                        },
-                                        {},
-                                        {
-                                            id: "btnAddCarExpense",
-                                            view: "button",
-                                            value: "Add trip expenses",
-                                       //     click: "reservationView.addExpense",
-                                            width: 200
                                         }
+
+
                                     ]
                                 }
                             ],
@@ -1549,11 +1558,5 @@ var reservationView = {
 
             util.dismissDialog('finishDialog');
         }
-    },
-
-
-
-
-
-
-}
+    }
+};

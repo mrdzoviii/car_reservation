@@ -1,21 +1,28 @@
 package ba.telegroup.car_reservation.model;
 
+import ba.telegroup.car_reservation.common.interfaces.Deletable;
 import com.fasterxml.jackson.annotation.JsonFormat;
 
 import javax.persistence.*;
 import java.math.BigDecimal;
 import java.sql.Timestamp;
+import java.util.Date;
 import java.util.Objects;
 
 @Entity
-public class Expense {
+@Inheritance(strategy = InheritanceType.JOINED)
+public class Expense implements Deletable {
     private Integer id;
     private Integer costId;
     private Integer carId;
-    private Timestamp createdTime;
+    private Date date;
     private BigDecimal price;
     private String description;
     private Byte deleted;
+    private Integer userId;
+    private Integer reservationId;
+
+
 
     @Id
     @Column(name = "id")
@@ -27,6 +34,25 @@ public class Expense {
     public void setId(Integer id) {
         this.id = id;
     }
+
+    @Column(name = "user_id")
+    public Integer getUserId(){
+        return userId;
+    }
+
+    public void setUserId(Integer userId) {
+        this.userId = userId;
+    }
+
+    @Column(name = "reservation_id")
+    public Integer getReservationId(){
+        return reservationId;
+    }
+
+    public void setReservationId(Integer reservationId) {
+        this.reservationId = reservationId;
+    }
+
 
     @Basic
     @Column(name = "cost_id")
@@ -49,15 +75,14 @@ public class Expense {
     }
 
     @Basic
-    @Column(name = "created_time")
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss",timezone = "UTC")
-    public Timestamp getCreatedTime() {
-        return createdTime ;
+    @Column(name = "date")
+    @JsonFormat(pattern = "yyyy-MM-dd",timezone = "Europe/Belgrade")
+    public Date getDate() {
+        return date ;
     }
 
-    public void setCreatedTime(Timestamp createdTime) {
-        this.createdTime = createdTime;
+    public void setDate(Date date) {
+        this.date = date;
     }
 
     @Basic
@@ -104,5 +129,17 @@ public class Expense {
     }
 
     public Expense() {
+    }
+
+    public Expense(Integer id, Integer costId, Integer carId, Date date, BigDecimal price, String description, Byte deleted, Integer userId, Integer reservationId) {
+        this.id = id;
+        this.costId = costId;
+        this.carId = carId;
+        this.date = date;
+        this.price = price;
+        this.description = description;
+        this.deleted = deleted;
+        this.userId = userId;
+        this.reservationId = reservationId;
     }
 }
