@@ -2,6 +2,7 @@ package ba.telegroup.car_reservation.repository.repositoryCustom.repositoryImpl;
 
 import ba.telegroup.car_reservation.common.CustomRepositoryImpl;
 import ba.telegroup.car_reservation.model.modelCustom.ReservationStateCarCompanyUser;
+import ba.telegroup.car_reservation.model.modelCustom.ReservationStateCarUserCompanyLocation;
 import ba.telegroup.car_reservation.repository.repositoryCustom.ReservationRepositoryCustom;
 
 import java.util.List;
@@ -17,6 +18,10 @@ public class ReservationRepositoryImpl extends CustomRepositoryImpl implements R
             " from reservation r inner join state s on r.state_id = s.id inner join user u on r.user_id = u.id inner join company c on r.company_id = c.id" +
             " inner join car v on r.car_id = v.id inner join model m on v.model_id = m.id inner join manufacturer m2 on m.manufacturer_id = m2.id inner join fuel f on m.fuel_id = f.id where r.id=? and r.deleted=0";
 
+    private final String SQL_GET_RESERVATION_INFO_FOR_NOTIFICATION="select r.id,r.car_id,r.company_id,r.deleted,r.user_id,r.direction,r.state_id,s.state,concat(c.plate_number,' - ',m.name,' ',k.model) as model,concat(r.start_time,' - ',r.end_time) as period,c.location_id,concat(l.name,' @',l.address) as location_name,u.username,concat(u.first_name,' ',u.last_name) as full_name " +
+            "from reservation r inner  join car c on r.car_id = c.id inner join location l on c.location_id = l.id inner join company f on r.company_id = f.id inner join model k on c.model_id = k.id inner join manufacturer m on k.manufacturer_id = m.id inner join user u on r.user_id = u.id inner join state s " +
+            "on r.state_id = s.id where r.deleted=0 and r.id=?";
+
     @Override
     public List getAllExtendedByCompanyId(Integer companyId) {
         return entityManager.createNativeQuery(SQL_GET_ALL_EXTENDED_BY_COMPANY,"ReservationStateCarCompanyUserMapping").
@@ -26,5 +31,11 @@ public class ReservationRepositoryImpl extends CustomRepositoryImpl implements R
     @Override
     public ReservationStateCarCompanyUser getExtendedById(Integer id) {
         return (ReservationStateCarCompanyUser) entityManager.createNativeQuery(SQL_GET_EXTENDED_BY_ID,"ReservationStateCarCompanyUserMapping").setParameter(1,id).getResultStream().findFirst().orElse(null);
+    }
+
+    @Override
+    public ReservationStateCarUserCompanyLocation getReservationInfoForNotification(Integer id) {
+        return (ReservationStateCarUserCompanyLocation) entityManager.createNativeQuery(SQL_GET_RESERVATION_INFO_FOR_NOTIFICATION,"ReservationStateCarUserCompanyLocationMapping")
+                .setParameter(1,id).getResultStream().findFirst().orElse(null);
     }
 }

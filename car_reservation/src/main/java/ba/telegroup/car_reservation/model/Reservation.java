@@ -180,4 +180,14 @@ public class Reservation implements Deletable, HasCompanyId {
         this.deleted = deleted;
         this.companyId = companyId;
     }
+
+    public Reservation(Integer id, Integer userId, Integer carId, String direction, Integer stateId, Byte deleted, Integer companyId) {
+        this.id = id;
+        this.userId = userId;
+        this.carId = carId;
+        this.direction = direction;
+        this.stateId = stateId;
+        this.deleted = deleted;
+        this.companyId = companyId;
+    }
 }

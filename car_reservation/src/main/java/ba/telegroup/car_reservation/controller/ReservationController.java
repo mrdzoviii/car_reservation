@@ -4,8 +4,11 @@ import ba.telegroup.car_reservation.common.exceptions.BadRequestException;
 import ba.telegroup.car_reservation.common.exceptions.ForbiddenException;
 import ba.telegroup.car_reservation.controller.genericController.GenericHasCompanyIdAndDeletableController;
 import ba.telegroup.car_reservation.model.Reservation;
+import ba.telegroup.car_reservation.model.User;
+import ba.telegroup.car_reservation.model.modelCustom.ReservationStateCarUserCompanyLocation;
 import ba.telegroup.car_reservation.repository.ReservationRepository;
 import ba.telegroup.car_reservation.repository.UserRepository;
+import ba.telegroup.car_reservation.util.Notification;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Scope;
@@ -36,12 +39,16 @@ public class ReservationController extends GenericHasCompanyIdAndDeletableContro
     private String forbiddenAction;
     @Value("${badRequest.reservation.delete}")
     private String badRequestReservationDelete;
+    @Value("${role.user}")
+    private Integer roleUser;
     private ReservationRepository reservationRepository;
     private UserRepository userRepository;
+    private Notification notification;
 
     @Autowired
-    public ReservationController(ReservationRepository reservationRepository, UserRepository userRepository) {
+    public ReservationController(ReservationRepository reservationRepository, UserRepository userRepository,Notification notification) {
         super(reservationRepository);
+        this.notification=notification;
         this.reservationRepository = reservationRepository;
         this.userRepository = userRepository;
     }
@@ -57,8 +64,11 @@ public class ReservationController extends GenericHasCompanyIdAndDeletableContro
     @Override
     public Reservation insert(@RequestBody Reservation reservation) throws BadRequestException, ForbiddenException {
         if (checkReservation(reservation)) {
-
-            return reservationRepository.getExtendedById(super.insert(reservation).getId());
+            reservation=super.insert(reservation);
+            ReservationStateCarUserCompanyLocation reservationInfo=reservationRepository.getReservationInfoForNotification(reservation.getId());
+            List<User> users=userRepository.getAllByCompanyIdAndRoleIdAndDeleted(reservationInfo.getCompanyId(),roleUser,notDeleted);
+            notification.sendNotification(reservationInfo,false,users);
+            return reservationRepository.getExtendedById(reservation.getId());
         }
         throw new BadRequestException(badRequestReservationInsert);
     }
@@ -80,11 +90,17 @@ public class ReservationController extends GenericHasCompanyIdAndDeletableContro
 
     }
 
+    @Transactional(rollbackFor = Exception.class)
     @Override
     public String delete(@PathVariable  Integer id) throws BadRequestException, ForbiddenException {
         Reservation reservation=reservationRepository.findById(id).orElse(null);
         if(reservation!=null && reservation.getStateId().equals(stateReserved) && reservation.getUserId().equals(userBean.getUser().getId())) {
-            return super.delete(id);
+            ReservationStateCarUserCompanyLocation reservationInfo=reservationRepository.getReservationInfoForNotification(id);
+            if(super.delete(id).equals(actionSuccess)){
+                List<User> users=userRepository.getAllByCompanyIdAndRoleIdAndDeleted(reservationInfo.getCompanyId(),roleUser,notDeleted);
+                notification.sendNotification(reservationInfo,true,users);
+                return actionSuccess;
+            }
         }
         throw new BadRequestException(badRequestReservationDelete);
     }
@@ -98,4 +114,10 @@ public class ReservationController extends GenericHasCompanyIdAndDeletableContro
                 && reservation.getStartTime() != null && reservation.getEndTime() != null &&
                 reservation.getStartTime().before(reservation.getEndTime());
     }
+
+    @RequestMapping(value = "/info/{id}",method = RequestMethod.GET)
+    public ReservationStateCarUserCompanyLocation getInfo(@PathVariable("id") Integer id){
+        return reservationRepository.getReservationInfoForNotification(id);
+    }
+
 }

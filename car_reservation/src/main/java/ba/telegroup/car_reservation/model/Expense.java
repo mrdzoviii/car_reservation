@@ -1,23 +1,25 @@
 package ba.telegroup.car_reservation.model;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
+
 import javax.persistence.*;
 import java.math.BigDecimal;
 import java.sql.Timestamp;
 import java.util.Objects;
 
 @Entity
-@Table(name = "running_cost", schema = "car_reservation", catalog = "")
-public class RunningCost {
+public class Expense {
     private Integer id;
     private Integer costId;
     private Integer carId;
-    private Timestamp datetime;
+    private Timestamp createdTime;
     private BigDecimal price;
     private String description;
     private Byte deleted;
 
     @Id
     @Column(name = "id")
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     public Integer getId() {
         return id;
     }
@@ -47,13 +49,15 @@ public class RunningCost {
     }
 
     @Basic
-    @Column(name = "datetime")
-    public Timestamp getDatetime() {
-        return datetime;
+    @Column(name = "created_time")
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss",timezone = "UTC")
+    public Timestamp getCreatedTime() {
+        return createdTime ;
     }
 
-    public void setDatetime(Timestamp datetime) {
-        this.datetime = datetime;
+    public void setCreatedTime(Timestamp createdTime) {
+        this.createdTime = createdTime;
     }
 
     @Basic
@@ -90,12 +94,15 @@ public class RunningCost {
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
-        RunningCost that = (RunningCost) o;
+        Expense that = (Expense) o;
         return Objects.equals(id, that.id);
     }
 
     @Override
     public int hashCode() {
         return Objects.hash(id);
+    }
+
+    public Expense() {
     }
 }
