@@ -85,53 +85,70 @@ var reservationView = {
                     var selectedItem=$$("reservationDT").getSelectedItem();
                         var contextMenuData = [];
                         if (userData.id == selectedItem.userId) {
-
-
                             if (selectedItem.stateId=== reservationState.reserved) {
-                                contextMenuData.push(
-                                    {
-                                        id: "1",
-                                        value: "Edit",
-                                        icon: "pencil-square-o"
-                                    },
-                                    {
-                                        id: "2",
-                                        value: "Cancel",
-                                        icon: "close"
-                                    },
-                                    {
-                                        $template: "Separator"
-                                    },
-                                    {
-                                        id: "4",
-                                        value: "Start",
-                                        icon: "arrow-up"
-                                    },
-                                    {
-                                        $template: "Separator"
-                                    },
-                                    {
-                                        id: "3",
-                                        value: "More details",
-                                        icon: "info-circle"
-                                    }
+                                if(new Date(selectedItem.startTime)>Date.now()) {
+                                    contextMenuData.push(
+                                        {
+                                            id: "1",
+                                            value: "Edit",
+                                            icon: "pencil-square-o"
+                                        },
+                                        {
+                                            id: "2",
+                                            value: "Cancel",
+                                            icon: "close"
+                                        },
+                                        {
+                                            $template: "Separator"
+                                        },
+                                        {
+                                            id: "3",
+                                            value: "More details",
+                                            icon: "info-circle"
+                                        }
                                     )
+                                }else{
+                                    contextMenuData.push(
+                                        {
+                                            id: "4",
+                                            value: "Start",
+                                            icon: "arrow-up"
+                                        },
+                                        {
+                                            $template: "Separator"
+                                        },
+                                        {
+                                            id: "3",
+                                            value: "More details",
+                                            icon: "info-circle"
+                                        }
+                                    )
+                                }
                             }
 
                             if (selectedItem.stateId === reservationState.running) {
-                                contextMenuData.push({
-                                    id: "5",
-                                    value: "Finish",
-                                    icon: "arrow-up"
-                                },
-                                    {
-                                        $template: "Separator"
-                                    },
-                                    {
-                                        id: "3",
-                                        value: "More details",
-                                        icon: "info-circle"
-                                    })
+                                if (new Date(selectedItem.startTime)<Date.now()) {
+                                    contextMenuData.push({
+                                            id: "5",
+                                            value: "Finish",
+                                            icon: "arrow-up"
+                                        },
+                                        {
+                                            $template: "Separator"
+                                        },
+                                        {
+                                            id: "3",
+                                            value: "More details",
+                                            icon: "info-circle"
+                                        })
+                                }else{
+                                    contextMenuData.push(
+                                        {
+                                            id: "3",
+                                            value: "More details",
+                                            icon: "info-circle"
+                                        })
+                                }
                             }
                             if (selectedItem.stateId === reservationState.finished) {
                                 contextMenuData.push(
@@ -323,6 +340,12 @@ var reservationView = {
                             break;
                         case "3":
                             reservationView.showDetailReservationDialog($$("reservationDT").getSelectedItem());
+                            break;
+                        case "4":
+                            reservationView.showStartDialog();
+                            break;
+                        case "5":
+                            reservationView.showFinishDialog();
                             break;
 
                     }
@@ -1286,6 +1309,250 @@ var reservationView = {
             util.dismissDialog('editReservationDialog');
         }
     },
+
+    startDialog: {
+        view: "popup",
+        id: "startDialog",
+        modal: true,
+        position: "center",
+        body: {
+            id: "startInside",
+            rows: [
+                {
+                    view: "toolbar",
+                    cols: [
+                        {
+                            view: "label",
+                            label: "<span class='webix_icon fa fa-bookmark'></span> Start trip",
+                            width: 300
+                        },
+                        {},
+                        {
+                            hotkey: 'esc',
+                            view: "icon",
+                            icon: "close",
+                            align: "right",
+                            click: "util.dismissDialog('startDialog');"
+                        }
+                    ]
+                },
+                {
+                    cols: [
+                        {
+                            view: "form",
+                            id: "startForm",
+                            borderless: true,
+                            width: 470,
+                            elementsConfig: {
+                                labelWidth: 170,
+                                bottomPadding: 18
+                            },
+                            elements: [
+                                {
+                                    view: "text",
+                                    id: "startMileage",
+                                    name: "startMileage",
+                                    label: "Start mileage:",
+                                    invalidMessage: "Please enter start mileage.",
+                                    required: true,
+                                },
+                                {
+                                    margin: 5,
+                                    cols: [
+                                        {},
+                                        {
+                                            id: "saveStartTrip",
+                                            view: "button",
+                                            value: "Start",
+                                            type: "form",
+                                            click: "reservationView.start",
+                                            hotkey: "enter",
+                                            width: 250
+                                        }
+                                    ]
+                                }
+                            ],
+                            rules: {
+                                "startMileage": function (value) {
+                                    if (value.length > 6) {
+                                        $$('startForm').elements.startMileage.config.invalidMessage = 'Maximum length is 6.';
+                                        return false;
+                                    }
+
+                                    if (!webix.rules.isNumber(value)) {
+                                        $$('startForm').elements.startMileage.config.invalidMessage = 'Invalid format. Start mileage must be number';
+                                        return false;
+                                    }
+
+                                    return true;
+                                }
+                            }
+                        }
+
+                    ]
+                }
+            ]
+        }
+    },
+
+    showStartDialog: function () {
+        if (util.popupIsntAlreadyOpened("startDialog")) {
+            webix.ui(webix.copy(reservationView.startDialog)).show();
+            webix.UIManager.setFocus("startDialog");
+        }
+    },
+
+    start: function () {
+        if ($$("startForm").validate()) {
+            var item=$$("reservationDT").getSelectedItem();
+            item.startMileage = $$("startForm").getValues().startMileage;
+            console.log(item);
+            webix.ajax().header({"Content-type": "application/json"})
+                .put("api/reservation/start/" + item.id+"/"+item.startMileage).then(function (data) {
+                if (data) {
+                    var updated=data.json();
+                    console.log(item);
+                    $$("reservationDT").updateItem(updated.id,updated);
+                    util.messages.showMessage("Reservation running.");
+                } else {
+                    util.messages.showErrorMessage("Reservation running failed.");
+                }
+
+            }).fail(function (error) {
+                util.messages.showErrorMessage(error.responseText);
+            });
+
+            util.dismissDialog('startDialog');
+        }
+    },
+
+    finishDialog: {
+        view: "popup",
+        id: "finishDialog",
+        modal: true,
+        position: "center",
+        body: {
+            id: "finishInside",
+            rows: [
+                {
+                    view: "toolbar",
+                    cols: [
+                        {
+                            view: "label",
+                            label: "<span class='webix_icon fa fa-bookmark'></span> Finish trip",
+                            width: 300
+                        },
+                        {},
+                        {
+                            hotkey: 'esc',
+                            view: "icon",
+                            icon: "close",
+                            align: "right",
+                            click: "util.dismissDialog('finishDialog');"
+                        }
+                    ]
+                },
+                {
+                    cols: [
+                        {
+                            view: "form",
+                            id: "finishForm",
+                            borderless: true,
+                            width: 540,
+                            elementsConfig: {
+                                labelWidth: 170,
+                                bottomPadding: 18
+                            },
+                            elements: [
+                                {
+                                    view: "text",
+                                    id: "finishMileage",
+                                    name: "finishMileage",
+                                    label: "Finish mileage:",
+                                    invalidMessage: "Enter finish mileage.",
+                                    required: true,
+                                },
+                                {
+                                    margin: 5,
+                                    cols: [
+                                        {
+                                            id: "saveFinishTrip",
+                                            view: "button",
+                                            value: "Finish",
+                                            type: "form",
+                                            click: "reservationView.finish",
+                                            hotkey: "enter",
+                                            width: 275
+                                        },
+                                        {},
+                                        {
+                                            id: "btnAddCarExpense",
+                                            view: "button",
+                                            value: "Add trip expenses",
+                                       //     click: "reservationView.addExpense",
+                                            width: 200
+                                        }
+                                    ]
+                                }
+                            ],
+                            rules: {
+                                "finishMileage": function (value) {
+                                    if (value.length > 6) {
+                                        $$('finishForm').elements.finishMileage.config.invalidMessage = 'Maximum length is 6.';
+                                        return false;
+                                    }
+
+                                    if (!webix.rules.isNumber(value)) {
+                                        $$('finishForm').elements.finishMileage.config.invalidMessage = 'Invalid format. Finish mileage must be number.';
+                                        return false;
+                                    }
+
+                                    if(value <= $$("reservationDT").getSelectedItem().startMileage){
+                                        $$('finishForm').elements.finishMileage.config.invalidMessage = 'Finish mileage must be greater than start mileage.';
+                                        return false;
+                                    }
+
+                                    return true;
+                                }
+                            }
+                        }
+
+                    ]
+                }
+            ]
+        }
+    },
+
+    showFinishDialog: function () {
+        if (util.popupIsntAlreadyOpened("finishDialog")) {
+            webix.ui(webix.copy(reservationView.finishDialog)).show();
+            webix.UIManager.setFocus("finishMileage");
+        }
+    },
+
+    finish: function () {
+        if ($$("finishForm").validate()) {
+            var item=$$("reservationDT").getSelectedItem();
+            var finishMileage = $$("finishForm").getValues().finishMileage;
+            webix.ajax().header({"Content-type": "application/json"})
+                .put("api/reservation/finish/" + item.id+"/"+finishMileage,).then(function (data) {
+                if (data) {
+                    var updated=data.json();
+                    $$("reservationDT").updateItem(updated.id, updated);
+                    util.messages.showMessage("Reservation finished.")
+                } else {
+                    util.messages.showErrorMessage("Reservation not finished.");
+                }
+            }).fail(function (error) {
+                util.messages.showErrorMessage(error.responseText);
+            });
+
+            util.dismissDialog('finishDialog');
+        }
+    },
+
+
+
 
 
 

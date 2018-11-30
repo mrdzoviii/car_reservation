@@ -5,6 +5,7 @@ import ba.telegroup.car_reservation.common.exceptions.ForbiddenException;
 import ba.telegroup.car_reservation.controller.genericController.GenericHasCompanyIdAndDeletableController;
 import ba.telegroup.car_reservation.model.Reservation;
 import ba.telegroup.car_reservation.model.User;
+import ba.telegroup.car_reservation.model.modelCustom.ReservationStateCarCompanyUser;
 import ba.telegroup.car_reservation.model.modelCustom.ReservationStateCarUserCompanyLocation;
 import ba.telegroup.car_reservation.repository.ReservationRepository;
 import ba.telegroup.car_reservation.repository.UserRepository;
@@ -16,7 +17,9 @@ import org.springframework.http.HttpStatus;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 
+import java.sql.Timestamp;
 import java.util.List;
+import java.util.TimeZone;
 
 
 @RestController
@@ -33,6 +36,10 @@ public class ReservationController extends GenericHasCompanyIdAndDeletableContro
     private Integer directionLength;
     @Value("${state.reserved}")
     private Integer stateReserved;
+    @Value("${state.running}")
+    private Integer stateRunning;
+    @Value("${state.finished}")
+    private Integer stateFinished;
     @Value("${action.success}")
     private String actionSuccess;
     @Value("${forbidden.action}")
@@ -41,9 +48,14 @@ public class ReservationController extends GenericHasCompanyIdAndDeletableContro
     private String badRequestReservationDelete;
     @Value("${role.user}")
     private Integer roleUser;
+    @Value("${badRequest.reservation.start}")
+    private String badRequestReservationStart;
+    @Value("${badRequest.reservation.finish}")
+    private String badRequestReservationFinish;
     private ReservationRepository reservationRepository;
     private UserRepository userRepository;
     private Notification notification;
+    TimeZone timeZone=TimeZone.getTimeZone("UTC");
 
     @Autowired
     public ReservationController(ReservationRepository reservationRepository, UserRepository userRepository,Notification notification) {
@@ -94,7 +106,8 @@ public class ReservationController extends GenericHasCompanyIdAndDeletableContro
     @Override
     public String delete(@PathVariable  Integer id) throws BadRequestException, ForbiddenException {
         Reservation reservation=reservationRepository.findById(id).orElse(null);
-        if(reservation!=null && reservation.getStateId().equals(stateReserved) && reservation.getUserId().equals(userBean.getUser().getId())) {
+        Timestamp now=new Timestamp(System.currentTimeMillis());
+        if(reservation!=null && reservation.getStateId().equals(stateReserved) && reservation.getUserId().equals(userBean.getUser().getId()) && reservation.getStartTime().after(now)) {
             ReservationStateCarUserCompanyLocation reservationInfo=reservationRepository.getReservationInfoForNotification(id);
             if(super.delete(id).equals(actionSuccess)){
                 List<User> users=userRepository.getAllByCompanyIdAndRoleIdAndDeleted(reservationInfo.getCompanyId(),roleUser,notDeleted);
@@ -105,13 +118,43 @@ public class ReservationController extends GenericHasCompanyIdAndDeletableContro
         throw new BadRequestException(badRequestReservationDelete);
     }
 
+    @RequestMapping(value = "/start/{id}/{startMileage}",method = RequestMethod.PUT)
+    public ReservationStateCarCompanyUser runReservation(@PathVariable("id") Integer id,@PathVariable("startMileage") Integer startMileage) throws BadRequestException, ForbiddenException {
+        Reservation reservation=reservationRepository.findById(id).orElse(null);
+
+        Timestamp now=new Timestamp(System.currentTimeMillis());
+        if(reservation!=null && reservation.getStateId().equals(stateReserved) && reservation.getStartMileage()==null && startMileage!=null && reservation.getStartTime().before(now)){
+            reservation.setStartMileage(startMileage);
+            reservation.setStateId(stateRunning);
+            if(super.update(id,reservation).equals(actionSuccess)){
+                return reservationRepository.getExtendedById(reservation.getId());
+            }
+        }
+        throw new BadRequestException(badRequestReservationStart);
+    }
+
+    @RequestMapping(value = "/finish/{id}/{finishMileage}",method = RequestMethod.PUT)
+    public ReservationStateCarCompanyUser finishReservation(@PathVariable("id") Integer id,@PathVariable("finishMileage") Integer finishMileage) throws BadRequestException, ForbiddenException {
+        Reservation reservation=reservationRepository.findById(id).orElse(null);
+        Timestamp now=new Timestamp(System.currentTimeMillis());
+        if(reservation!=null && reservation.getStateId().equals(stateRunning) && reservation.getFinishMileage()==null && finishMileage!=null && reservation.getStartTime().before(now)){
+            reservation.setFinishMileage(finishMileage);
+            reservation.setStateId(stateFinished);
+            if(super.update(id,reservation).equals(actionSuccess)){
+                return reservationRepository.getExtendedById(reservation.getId());
+            }
+        }
+        throw new BadRequestException(badRequestReservationFinish);
+    }
+
     private Boolean checkReservation(Reservation reservation){
+        Timestamp now=new Timestamp(System.currentTimeMillis());
         return reservation != null && reservation.getCarId() != null && reservation.getCompanyId() != null && reservation.getDeleted() != null &&
                 reservation.getDeleted().equals(notDeleted) &&
                 reservation.getDirection() != null && !reservation.getDirection().isEmpty() && reservation.getDirection().length() <= directionLength &&
                 reservation.getStateId() != null && reservation.getStateId().equals(stateReserved) && reservation.getUserId() != null
                 && (userRepository.findById(reservation.getUserId()).orElse(null)) != null && userBean.getUser().getId().equals(reservation.getUserId())
-                && reservation.getStartTime() != null && reservation.getEndTime() != null &&
+                && reservation.getStartTime() != null && reservation.getEndTime() != null && reservation.getStartTime().after(now) &&
                 reservation.getStartTime().before(reservation.getEndTime());
     }
 

@@ -6,6 +6,9 @@ import com.fasterxml.jackson.annotation.JsonFormat;
 
 import javax.persistence.*;
 import java.sql.Timestamp;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.time.ZoneOffset;
 import java.util.Date;
 import java.util.Objects;
 
@@ -39,7 +42,7 @@ public class Reservation implements Deletable, HasCompanyId {
     @Basic
     @Column(name = "created_time")
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss",timezone = "UTC")
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss",timezone = "Europe/Belgrade")
     public Timestamp getCreatedTime() {
         return createdTime;
     }
@@ -100,7 +103,7 @@ public class Reservation implements Deletable, HasCompanyId {
 
     @Basic
     @Column(name = "start_time")
-    @JsonFormat(pattern="yyyy-MM-dd HH:mm:ss",timezone = "UTC")
+    @JsonFormat(pattern="yyyy-MM-dd HH:mm:ss",timezone = "Europe/Belgrade")
     public Timestamp getStartTime() {
         return startTime;
     }
@@ -111,7 +114,7 @@ public class Reservation implements Deletable, HasCompanyId {
 
     @Basic
     @Column(name = "end_time")
-    @JsonFormat(pattern="yyyy-MM-dd HH:mm:ss",timezone = "UTC")
+    @JsonFormat(pattern="yyyy-MM-dd HH:mm:ss",timezone = "Europe/Belgrade")
     public Timestamp getEndTime() {
         return endTime;
     }
