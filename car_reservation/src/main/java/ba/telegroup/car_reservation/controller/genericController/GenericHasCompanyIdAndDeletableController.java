@@ -25,6 +25,9 @@ public class GenericHasCompanyIdAndDeletableController<T extends HasCompanyId & 
     @Value("${badRequest.delete}")
     private String badRequestDelete;
 
+    @Value("${action.success}")
+    private String success;
+
 
     public GenericHasCompanyIdAndDeletableController(JpaRepository<T, ID> repo) {
         super(repo);
@@ -61,7 +64,7 @@ public class GenericHasCompanyIdAndDeletableController<T extends HasCompanyId & 
         if (object != null) {
             object.setDeleted((byte) 1);
             logDeleteAction(object);
-            return "Success";
+            return success;
         } else {
             throw new BadRequestException(badRequestDelete);
         }

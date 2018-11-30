@@ -1,3 +1,8 @@
+var freeVehicles = [];
+var firstFreeVehicle;
+var selectedReservation;
+var vehicleMaintenances = [];
+var endKmTemp;
 
 var reservationView = {
     panel: {
@@ -57,7 +62,7 @@ var reservationView = {
                         view: "button",
                         type: "iconButton",
                         label: "Make new reservation",
-                       // click: "reservationView.showAddDialog",
+                        click: "reservationView.showAddDialog",
                         icon: "plus-circle",
                         autowidth: true
                     }
@@ -72,14 +77,88 @@ var reservationView = {
                 fillspace: true,
                 resizeColumn:true,
                 url:"api/reservation",
-                /*
                 on: {
-                    onBeforeContextMenu: function (item) {
-                        if (item.row === userData.id)
-                            return false;
-                        this.select(item.row);
+                    onItemDblClick:function(id,e,node){
+                        reservationView.showDetailReservationDialog($$("reservationDT").getSelectedItem());
+                    },
+                    onBeforeContextMenu:function (id,e,node) {
+                    var selectedItem=$$("reservationDT").getSelectedItem();
+                        var contextMenuData = [];
+                        if (userData.id == selectedItem.userId) {
+
+
+                            if (selectedItem.stateId=== reservationState.reserved) {
+                                contextMenuData.push(
+                                    {
+                                        id: "1",
+                                        value: "Edit",
+                                        icon: "pencil-square-o"
+                                    },
+                                    {
+                                        id: "2",
+                                        value: "Cancel",
+                                        icon: "close"
+                                    },
+                                    {
+                                        $template: "Separator"
+                                    },
+                                    {
+                                        id: "4",
+                                        value: "Start",
+                                        icon: "arrow-up"
+                                    },
+                                    {
+                                        $template: "Separator"
+                                    },
+                                    {
+                                        id: "3",
+                                        value: "More details",
+                                        icon: "info-circle"
+                                    }
+                                    )
+                            }
+
+                            if (selectedItem.stateId === reservationState.running) {
+                                contextMenuData.push({
+                                    id: "5",
+                                    value: "Finish",
+                                    icon: "arrow-up"
+                                },
+                                    {
+                                        $template: "Separator"
+                                    },
+                                    {
+                                        id: "3",
+                                        value: "More details",
+                                        icon: "info-circle"
+                                    })
+                            }
+                            if (selectedItem.stateId === reservationState.finished) {
+                                contextMenuData.push(
+                                    {
+                                        id: "3",
+                                        value: "More details",
+                                        icon: "info-circle"
+                                    })
+                            }
+
+                            $$("reservationContextMenu").clearAll();
+                            $$("reservationContextMenu").define("data", contextMenuData);
+                            $$("reservationContextMenu").refresh();
+
+                        }else{
+                            contextMenuData.push(
+                                {
+                                    id: "3",
+                                    value: "More details",
+                                    icon: "info-circle"
+                                })
+                            $$("reservationContextMenu").clearAll();
+                            $$("reservationContextMenu").define("data", contextMenuData);
+                            $$("reservationContextMenu").refresh();
+                        }
                     }
-                },*/
+                },
                 columns: [
                     {
                         id: "id",
@@ -213,5 +292,1001 @@ var reservationView = {
         rightPanel = "reservationPanel";
         var panelCopy = webix.copy(this.panel);
         $$("main").addView(webix.copy(panelCopy));
+        webix.ui({
+            view: "contextmenu",
+            id: "reservationContextMenu",
+            width: 230,
+            master: $$("reservationDT"),
+            on: {
+                onItemClick: function (id) {
+                    var context = this.getContext();
+                    switch (id) {
+                        case "1":
+                            reservationView.showEditDialog($$("reservationDT").getSelectedItem());
+                            break;
+                        case "2":
+                            var delBox = (webix.copy(commonViews.cancelConfirm("reservation","reservation")));
+                            delBox.callback = function (result) {
+                                if (result) {
+                                    var item = $$("reservationDT").getItem(context.id.row);
+                                    connection.sendAjax("DELETE", "api/reservation/" + item.id, function (text, data, xhr) {
+                                        if (text) {
+                                            $$("reservationDT").remove(context.id.row);
+                                            util.messages.showMessage("Reservation canceled");
+                                        }
+                                    }, function (text, data, xhr) {
+                                        util.messages.showErrorMessage("Reservation not canceled");
+                                    }, item);
+                                }
+                            };
+                            webix.confirm(delBox);
+                            break;
+                        case "3":
+                            reservationView.showDetailReservationDialog($$("reservationDT").getSelectedItem());
+                            break;
+
+                    }
+                },
+
+            }
+        });
     },
+    detailReservationDialog: {
+        view: "popup",
+        id: "detailReservationDialog",
+        modal: true,
+        position: "center",
+        body: {
+            id: "detailReservationInside",
+            rows: [
+                {
+                    view: "toolbar",
+                    cols: [
+                        {
+                            view: "label",
+                            label: "<span class='webix_icon fa fa-bookmark'></span> Reservation details",
+                            width: 400
+                        },
+                        {},
+                        {
+                            hotkey: 'esc',
+                            view: "icon",
+                            icon: "close",
+                            align: "right",
+                            click: "util.dismissDialog('detailReservationDialog');"
+                        }
+                    ]
+                },
+                {
+                    cols: [
+                        {
+                            width:300,
+                            rows: [
+                                {
+                                    view: "template",
+                                    borderless: true,
+                                    id: "image",
+                                    name: "image",
+                                    width: 300,
+                                    height: 300,
+                                    template: "<img src='data:image/jpg;base64, #src#' width='300' height='300' alt='No image' class='photo-alignment'/>"
+                                },
+                                { template:"Vehicle details", type:"section"},
+                                {
+                                    view: "label",
+                                    borderless: true,
+                                    id: "manufacturer",
+                                    name: "manufacturer",
+                                    label: "Manufacturer",
+                                    align: "left"
+                                },
+                                {
+                                    view: "label",
+                                    borderless: true,
+                                    id: "model",
+                                    name: "model",
+                                    label: "Model",
+                                    align: "left"
+                                },
+                                {
+                                    view: "label",
+                                    borderless: true,
+                                    id: "plateNumber",
+                                    name: "plateNumber",
+                                    label: "Plate number",
+                                    align: "left"
+                                },
+                                {
+                                    view: "label",
+                                    borderless: true,
+                                    id: "year",
+                                    name: "year",
+                                    label: "Year",
+                                    align: "left"
+                                },
+                                {
+                                    view: "label",
+                                    borderless: true,
+                                    id: "engine",
+                                    name: "engine",
+                                    label: "Engine",
+                                    align: "left"
+                                },
+                                {
+                                    view: "label",
+                                    borderless: true,
+                                    id: "transmission",
+                                    name: "transmission",
+                                    label: "Transmission",
+                                    align: "left"
+                                },
+                                {
+                                    view: "label",
+                                    borderless: true,
+                                    id: "fuelName",
+                                    name: "fuelName",
+                                    label: "Fuel type",
+                                    align: "left"
+                                },
+                            ]
+                        },
+                        {
+                            width: 20
+                        },
+                        {
+                            width:450,
+                            rows: [
+                                { template:"Basic info", type:"section"},
+                                {
+                                    view: "label",
+                                    borderless: true,
+                                    id: "direction",
+                                    name: "direction",
+                                    align: "left",
+                                },
+                                {
+                                    view: "label",
+                                    borderless: true,
+                                    id: "created",
+                                    name: "created",
+                                    align: "left",
+                                },
+                                { template:"Period", type:"section"},
+                                {
+                                    view: "label",
+                                    borderless: true,
+                                    id: "timeFrom",
+                                    name: "timeFrom",
+                                    align: "left",
+                                },
+                                {
+                                    view: "label",
+                                    borderless: true,
+                                    id: "timeTo",
+                                    name: "timeTo",
+                                    align: "left",
+                                },
+                                { template:"State", type:"section"},
+                                {
+                                    view: "label",
+                                    borderless: true,
+                                    id: "state",
+                                    name: "state",
+                                    align: "center",
+                                },
+                                { template:"User data", type:"section"},
+                                {
+                                    view: "label",
+                                    borderless: true,
+                                    id: "fullName",
+                                    name: "fullName",
+                                    align: "left",
+                                },
+                                {
+                                    view: "label",
+                                    borderless: true,
+                                    id: "username",
+                                    name: "username",
+                                    align: "left",
+                                },
+                                { template:"Mileage", type:"section"},
+                                {
+                                    view: "label",
+                                    borderless: true,
+                                    id: "startMileage",
+                                    name: "startMileage",
+                                    align: "left",
+                                },
+                                {
+                                    view: "label",
+                                    borderless: true,
+                                    id: "finishMileage",
+                                    name: "finishMileage",
+                                    align: "left",
+                                }
+                            ]
+                        }
+
+                    ]
+                }
+            ]
+        }
+    },
+    showDetailReservationDialog: function(item){
+        if (util.popupIsntAlreadyOpened("detailReservationDialog")) {
+            var dialog=webix.ui(webix.copy(reservationView.detailReservationDialog));
+            $$("image").setValues({
+                src: item.image
+            });
+            $$("manufacturer").define("label", "Manufacturer: <b>" + item.manufacturerName+"</b>");
+            $$("model").define("label","Model: <b>" + item.model+"</b>");
+            $$("plateNumber").define("label","Plate number: <b>" + item.plateNumber+"</b>");
+            $$("year").define("label","Year: <b>" + item.year+"</b>");
+            $$("engine").define("label","Engine: <b>" + item.engine+"</b>");
+            $$("transmission").define("label","Transmission: <b>" + item.transmission+"</b>");
+            $$("fuelName").define("label","Fuel: <b>" + item.fuelName+"</b>");
+            $$("direction").define("label","Direction: <b>" + item.direction+"</b>");
+            var format = webix.Date.dateToStr("%d.%m.%Y %H:%i:%s");
+            $$("created").define("label","Time created: <b>" + format(new Date(item.createdTime))+"</b>");
+            $$("timeFrom").define("label","From: <b>" + format(new Date(item.startTime))+"</b>");
+            $$("timeTo").define("label","To: <b>" + format(new Date(item.endTime))+"</b>");
+            if(item.stateId==reservationState.reserved) {
+                $$("state").define("label", "<b style='color:blue;'>" + item.state.toString().toUpperCase() + "</b>");
+            }else if(item.stateId==reservationState.running){
+                $$("state").define("label", "<b style='color:green;'>" + item.state.toString().toUpperCase() + "</b>");
+            }else{
+                $$("state").define("label", "<b style='color:red;'>" + item.state.toString().toUpperCase() + "</b>");
+            }
+            $$("fullName").define("label","Full name: <b>" + item.fullName+"</b>");
+            $$("username").define("label","Username: <b>" + item.username+"</b>");
+            $$("startMileage").define("label","Start: <b> " +(item.startMileage!=null? item.startMileage+' km':'/')+"</b>");
+            $$("finishMileage").define("label","Finish: <b>" +(item.finishMileage!=null? item.finishMileage+' km':'/')+"</b>");
+            dialog.show();
+        }
+    },
+    loadFreeVehicle: function (startTime, endTime) {
+        webix.ajax().get("api/car/reservation/" + startTime + "/" + endTime).then(function (data) {
+            freeVehicles.length = 0;
+            var freeVehiclesTemp = data.json();
+            firstFreeVehicle = freeVehiclesTemp[0].id;
+            freeVehiclesTemp.forEach(function (obj) {
+                freeVehicles.push({
+                    id: obj.id,
+                    value: obj.plateNumber + " - " + obj.manufacturerName + " " + obj.model,
+                    item: obj
+                });
+            });
+            var item=freeVehiclesTemp[0];
+            $$("carId").define("options",freeVehicles);
+            $$("carId").define("value",firstFreeVehicle);
+            $$("carId").refresh();
+            $$("image").setValues({
+                src: item.image
+            });
+            $$("manufacturer").define("label", "Manufacturer: <b>" + item.manufacturerName+"</b>");
+            $$("model").define("label","Model: <b>" + item.model+"</b>");
+            $$("plateNumber").define("label","Plate number: <b>" + item.plateNumber+"</b>");
+            $$("year").define("label","Year: <b>" + item.year+"</b>");
+            $$("engine").define("label","Engine: <b>" + item.engine+"</b>");
+            $$("transmission").define("label","Transmission: <b>" + item.transmission+"</b>");
+            $$("fuelName").define("label","Fuel: <b>" + item.fuelName+"</b>");
+            $$("carDetails").show();
+            $$("image").refresh();
+            $$("carPhoto").show();
+            $$("manufacturer").refresh();
+            $$("model").refresh();
+            $$("plateNumber").refresh();
+            $$("year").refresh();
+            $$("engine").refresh();
+            $$("fuelName").refresh();
+            $$("transmission").refresh();
+        }).fail(function (error) {
+            util.messages.showErrorMessage("Load free vehicles failed.");
+        });
+    },
+    addReservationDialog: {
+        view: "popup",
+        id: "addReservationDialog",
+        modal: true,
+        position: "center",
+        body: {
+            id: "addReservationInside",
+            rows: [
+                {
+                    view: "toolbar",
+                    cols: [
+                        {
+                            view: "label",
+                            label: "<span class='webix_icon fa fa-bookmark'></span>Make new reservation",
+                            width: 400
+                        },
+                        {},
+                        {
+                            hotkey: 'esc',
+                            view: "icon",
+                            icon: "close",
+                            align: "right",
+                            click: "util.dismissDialog('addReservationDialog');"
+                        }
+                    ]
+                },
+                {
+                    cols: [
+                        {
+                            rows: [
+                                {
+                                    height: 22
+                                },
+                                {
+                                    hidden: true,
+                                    id: "carPhoto",
+                                    width: 300,
+                                    rows: [
+                                        {template: "Vehicle photo", type: "section"},
+                                        {
+
+                                            view: "template",
+                                            borderless: true,
+                                            id: "image",
+                                            name: "image",
+                                            width: 300,
+                                            height: 300,
+                                            template: "<img src='data:image/jpg;base64, #src#' width='300' height='300' alt='No image' class='photo-alignment'/>"
+                                        },
+                                    ]
+                                }
+                            ]
+                        },
+                        {
+                            width: 20
+                        },
+                        {
+                            rows: [
+                                {
+                                    height: 22,
+                                },
+                                {
+                                    hidden: true,
+                                    id: "carDetails",
+                                    width: 300,
+                                    rows: [
+                                        {template: "Vehicle details", type: "section"},
+                                        {
+
+                                            view: "label",
+                                            borderless: true,
+                                            id: "manufacturer",
+                                            name: "manufacturer",
+                                            label: "Manufacturer",
+                                            align: "left"
+                                        },
+                                        {
+
+                                            view: "label",
+                                            borderless: true,
+                                            id: "model",
+                                            name: "model",
+                                            label: "Model",
+                                            align: "left"
+                                        },
+                                        {
+
+                                            view: "label",
+                                            borderless: true,
+                                            id: "plateNumber",
+                                            name: "plateNumber",
+                                            label: "Plate number",
+                                            align: "left"
+                                        },
+                                        {
+
+                                            view: "label",
+                                            borderless: true,
+                                            id: "year",
+                                            name: "year",
+                                            label: "Year",
+                                            align: "left"
+                                        },
+                                        {
+
+                                            view: "label",
+                                            borderless: true,
+                                            id: "engine",
+                                            name: "engine",
+                                            label: "Engine",
+                                            align: "left"
+                                        },
+                                        {
+
+                                            view: "label",
+                                            borderless: true,
+                                            id: "transmission",
+                                            name: "transmission",
+                                            label: "Transmission",
+                                            align: "left"
+                                        },
+                                        {
+                                            view: "label",
+                                            borderless: true,
+                                            id: "fuelName",
+                                            name: "fuelName",
+                                            label: "Fuel type",
+                                            align: "left"
+                                        },
+                                    ]
+                                }
+                            ]
+                        },
+                        {
+                            width: 20
+                        },
+                        {
+                            rows: [
+                                {
+                                    height: 5,
+                                },
+                                {
+                                    view: "form",
+                                    id: "addReservationForm",
+                                    borderless: true,
+                                    width: 600,
+                                    elementsConfig: {
+                                        labelWidth: 200,
+                                        bottomPadding: 18
+                                    },
+                                    elements: [
+                                        {template: "Reservation data", type: "section"},
+                                        {
+                                            id: "startTime",
+                                            name: "startTime",
+                                            view: "datepicker",
+                                            stringResult: true,
+                                            label: "From:",
+                                            timepicker: true,
+                                            type: "date",
+                                            required: true,
+                                            invalidMessage: "Enter reservation start time.",
+                                            format: "%d-%m-%Y %H:%i:%s",
+                                            suggest: {
+                                                type: "calendar",
+                                                body: {
+                                                    type: "date",
+                                                    timepicker: true,
+                                                    calendarTime: "%d-%m-%Y %H:%i:%s",
+                                                    minDate: new Date()
+                                                }
+                                            },
+                                            on: {
+                                                onChange: function (newValue, oldValue) {
+                                                    $$("endTime").define("value", newValue);
+                                                    $$("endTime").define("disabled", false);
+                                                    $$("endTime").getPopup().getBody().define("minDate", newValue);
+                                                    $$("endTime").refresh();
+                                                }
+                                            }
+                                        },
+                                        {
+                                            id: "endTime",
+                                            name: "endTime",
+                                            view: "datepicker",
+                                            stringResult: true,
+                                            label: "End time:",
+                                            disabled: true,
+                                            timepicker: true,
+                                            type: "date",
+                                            required: true,
+                                            invalidMessage: "Enter reservation finish time.",
+                                            format: "%d-%m-%Y %H:%i:%s",
+                                            suggest: {
+                                                type: "calendar",
+                                                body: {
+                                                    type: "date",
+                                                    timepicker: true,
+                                                    calendarTime: "%d-%m-%Y %H:%i:%s"
+                                                }
+                                            },
+                                            on: {
+                                                onChange: function (newValue, oldValue) {
+                                                    $$("carId").define("disabled", false);
+                                                    var startTime = webix.i18n.parseFormatStr($$("startTime").getValue()) + ":00";
+                                                    var endTime = webix.i18n.parseFormatStr(newValue) + ":00";
+                                                    reservationView.loadFreeVehicle(startTime, endTime);
+
+                                                }
+                                            }
+                                        },
+                                        {
+                                            view: "text",
+                                            id: "direction",
+                                            name: "direction",
+                                            label: "Direction:",
+                                            invalidMessage: "Please enter direction.",
+                                            required: true,
+                                        },
+                                        {
+                                            id: "carId",
+                                            name: "carId",
+                                            view: "select",
+                                            invalidMessage: "Please choose vehicle.",
+                                            required: true,
+                                            disabled: true,
+                                            label: "Vehicle:",
+                                            options: [],
+                                            on: {
+                                                onChange: function (newValue, oldValue) {
+                                                    console.log(firstFreeVehicle);
+                                                    console.log(oldValue);
+                                                    console.log(newValue);
+                                                    var options = $$("carId").config.options;
+                                                    for (var i = 0; i < options.length; i++) {
+                                                        if (options[i].id == newValue) {
+                                                            var item = options[i].item;
+
+                                                            $$("image").setValues({
+                                                                src: item.image
+                                                            });
+                                                            $$("manufacturer").define("label", "Manufacturer: <b>" + item.manufacturerName + "</b>");
+                                                            $$("model").define("label", "Model: <b>" + item.model + "</b>");
+                                                            $$("plateNumber").define("label", "Plate number: <b>" + item.plateNumber + "</b>");
+                                                            $$("year").define("label", "Year: <b>" + item.year + "</b>");
+                                                            $$("engine").define("label", "Engine: <b>" + item.engine + "</b>");
+                                                            $$("transmission").define("label", "Transmission: <b>" + item.transmission + "</b>");
+                                                            $$("fuelName").define("label", "Fuel: <b>" + item.fuelName + "</b>");
+                                                            $$("image").refresh();
+                                                            $$("manufacturer").refresh();
+                                                            $$("model").refresh();
+                                                            $$("plateNumber").refresh();
+                                                            $$("year").refresh();
+                                                            $$("engine").refresh();
+                                                            $$("fuelName").refresh();
+                                                            $$("transmission").refresh();
+
+                                                        }
+                                                    }
+                                                }
+                                            }
+                                        },
+                                        {
+                                            margin: 5,
+                                            cols: [
+                                                {},
+                                                {
+                                                    id: "saveReservation",
+                                                    view: "button",
+                                                    value: "Save",
+                                                    type: "form",
+                                                    click: "reservationView.save",
+                                                    hotkey: "enter",
+                                                    width: 170
+                                                }
+                                            ]
+                                        }
+                                    ],
+                                    rules: {
+                                        "direction": function (value) {
+                                            if (value.length > 250) {
+                                                $$('addReservationForm').elements.direction.config.invalidMessage = 'Maximum length is 250.';
+                                                return false;
+                                            }
+
+                                            return true;
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    ]
+                }
+            ]
+        }
+    },
+
+    showAddDialog: function () {
+        if (util.popupIsntAlreadyOpened("addReservationDialog")) {
+            webix.ui(webix.copy(reservationView.addReservationDialog)).show();
+            webix.UIManager.setFocus("startTime");
+        }
+    },
+
+    save: function () {
+        if ($$("addReservationForm").validate()) {
+            var newItem = {
+                startTime: $$("addReservationForm").getValues().startTime + ":00",
+                endTime: $$("addReservationForm").getValues().endTime + ":00",
+                direction: $$("addReservationForm").getValues().direction,
+                stateId: 1,
+                deleted: 0,
+                userId: userData.id,
+                carId: $$("addReservationForm").getValues().carId,
+                companyId: userData.companyId
+            };
+            webix.ajax().header({"Content-type": "application/json"})
+                .post("api/reservation", newItem).then(function (data) {
+                $$("reservationDT").add(data.json());
+                util.messages.showMessage("Reservation successfully made.");
+            }).fail(function (error) {
+                util.messages.showErrorMessage(error.responseText);
+            });
+            console.log(newItem);
+            util.dismissDialog('addReservationDialog');
+        }
+    },
+    editReservationDialog: {
+        view: "popup",
+        id: "editReservationDialog",
+        modal: true,
+        position: "center",
+        body: {
+            id: "editReservationInside",
+            rows: [
+                {
+                    view: "toolbar",
+                    cols: [
+                        {
+                            view: "label",
+                            label: "<span class='webix_icon fa fa-bookmark'></span>Edit reservation",
+                            width: 400
+                        },
+                        {},
+                        {
+                            hotkey: 'esc',
+                            view: "icon",
+                            icon: "close",
+                            align: "right",
+                            click: "util.dismissDialog('editReservationDialog');"
+                        }
+                    ]
+                },
+                {
+                    cols: [
+                        {
+                            rows: [
+                                {
+                                    height: 22
+                                },
+                                {
+                                    id: "carPhoto",
+                                    width: 300,
+                                    rows: [
+                                        {template: "Vehicle photo", type: "section"},
+                                        {
+
+                                            view: "template",
+                                            borderless: true,
+                                            id: "image",
+                                            name: "image",
+                                            width: 300,
+                                            height: 300,
+                                            template: "<img src='data:image/jpg;base64, #src#' width='300' height='300' alt='No image' class='photo-alignment'/>"
+                                        },
+                                    ]
+                                }
+                            ]
+                        },
+                        {
+                            width: 20
+                        },
+                        {
+                            rows: [
+                                {
+                                    height: 22,
+                                },
+                                {
+                                    id: "carDetails",
+                                    width: 300,
+                                    rows: [
+                                        {template: "Vehicle details", type: "section"},
+                                        {
+
+                                            view: "label",
+                                            borderless: true,
+                                            id: "manufacturer",
+                                            name: "manufacturer",
+                                            label: "Manufacturer",
+                                            align: "left"
+                                        },
+                                        {
+
+                                            view: "label",
+                                            borderless: true,
+                                            id: "model",
+                                            name: "model",
+                                            label: "Model",
+                                            align: "left"
+                                        },
+                                        {
+
+                                            view: "label",
+                                            borderless: true,
+                                            id: "plateNumber",
+                                            name: "plateNumber",
+                                            label: "Plate number",
+                                            align: "left"
+                                        },
+                                        {
+
+                                            view: "label",
+                                            borderless: true,
+                                            id: "year",
+                                            name: "year",
+                                            label: "Year",
+                                            align: "left"
+                                        },
+                                        {
+
+                                            view: "label",
+                                            borderless: true,
+                                            id: "engine",
+                                            name: "engine",
+                                            label: "Engine",
+                                            align: "left"
+                                        },
+                                        {
+
+                                            view: "label",
+                                            borderless: true,
+                                            id: "transmission",
+                                            name: "transmission",
+                                            label: "Transmission",
+                                            align: "left"
+                                        },
+                                        {
+                                            view: "label",
+                                            borderless: true,
+                                            id: "fuelName",
+                                            name: "fuelName",
+                                            label: "Fuel type",
+                                            align: "left"
+                                        },
+                                    ]
+                                }
+                            ]
+                        },
+                        {
+                            width: 20
+                        },
+                        {
+                            rows: [
+                                {
+                                    height: 5,
+                                },
+                                {
+                                    view: "form",
+                                    id: "editReservationForm",
+                                    borderless: true,
+                                    width: 600,
+                                    elementsConfig: {
+                                        labelWidth: 200,
+                                        bottomPadding: 18
+                                    },
+                                    elements: [
+                                        {template: "Reservation data", type: "section"},
+                                        {
+                                            id: "startTime",
+                                            name: "startTime",
+                                            view: "datepicker",
+                                            stringResult: true,
+                                            label: "From:",
+                                            timepicker: true,
+                                            type: "date",
+                                            required: true,
+                                            invalidMessage: "Enter reservation start time.",
+                                            format: "%d-%m-%Y %H:%i:%s",
+                                            suggest: {
+                                                type: "calendar",
+                                                body: {
+                                                    type: "date",
+                                                    timepicker: true,
+                                                    calendarTime: "%d-%m-%Y %H:%i:%s",
+                                                    minDate: new Date()
+                                                }
+                                            },
+                                            on: {
+                                                onChange: function (newValue, oldValue) {
+                                                    $$("endTime").define("value", newValue);
+                                                    $$("endTime").define("disabled", false);
+                                                    $$("endTime").getPopup().getBody().define("minDate", newValue);
+                                                    $$("endTime").refresh();
+                                                }
+                                            }
+                                        },
+                                        {
+                                            id: "endTime",
+                                            name: "endTime",
+                                            view: "datepicker",
+                                            stringResult: true,
+                                            label: "End time:",
+                                            timepicker: true,
+                                            type: "date",
+                                            required: true,
+                                            invalidMessage: "Enter reservation finish time.",
+                                            format: "%d-%m-%Y %H:%i:%s",
+                                            suggest: {
+                                                type: "calendar",
+                                                body: {
+                                                    type: "date",
+                                                    timepicker: true,
+                                                    calendarTime: "%d-%m-%Y %H:%i:%s"
+                                                }
+                                            },
+                                            on: {
+                                                onChange: function (newValue, oldValue) {
+                                                    $$("carId").define("disabled", false);
+                                                    var startTime = webix.i18n.parseFormatStr($$("startTime").getValue()) + ":00";
+                                                    var endTime = webix.i18n.parseFormatStr(newValue) + ":00";
+                                                    reservationView.loadFreeVehicle(startTime, endTime);
+
+                                                }
+                                            }
+                                        },
+                                        {
+                                            view: "text",
+                                            id: "direction",
+                                            name: "direction",
+                                            label: "Direction:",
+                                            invalidMessage: "Please enter direction.",
+                                            required: true,
+                                        },
+                                        {
+                                            view: "text",
+                                            id: "id",
+                                            name: "id",
+                                           hidden:true,
+                                        },
+                                        {
+                                            view: "text",
+                                            id: "deleted",
+                                            name: "deleted",
+                                            hidden:true,
+                                        },
+                                        {
+                                            view: "text",
+                                            id: "stateId",
+                                            name: "stateId",
+                                            hidden:true,
+                                        },
+                                        {
+                                            view: "text",
+                                            id: "userId",
+                                            name: "userId",
+                                            hidden:true,
+                                        },
+                                        {
+                                            view: "text",
+                                            id: "companyId",
+                                            name: "companyId",
+                                            hidden:true,
+                                        },
+                                        {
+                                            view: "text",
+                                            id: "createdTime",
+                                            name: "createdTime",
+                                            hidden:true,
+                                        },
+                                        {
+                                            id: "carId",
+                                            name: "carId",
+                                            view: "select",
+                                            invalidMessage: "Please choose vehicle.",
+                                            required: true,
+                                            label: "Vehicle:",
+                                            options: [],
+                                            on: {
+                                                onChange: function (newValue, oldValue) {
+                                                    var options = $$("carId").config.options;
+                                                    for (var i = 0; i < options.length; i++) {
+                                                        if (options[i].id == newValue) {
+                                                            var item = options[i].item;
+
+                                                            $$("image").setValues({
+                                                                src: item.image
+                                                            });
+                                                            $$("manufacturer").define("label", "Manufacturer: <b>" + item.manufacturerName + "</b>");
+                                                            $$("model").define("label", "Model: <b>" + item.model + "</b>");
+                                                            $$("plateNumber").define("label", "Plate number: <b>" + item.plateNumber + "</b>");
+                                                            $$("year").define("label", "Year: <b>" + item.year + "</b>");
+                                                            $$("engine").define("label", "Engine: <b>" + item.engine + "</b>");
+                                                            $$("transmission").define("label", "Transmission: <b>" + item.transmission + "</b>");
+                                                            $$("fuelName").define("label", "Fuel: <b>" + item.fuelName + "</b>");
+                                                            $$("image").refresh();
+                                                            $$("manufacturer").refresh();
+                                                            $$("model").refresh();
+                                                            $$("plateNumber").refresh();
+                                                            $$("year").refresh();
+                                                            $$("engine").refresh();
+                                                            $$("fuelName").refresh();
+                                                            $$("transmission").refresh();
+
+                                                        }
+                                                    }
+                                                }
+                                            }
+                                        },
+                                        {
+                                            margin: 5,
+                                            cols: [
+                                                {},
+                                                {
+                                                    id: "saveReservation",
+                                                    view: "button",
+                                                    value: "Save",
+                                                    type: "form",
+                                                    click: "reservationView.saveChanges",
+                                                    hotkey: "enter",
+                                                    width: 170
+                                                }
+                                            ]
+                                        }
+                                    ],
+                                    rules: {
+                                        "direction": function (value) {
+                                            if (value.length > 250) {
+                                                $$('addReservationForm').elements.direction.config.invalidMessage = 'Maximum length is 250.';
+                                                return false;
+                                            }
+
+                                            return true;
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    ]
+                }
+            ]
+        }
+    },
+
+    showEditDialog: function (item) {
+        if (util.popupIsntAlreadyOpened("editReservationDialog")) {
+            var dialog=  webix.ui(webix.copy(reservationView.editReservationDialog));
+            webix.UIManager.setFocus("startTime");
+            $$("image").setValues({
+                src: item.image
+            });
+            $$("manufacturer").define("label", "Manufacturer: <b>" + item.manufacturerName + "</b>");
+            $$("model").define("label", "Model: <b>" + item.model + "</b>");
+            $$("plateNumber").define("label", "Plate number: <b>" + item.plateNumber + "</b>");
+            $$("year").define("label", "Year: <b>" + item.year + "</b>");
+            $$("engine").define("label", "Engine: <b>" + item.engine + "</b>");
+            $$("transmission").define("label", "Transmission: <b>" + item.transmission + "</b>");
+            $$("fuelName").define("label", "Fuel: <b>" + item.fuelName + "</b>");
+            var form=$$("editReservationForm");
+            form.elements.id.setValue(item.id);
+            form.elements.deleted.setValue(item.deleted);
+            form.elements.stateId.setValue(item.stateId);
+            form.elements.userId.setValue(item.userId);
+            form.elements.companyId.setValue(item.companyId);
+            form.elements.createdTime.setValue(item.createdTime);
+            form.elements.startTime.setValue(item.startTime);
+            form.elements.endTime.setValue(item.endTime)
+            form.elements.direction.setValue(item.direction);
+            dialog.show();
+
+        }
+    },
+
+    saveChanges: function () {
+        if ($$("editReservationForm").validate()) {
+            var updatedItem=$$("editReservationForm").getValues();
+            updatedItem.startTime=$$("editReservationForm").getValues().startTime+":00";
+            updatedItem.endTime=$$("editReservationForm").getValues().endTime+":00";
+            webix.ajax().header({"Content-type": "application/json"})
+                .put("api/reservation/custom/" + updatedItem.id, updatedItem).then(function (data) {
+                if (data) {
+                    var result=data.json();
+                    $$("reservationDT").updateItem(result.id,result);
+                    util.messages.showMessage("Reservation updated.");
+                } else {
+                    util.messages.showErrorMessage("Reservation not updated.");
+                }
+            }).fail(function (error) {
+                util.messages.showErrorMessage(error.responseText);
+            });
+            util.dismissDialog('editReservationDialog');
+        }
+    },
+
+
+
 }

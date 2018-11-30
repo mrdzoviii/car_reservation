@@ -2,6 +2,7 @@ package ba.telegroup.car_reservation.model;
 
 import ba.telegroup.car_reservation.common.interfaces.Deletable;
 import ba.telegroup.car_reservation.common.interfaces.HasCompanyId;
+import com.fasterxml.jackson.annotation.JsonFormat;
 
 import javax.persistence.*;
 import java.sql.Timestamp;
@@ -37,6 +38,8 @@ public class Reservation implements Deletable, HasCompanyId {
 
     @Basic
     @Column(name = "created_time")
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss",timezone = "UTC")
     public Timestamp getCreatedTime() {
         return createdTime;
     }
@@ -97,6 +100,7 @@ public class Reservation implements Deletable, HasCompanyId {
 
     @Basic
     @Column(name = "start_time")
+    @JsonFormat(pattern="yyyy-MM-dd HH:mm:ss",timezone = "UTC")
     public Timestamp getStartTime() {
         return startTime;
     }
@@ -107,6 +111,7 @@ public class Reservation implements Deletable, HasCompanyId {
 
     @Basic
     @Column(name = "end_time")
+    @JsonFormat(pattern="yyyy-MM-dd HH:mm:ss",timezone = "UTC")
     public Timestamp getEndTime() {
         return endTime;
     }

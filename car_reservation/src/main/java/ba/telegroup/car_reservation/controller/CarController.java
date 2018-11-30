@@ -16,6 +16,7 @@ import org.springframework.context.annotation.Scope;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 
+import javax.persistence.SqlResultSetMapping;
 import java.util.Arrays;
 import java.util.List;
 
@@ -84,6 +85,10 @@ public class CarController extends GenericDeletableController<Car,Integer> {
                     }
                 }
         throw new BadRequestException(badRequestInsert);
+    }
+    @RequestMapping(value = "/reservation/{startTime}/{endTime}",method = RequestMethod.GET)
+    public List getFreeCars(@PathVariable("startTime") String startTime,@PathVariable("endTime") String endTime){
+        return carRepository.getAllExtendedByCompanyIdAndFreeBeetweenStartAndEndTime(userBean.getUser().getCompanyId(),startTime,endTime);
     }
     @Transactional(rollbackFor = Exception.class)
     @RequestMapping(value = "/custom/{id}",method = RequestMethod.PUT)

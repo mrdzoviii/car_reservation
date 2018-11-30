@@ -28,10 +28,15 @@ import java.util.Date;
                 @ColumnResult(name="plate_number",type = String.class),
                 @ColumnResult(name="engine",type = String.class),
                 @ColumnResult(name="image",type=byte[].class),
+                @ColumnResult(name="fuel_name",type=String.class),
+                @ColumnResult(name="fuel_id",type=Integer.class),
+                @ColumnResult(name = "manufacturer_id",type = Integer.class),
+                @ColumnResult(name="manufacturer_name",type=String.class),
                 @ColumnResult(name="transmission",type = String.class),
                 @ColumnResult(name="company_id",type = Integer.class),
                 @ColumnResult(name="company_name",type = String.class),
-                @ColumnResult(name="year",type = String.class)
+                @ColumnResult(name="year",type = String.class),
+                @ColumnResult(name="model",type=String.class)
         }
         ))
 
@@ -42,7 +47,8 @@ public class ReservationStateCarCompanyUser extends Reservation {
    public ReservationStateCarCompanyUser(Integer id, Date createdTime,Date startTime,Date endTime,Integer startMileage,
                                          Integer finishMileage,String direction,Integer stateId,String state,Integer userId,Byte deleted,
                                          Integer carId,String username,String fullName,String carName,String plateNumber,String engine,byte[] image,
-                                         String transmission,Integer companyId,String companyName,String year){
+                                         String fuelName,Integer fuelId,Integer manufacturerId,String manufacturerName,
+                                         String transmission,Integer companyId,String companyName,String year,String model){
        super(id,createdTime,userId,carId,startMileage,finishMileage,direction,startTime,endTime,stateId,deleted,companyId);
        this.state = state;
        this.username = username;
@@ -50,11 +56,17 @@ public class ReservationStateCarCompanyUser extends Reservation {
        this.plateNumber = plateNumber;
        this.engine = engine;
        this.image = image;
+       this.fuelName = fuelName;
+       this.fuelId = fuelId;
+       this.manufacturerId = manufacturerId;
+       this.manufacturerName = manufacturerName;
        this.transmission = transmission;
        this.companyName = companyName;
        this.carName=carName;
        this.year=year;
+       this.model=model;
    }
+    private String model;
     private String year;
     private String state;
     private String username;
@@ -65,6 +77,50 @@ public class ReservationStateCarCompanyUser extends Reservation {
     private byte[] image;
     private String transmission;
     private String companyName;
+    private Integer fuelId;
+    private String fuelName;
+    private Integer manufacturerId;
+    private String manufacturerName;
+
+    public String getModel() {
+        return model;
+    }
+
+    public void setModel(String model) {
+        this.model = model;
+    }
+
+    public Integer getFuelId() {
+        return fuelId;
+    }
+
+    public void setFuelId(Integer fuelId) {
+        this.fuelId = fuelId;
+    }
+
+    public String getFuelName() {
+        return fuelName;
+    }
+
+    public void setFuelName(String fuelName) {
+        this.fuelName = fuelName;
+    }
+
+    public Integer getManufacturerId() {
+        return manufacturerId;
+    }
+
+    public void setManufacturerId(Integer manufacturerId) {
+        this.manufacturerId = manufacturerId;
+    }
+
+    public String getManufacturerName() {
+        return manufacturerName;
+    }
+
+    public void setManufacturerName(String manufacturerName) {
+        this.manufacturerName = manufacturerName;
+    }
 
     public String getYear() {
         return year;

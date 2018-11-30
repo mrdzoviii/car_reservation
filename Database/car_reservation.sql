@@ -280,9 +280,9 @@ CREATE TABLE `reservation` (
   `created_time` timestamp NOT NULL DEFAULT current_timestamp(),
   `user_id` int(11) NOT NULL,
   `car_id` int(11) NOT NULL,
-  `start_mileage` int(11) NOT NULL,
+  `start_mileage` int(11) DEFAULT NULL,
   `finish_mileage` int(11) DEFAULT NULL,
-  `direction` varchar(150) COLLATE utf8mb4_croatian_ci NOT NULL,
+  `direction` varchar(250) COLLATE utf8mb4_croatian_ci NOT NULL,
   `start_time` datetime NOT NULL,
   `end_time` datetime NOT NULL,
   `state_id` int(11) NOT NULL DEFAULT 0,
@@ -306,7 +306,7 @@ CREATE TABLE `reservation` (
 
 LOCK TABLES `reservation` WRITE;
 /*!40000 ALTER TABLE `reservation` DISABLE KEYS */;
-INSERT INTO `reservation` (`id`, `created_time`, `user_id`, `car_id`, `start_mileage`, `finish_mileage`, `direction`, `start_time`, `end_time`, `state_id`, `deleted`, `company_id`) VALUES (1,'2018-11-28 19:27:15',4,8,150000,NULL,'Beograd-Banja Luka-Beograd','2018-11-30 15:00:00','2018-01-08 15:26:58',1,0,3),(2,'2018-11-28 19:27:15',4,1,150000,NULL,'Beograd-Banja Luka-Beograd','2018-11-30 15:00:00','2018-01-08 15:26:58',1,0,3);
+INSERT INTO `reservation` (`id`, `created_time`, `user_id`, `car_id`, `start_mileage`, `finish_mileage`, `direction`, `start_time`, `end_time`, `state_id`, `deleted`, `company_id`) VALUES (1,'2018-11-28 19:27:15',4,5,150000,NULL,'Beograd-Banja Luka-Beograd','2018-11-30 15:00:00','2018-12-08 15:26:58',1,0,3),(2,'2018-11-28 19:27:15',4,1,150000,NULL,'Beograd-Banja Luka-Beograd','2018-10-30 15:00:00','2018-11-08 15:26:58',1,0,3);
 /*!40000 ALTER TABLE `reservation` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -471,4 +471,4 @@ UNLOCK TABLES;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2018-11-29  0:42:00
+-- Dump completed on 2018-11-29 22:58:04
