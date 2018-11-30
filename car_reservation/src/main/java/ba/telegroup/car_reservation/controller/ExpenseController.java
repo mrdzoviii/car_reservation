@@ -61,6 +61,11 @@ public class ExpenseController extends GenericDeletableController<Expense,Intege
         return expenseRepository.getAllExtendedByReservationId(id);
     }
 
+    @RequestMapping(value="/car/{id}",method = RequestMethod.GET)
+    public List<ExpenseCarReservationUser> getAllExtendedByCarId(@PathVariable("id") Integer id){
+        return expenseRepository.getAllExtendedByCarId(id);
+    }
+
     @Override
     public String update(@PathVariable Integer integer,@RequestBody Expense object) throws BadRequestException, ForbiddenException {
         throw new BadRequestException(badRequestUpdate);

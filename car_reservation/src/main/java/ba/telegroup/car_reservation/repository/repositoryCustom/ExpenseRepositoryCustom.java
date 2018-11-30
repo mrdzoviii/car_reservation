@@ -5,7 +5,8 @@ import ba.telegroup.car_reservation.model.modelCustom.ExpenseCarReservationUser;
 import java.util.List;
 
 public interface ExpenseRepositoryCustom {
-    List<ExpenseCarReservationUser> getAllExtendedByReservationId(Integer reservationId);
-    List<ExpenseCarReservationUser> getAllExtended();
+    List getAllExtendedByReservationId(Integer reservationId);
+    List getAllExtended();
+    List getAllExtendedByCarId(Integer carId);
     ExpenseCarReservationUser getExtendedById(Integer id);
 }

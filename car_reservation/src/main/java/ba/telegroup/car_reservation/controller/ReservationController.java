@@ -70,6 +70,11 @@ public class ReservationController extends GenericHasCompanyIdAndDeletableContro
         return reservationRepository.getAllExtendedByCompanyId(userBean.getUser().getCompanyId());
     }
 
+    @RequestMapping(value = "/car/{id}",method = RequestMethod.GET)
+    public List getAllByCarId(@PathVariable("id") Integer id) throws ForbiddenException {
+        return reservationRepository.getAllExtendedByCarId(id);
+    }
+
 
     @Transactional(rollbackFor = Exception.class)
     @ResponseStatus(HttpStatus.CREATED)

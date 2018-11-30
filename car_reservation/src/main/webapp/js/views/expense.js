@@ -1,5 +1,4 @@
 var selectedReservation;
-var vehicleExpenses = [];
 var expenseView = {
     panel: {
         id: "expensePanel",
@@ -16,6 +15,26 @@ var expenseView = {
                         template: "<span class='fa fa-wrench'></span> Expenses"
                     },
                     {},
+                    {
+                        id: "backBtn",
+                        name:"backBtn",
+                        view: "button",
+                        type: "iconButton",
+                        label: "Back",
+                        click: "expenseView.back",
+                        icon: "arrow-left",
+                        autowidth: true,
+                    },
+                    {
+                        id: "backAdminBtn",
+                        view: "button",
+                        type: "iconButton",
+                        label: "Back",
+                        click: "expenseView.backAdmin",
+                        icon: "arrow-left",
+                        hidden:true,
+                        autowidth: true,
+                    },
                     {
                         id: "addBtn",
                         name:"addBtn",
@@ -70,7 +89,7 @@ var expenseView = {
                         hidden: true
                     },
                     {
-                        fillspace:true,
+                        fillspace:2,
                         id: "description",
                         tooltip:true,
                         header: [
@@ -84,6 +103,7 @@ var expenseView = {
                     {
                         id: "fullName",
                         hidden:true,
+                        fillspace:1,
                         header: [
                             "Full name",
                             {
@@ -119,7 +139,7 @@ var expenseView = {
                     {
                         id:"carModel",
                         hidden:true,
-                        fillspace:true,
+                        fillspace:1,
                         header: [
                             "Car",
                             {
@@ -152,6 +172,7 @@ var expenseView = {
                         id: "date",
                         editable: false,
                         sort: "date",
+                        width:200,
                         header: [
                             "Date",
                             {
@@ -173,15 +194,26 @@ var expenseView = {
 
     selectPanel: function (reservation) {
         $$("main").removeView(rightPanel);
-        selectedReservation=reservation;
+
         rightPanel = "expensePanel";
         var panelCopy = webix.copy(this.panel);
         $$("main").addView(webix.copy(panelCopy));
-        $$("expenseDT").define("url","/api/expense/custom/reservation/"+selectedReservation.id);
-        $$("expenseDT").refresh();
-        if(userData.id!=selectedReservation.userId){
+        if(userData.roleId==role.companyAdministrator){
+            $$("expenseDT").showColumn("fullName");
             $$("addBtn").hide();
+            $$("backBtn").hide();
+            $$("backAdminBtn").show();
+            $$("expenseDT").define("url","/api/expense/car/"+reservation);
+        }else{
+            selectedReservation=reservation;
+            if(userData.id!=selectedReservation.userId) {
+                $$("addBtn").hide();
+            }
+            $$("expenseDT").hideColumn("carModel");
+            $$("expenseDT").hideColumn("fullName");
+            $$("expenseDT").define("url","/api/expense/custom/reservation/"+selectedReservation.id);
         }
+        $$("expenseDT").refresh();
         webix.ui({
             view: "contextmenu",
             id: "expenseContextMenu",
@@ -621,4 +653,11 @@ var expenseView = {
             util.dismissDialog('editExpenseDialog');
         }
     },
+    back:function () {
+        reservationView.selectPanel();
+    },
+    backAdmin:function(){
+        vehicleView.selectPanel();
+    }
+
    };

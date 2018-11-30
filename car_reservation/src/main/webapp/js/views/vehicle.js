@@ -113,6 +113,16 @@ var vehicleView = {
                         value: "Show on map",
                         icon: "map-marker"
                     },
+                    {
+                        id: "4",
+                        value:"Show reservations",
+                        icon:"bookmark"
+                    },
+                    {
+                        id: "5",
+                        value:"Show expenses",
+                        icon:"wrench"
+                    }
                 ],
                 master: $$("vehicleDV"),
                 on: {
@@ -143,6 +153,14 @@ var vehicleView = {
                             case "3":
                                 var item = $$("vehicleDV").getSelectedItem();
                                 vehicleView.showMapDetailsDialog(item.latitude, item.longitude, item.locationName);
+                                break;
+                            case "4":
+                                var item=$$("vehicleDV").getSelectedItem();
+                                reservationView.selectPanel(item.id);
+                                break;
+                            case "5":
+                                var item=$$("vehicleDV").getSelectedItem();
+                                expenseView.selectPanel(item.id);
                                 break;
 
                         }

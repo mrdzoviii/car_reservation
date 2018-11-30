@@ -13,6 +13,7 @@ public class ExpenseRepositoryImpl extends CustomRepositoryImpl implements Expen
 
     private String SQL_GET_EXTENDED_BY_ID="select e.id,e.cost_id,c2.cost,e.user_id,u.username,concat(u.first_name,' ',u.last_name) as full_name,e.reservation_id,e.price,e.date,e.description,e.car_id,concat(c.plate_number,' - ',m2.name,' ',m.model) as car_model,e.deleted from expense e inner join reservation r on e.reservation_id = r.id inner join user u on r.user_id = u.id inner join car c on r.car_id = c.id inner join model m on c.model_id = m.id inner join manufacturer m2 on m.manufacturer_id = m2.id inner join cost c2 on e.cost_id = c2.id where e.deleted=0 and e.id=?";
 
+    private String SQL_GET_EXTENDED_BY_CAR_ID="select e.id,e.cost_id,c2.cost,e.user_id,u.username,concat(u.first_name,' ',u.last_name) as full_name,e.reservation_id,e.price,e.date,e.description,e.car_id,concat(c.plate_number,' - ',m2.name,' ',m.model) as car_model,e.deleted from expense e inner join reservation r on e.reservation_id = r.id inner join user u on r.user_id = u.id inner join car c on r.car_id = c.id inner join model m on c.model_id = m.id inner join manufacturer m2 on m.manufacturer_id = m2.id inner join cost c2 on e.cost_id = c2.id where e.deleted=0 and e.car_id=?";
 
     @Override
     public List getAllExtendedByReservationId(Integer reservationId) {
@@ -30,5 +31,11 @@ public class ExpenseRepositoryImpl extends CustomRepositoryImpl implements Expen
     public ExpenseCarReservationUser getExtendedById(Integer id) {
         return (ExpenseCarReservationUser) entityManager.createNativeQuery(SQL_GET_EXTENDED_BY_ID,"ExpenseCarReservationUserMapping")
                 .setParameter(1,id).getResultStream().findFirst().orElse(null);
+    }
+
+    @Override
+    public List getAllExtendedByCarId(Integer carId) {
+         return entityManager.createNativeQuery(SQL_GET_EXTENDED_BY_CAR_ID,"ExpenseCarReservationUserMapping")
+                .setParameter(1,carId).getResultList();
     }
 }

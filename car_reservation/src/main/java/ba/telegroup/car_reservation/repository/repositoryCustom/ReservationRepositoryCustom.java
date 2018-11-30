@@ -9,4 +9,5 @@ public interface ReservationRepositoryCustom {
     List getAllExtendedByCompanyId(Integer companyId);
     ReservationStateCarCompanyUser getExtendedById(Integer id);
     ReservationStateCarUserCompanyLocation getReservationInfoForNotification(Integer id);
+    List getAllExtendedByCarId(Integer carId);
 }

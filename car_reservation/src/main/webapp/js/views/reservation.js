@@ -54,6 +54,16 @@ var reservationView = {
                         }
                     },
                     {
+                        id: "backBtn",
+                        view: "button",
+                        type: "iconButton",
+                        label: "Back",
+                        click: "reservationView.back",
+                        icon: "arrow-left",
+                        autowidth: true,
+                        hidden:true
+                    },
+                    {
                         id: "addReservationBtn",
                         view: "button",
                         type: "iconButton",
@@ -67,22 +77,22 @@ var reservationView = {
             {
                 id: "reservationDT",
                 view: "datatable",
-                css:"webixDatatable",
+                css: "webixDatatable",
                 select: true,
                 navigation: true,
                 fillspace: true,
-                resizeColumn:true,
-                url:"api/reservation",
+                resizeColumn: true,
+
                 on: {
-                    onItemDblClick:function(id,e,node){
+                    onItemDblClick: function (id, e, node) {
                         reservationView.showDetailReservationDialog($$("reservationDT").getSelectedItem());
                     },
-                    onBeforeContextMenu:function (id,e,node) {
-                    var selectedItem=$$("reservationDT").getSelectedItem();
+                    onBeforeContextMenu: function (id, e, node) {
+                        var selectedItem = $$("reservationDT").getSelectedItem();
                         var contextMenuData = [];
                         if (userData.id == selectedItem.userId) {
-                            if (selectedItem.stateId=== reservationState.reserved) {
-                                if(new Date(selectedItem.startTime)>Date.now()) {
+                            if (selectedItem.stateId === reservationState.reserved) {
+                                if (new Date(selectedItem.startTime) > Date.now()) {
                                     contextMenuData.push(
                                         {
                                             id: "1",
@@ -103,7 +113,7 @@ var reservationView = {
                                             icon: "info-circle"
                                         }
                                     )
-                                }else{
+                                } else {
                                     contextMenuData.push(
                                         {
                                             id: "4",
@@ -123,7 +133,7 @@ var reservationView = {
                             }
 
                             if (selectedItem.stateId === reservationState.running) {
-                                if (new Date(selectedItem.startTime)<Date.now()) {
+                                if (new Date(selectedItem.startTime) < Date.now()) {
                                     contextMenuData.push({
                                             id: "5",
                                             value: "Finish",
@@ -137,7 +147,7 @@ var reservationView = {
                                             value: "More details",
                                             icon: "info-circle"
                                         })
-                                }else{
+                                } else {
                                     contextMenuData.push(
                                         {
                                             id: "3",
@@ -167,7 +177,17 @@ var reservationView = {
                             $$("reservationContextMenu").define("data", contextMenuData);
                             $$("reservationContextMenu").refresh();
 
-                        }else{
+                        } else if (userData.roleId == role.companyAdministrator) {
+                            contextMenuData.push(
+                                {
+                                    id: "3",
+                                    value: "More details",
+                                    icon: "info-circle"
+                                })
+                            $$("reservationContextMenu").clearAll();
+                            $$("reservationContextMenu").define("data", contextMenuData);
+                            $$("reservationContextMenu").refresh();
+                        } else {
                             contextMenuData.push(
                                 {
                                     id: "6",
@@ -315,12 +335,25 @@ var reservationView = {
             }
         ]
     },
-
-    selectPanel: function () {
+    back:function(){
+      vehicleView.selectPanel();
+    },
+    selectPanel: function (id) {
         $$("main").removeView(rightPanel);
         rightPanel = "reservationPanel";
         var panelCopy = webix.copy(this.panel);
         $$("main").addView(webix.copy(panelCopy));
+        if(userData.roleId==role.companyAdministrator){
+            $$("reservationDT").define("url","/api/reservation/car/"+id);
+            $$("reservationDT").hideColumn("carName");
+            $$("reservationDT").hideColumn("plateNumber");
+            $$("backBtn").show();
+            $$("addReservationBtn").hide();
+        }else{
+            $$("reservationDT").define("url","api/reservation",)
+        }
+        $$("reservationDT").refresh();
+
         webix.ui({
             view: "contextmenu",
             id: "reservationContextMenu",
