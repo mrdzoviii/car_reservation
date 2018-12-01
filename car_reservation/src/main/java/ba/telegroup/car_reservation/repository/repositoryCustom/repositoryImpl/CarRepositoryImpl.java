@@ -31,7 +31,7 @@ public class CarRepositoryImpl extends CustomRepositoryImpl implements CarReposi
             "                               inner join location l on c.location_id = l.id" +
             "                             inner join company f on l.company_id = f.id  where f.deleted=0 and f.id=? and c.id" +
             "    not in(select car_id from reservation where ((start_time between CAST(? as datetime) and cast(? as datetime)) or" +
-            "          (end_time between CAST(? as datetime) and cast(? as datetime)) or (start_time <= CAST(? as DATETIME) and end_time >= CAST(? as DATETIME))) and deleted=0 and state_id != 3)";
+            "          (end_time between CAST(? as datetime) and cast(? as datetime)) or (start_time <= CAST(? as DATETIME) and end_time >= CAST(? as DATETIME))) and deleted=0 and state_id in (1,2)";
 
     @Override
     public List getAllExtendedByCompanyId(Integer companyId) {

@@ -12,7 +12,8 @@ var userStatus = {
 var reservationState={
     reserved:1,
     running:2,
-    finished:3
+    finished:3,
+    completed:4
 }
 
 var mapProperties={

@@ -59,7 +59,7 @@ var expenseView = {
                     onBeforeContextMenu:function (id,e,node) {
                         var selectedItem=$$("expenseDT").getSelectedItem();
                         var contextMenuData = [];
-                        if (userData.id == selectedItem.userId) {
+                        if (userData.id == selectedItem.userId && selectedReservation.stateId==reservationState.finished) {
                                     contextMenuData.push(
                                         {
                                             id: "1",
@@ -206,7 +206,7 @@ var expenseView = {
             $$("expenseDT").define("url","/api/expense/car/"+reservation);
         }else{
             selectedReservation=reservation;
-            if(userData.id!=selectedReservation.userId) {
+            if(userData.id!=selectedReservation.userId || selectedReservation.stateId==reservationState.completed) {
                 $$("addBtn").hide();
             }
             $$("expenseDT").hideColumn("carModel");

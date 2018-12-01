@@ -33,6 +33,8 @@ public class ExpenseController extends GenericDeletableController<Expense,Intege
     private String badRequestUpdate;
     @Value("${action.success}")
     private String actionSuccess;
+    @Value("${state.finished}")
+    private Integer stateFinished;
     @Value("${badRequest.insert}")
     private String badRequestInsert;
     @Value("${deleted.not}")
@@ -76,11 +78,8 @@ public class ExpenseController extends GenericDeletableController<Expense,Intege
     @Transactional(rollbackFor = Exception.class)
     public ExpenseCarReservationUser updateExtended(@PathVariable("id") Integer id,@RequestBody Expense expense) throws BadRequestException, ForbiddenException {
         if(checkExpense(expense)){
-            Reservation reservation=reservationRepository.findById(expense.getReservationId()).orElse(null);
             Expense expenseDb=expenseRepository.findById(id).orElse(null);
-            if(expenseDb!=null && expenseDb.getUserId().equals(expense.getUserId()) &&
-                    reservation!=null && reservation.getUserId().equals(expense.getUserId())
-                    && userBean.getUser().getId().equals(expense.getUserId()) && check(expense.getDate(),reservation.getStartTime(),reservation.getEndTime())){
+            if(expenseDb!=null && expenseDb.getUserId().equals(expense.getUserId())){
                 if(super.update(id,expense).equals(actionSuccess)){
                     return expenseRepository.getExtendedById(id);
                 }
@@ -104,11 +103,6 @@ public class ExpenseController extends GenericDeletableController<Expense,Intege
     @ResponseStatus(HttpStatus.CREATED)
     public ExpenseCarReservationUser insertExtended(@RequestBody Expense expense) throws BadRequestException, ForbiddenException {
         if(checkExpense(expense)){
-
-            Reservation reservation=reservationRepository.findById(expense.getReservationId()).orElse(null);
-            System.out.println(check(expense.getDate(),reservation.getStartTime(),reservation.getEndTime()));
-            if(reservation!=null && reservation.getUserId().equals(expense.getUserId())
-                    && userBean.getUser().getId().equals(expense.getUserId()) && check(expense.getDate(),reservation.getStartTime(),reservation.getEndTime()))
             return expenseRepository.getExtendedById(super.insert(expense).getId());
         }
         throw new BadRequestException(badRequestExpenseInsert);
@@ -123,9 +117,18 @@ public class ExpenseController extends GenericDeletableController<Expense,Intege
     }
 
     private Boolean checkExpense(Expense expense){
-        return expense!=null && expense.getCarId()!=null && expense.getCostId()!=null && expense.getPrice()!=null &&
-                expense.getReservationId()!=null && expense.getDate()!=null && expense.getUserId()!=null &&
-                expense.getDeleted()!=null && expense.getDeleted().equals(notDeleted);
+        if(expense!=null && expense.getReservationId()!=null) {
+            Reservation reservation=reservationRepository.findById(expense.getReservationId()).orElse(null);
+
+            return expense != null && expense.getCarId() != null && expense.getCostId() != null && expense.getPrice() != null &&
+                    expense.getReservationId() != null && expense.getDate() != null && expense.getUserId() != null &&
+                    expense.getDeleted() != null && expense.getDeleted().equals(notDeleted) &&
+                    reservation!=null && reservation.getUserId().equals(expense.getUserId())
+                    && userBean.getUser().getId().equals(expense.getUserId()) &&
+                    check(expense.getDate(),reservation.getStartTime(),reservation.getEndTime())
+                    && reservation.getStateId().equals(stateFinished);
+        }
+        return false;
     }
 
     private Boolean check(Date date,Date timeFrom,Date timeTo){

@@ -159,12 +159,31 @@ var reservationView = {
                             if (selectedItem.stateId === reservationState.finished) {
                                 contextMenuData.push(
                                     {
+                                        id:"7",
+                                        value:"Complete reservation",
+                                        icon:"check"
+                                    },
+                                    {
+                                        $template: "Separator"
+                                    },
+                                    {
                                         id: "6",
                                         value: "Expenses",
                                         icon: "fas fa-wrench"
                                     },
                                     {
-                                        $template: "Separator"
+                                        id: "3",
+                                        value: "More details",
+                                        icon: "info-circle"
+                                    })
+                            }
+                            if(selectedItem.stateId===reservationState.completed){
+                                contextMenuData.push(
+
+                                    {
+                                        id: "6",
+                                        value: "Expenses",
+                                        icon: "fas fa-wrench"
                                     },
                                     {
                                         id: "3",
@@ -394,6 +413,9 @@ var reservationView = {
                             break;
                         case "6":
                             expenseView.selectPanel($$("reservationDT").getSelectedItem());
+                            break;
+                        case "7":
+                            reservationView.complete();
                             break;
 
                     }
@@ -1591,5 +1613,27 @@ var reservationView = {
 
             util.dismissDialog('finishDialog');
         }
+    },
+    complete: function(){
+        var item=$$("reservationDT").getSelectedItem();
+        var completedBox = (webix.copy(commonViews.completeConfirm("reservation","reservation")));
+        completedBox.callback = function (result) {
+            if (result) {
+                webix.ajax().header({"Content-type": "application/json"})
+                    .put("api/reservation/complete/" + item.id).then(function (data) {
+                    if (data) {
+                        var updated = data.json();
+                        $$("reservationDT").updateItem(updated.id, updated);
+                        util.messages.showMessage("Reservation completed.");
+                    } else {
+                        util.messages.showErrorMessage("Reservation not completed.");
+                    }
+
+                }).fail(function (error) {
+                    util.messages.showErrorMessage(error.responseText);
+                });
+            }
+        }
+        webix.confirm(completedBox);
     }
 };

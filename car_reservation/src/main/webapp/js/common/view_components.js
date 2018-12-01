@@ -25,6 +25,17 @@ var commonViews = {
             text: "Are you sure you want to cancel " + text + "?"
         };
     },
+    completeConfirm: function (titleEntity, textEntity) {
+        var text = titleEntity;
+        if (textEntity) text = textEntity;
+        return {
+            title: "Cancel " + titleEntity,
+            ok: "Yes",
+            cancel: "No",
+            width: 500,
+            text: "Are you sure you want to complete " + text + "?"
+        };
+    },
     // confirm dijalog na sprskom
     deleteConfirmSerbian: function (titleEntity, textEntity) {
         var text = titleEntity;

@@ -6,4 +6,5 @@ import ba.telegroup.car_reservation.repository.repositoryCustom.ExpenseRepositor
 import org.springframework.data.jpa.repository.JpaRepository;
 
 public interface ExpenseRepository extends JpaRepository<Expense,Integer>, DeletableRepository<Expense>, ExpenseRepositoryCustom {
+    Long countExpenseByReservationIdAndDeleted(Integer reservationId,Byte deleted);
 }

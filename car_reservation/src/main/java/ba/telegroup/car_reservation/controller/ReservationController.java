@@ -7,6 +7,7 @@ import ba.telegroup.car_reservation.model.Reservation;
 import ba.telegroup.car_reservation.model.User;
 import ba.telegroup.car_reservation.model.modelCustom.ReservationStateCarCompanyUser;
 import ba.telegroup.car_reservation.model.modelCustom.ReservationStateCarUserCompanyLocation;
+import ba.telegroup.car_reservation.repository.ExpenseRepository;
 import ba.telegroup.car_reservation.repository.ReservationRepository;
 import ba.telegroup.car_reservation.repository.UserRepository;
 import ba.telegroup.car_reservation.util.Notification;
@@ -40,6 +41,8 @@ public class ReservationController extends GenericHasCompanyIdAndDeletableContro
     private Integer stateRunning;
     @Value("${state.finished}")
     private Integer stateFinished;
+    @Value("${state.completed}")
+    private Integer stateCompleted;
     @Value("${action.success}")
     private String actionSuccess;
     @Value("${forbidden.action}")
@@ -52,17 +55,21 @@ public class ReservationController extends GenericHasCompanyIdAndDeletableContro
     private String badRequestReservationStart;
     @Value("${badRequest.reservation.finish}")
     private String badRequestReservationFinish;
+    @Value("${badRequest.reservation.complete}")
+    private String badRequestReservationComplete;
     private ReservationRepository reservationRepository;
     private UserRepository userRepository;
     private Notification notification;
-    TimeZone timeZone=TimeZone.getTimeZone("UTC");
+    private ExpenseRepository expenseRepository;
 
     @Autowired
-    public ReservationController(ReservationRepository reservationRepository, UserRepository userRepository,Notification notification) {
+    public ReservationController(ReservationRepository reservationRepository, UserRepository userRepository,Notification notification,
+                                 ExpenseRepository expenseRepository) {
         super(reservationRepository);
         this.notification=notification;
         this.reservationRepository = reservationRepository;
         this.userRepository = userRepository;
+        this.expenseRepository=expenseRepository;
     }
 
     @Override
@@ -128,7 +135,8 @@ public class ReservationController extends GenericHasCompanyIdAndDeletableContro
         Reservation reservation=reservationRepository.findById(id).orElse(null);
 
         Timestamp now=new Timestamp(System.currentTimeMillis());
-        if(reservation!=null && reservation.getStateId().equals(stateReserved) && reservation.getStartMileage()==null && startMileage!=null && reservation.getStartTime().before(now)){
+        if(reservation!=null && reservation.getStateId().equals(stateReserved) && reservation.getStartMileage()==null && startMileage!=null && reservation.getStartTime().before(now)
+              && reservation.getUserId().equals(userBean.getUser().getId())){
             reservation.setStartMileage(startMileage);
             reservation.setStateId(stateRunning);
             if(super.update(id,reservation).equals(actionSuccess)){
@@ -142,7 +150,8 @@ public class ReservationController extends GenericHasCompanyIdAndDeletableContro
     public ReservationStateCarCompanyUser finishReservation(@PathVariable("id") Integer id,@PathVariable("finishMileage") Integer finishMileage) throws BadRequestException, ForbiddenException {
         Reservation reservation=reservationRepository.findById(id).orElse(null);
         Timestamp now=new Timestamp(System.currentTimeMillis());
-        if(reservation!=null && reservation.getStateId().equals(stateRunning) && reservation.getFinishMileage()==null && finishMileage!=null && reservation.getStartTime().before(now)){
+        if(reservation!=null && reservation.getStateId().equals(stateRunning) && reservation.getUserId().equals(userBean.getUser().getId()) &&
+                reservation.getFinishMileage()==null && finishMileage!=null && reservation.getStartTime().before(now)){
             reservation.setFinishMileage(finishMileage);
             reservation.setStateId(stateFinished);
             if(super.update(id,reservation).equals(actionSuccess)){
@@ -150,6 +159,19 @@ public class ReservationController extends GenericHasCompanyIdAndDeletableContro
             }
         }
         throw new BadRequestException(badRequestReservationFinish);
+    }
+
+    @RequestMapping(value = "/complete/{id}",method = RequestMethod.PUT)
+    public ReservationStateCarCompanyUser completeReservation(@PathVariable("id") Integer id) throws BadRequestException, ForbiddenException {
+        Reservation reservation=reservationRepository.findById(id).orElse(null);
+        if(reservation!=null && reservation.getStateId().equals(stateFinished) && reservation.getUserId().equals(userBean.getUser().getId())
+        && expenseRepository.countExpenseByReservationIdAndDeleted(reservation.getId(),notDeleted)>0){
+            reservation.setStateId(stateCompleted);
+            if(super.update(id,reservation).equals(actionSuccess)){
+                return reservationRepository.getExtendedById(reservation.getId());
+            }
+        }
+        throw new BadRequestException(badRequestReservationComplete);
     }
 
     private Boolean checkReservation(Reservation reservation){
