@@ -9,6 +9,22 @@ import java.sql.Timestamp;
 import java.util.Date;
 import java.util.Objects;
 
+@SqlResultSetMapping(name = "ExpenseMapping",classes = @ConstructorResult(
+        targetClass = Expense.class,columns = {
+                @ColumnResult(name="id",type = Integer.class),
+        @ColumnResult(name="cost_id",type=Integer.class),
+        @ColumnResult(name="car_id",type=Integer.class),
+        @ColumnResult(name="date",type=Date.class),
+        @ColumnResult(name="price",type = BigDecimal.class),
+        @ColumnResult(name="description",type=String.class),
+        @ColumnResult(name="deleted",type=Byte.class),
+        @ColumnResult(name="user_id",type=Integer.class),
+        @ColumnResult(name="reservation_id",type=Integer.class)
+}
+))
+
+
+
 @Entity
 @Inheritance(strategy = InheritanceType.JOINED)
 public class Expense implements Deletable {

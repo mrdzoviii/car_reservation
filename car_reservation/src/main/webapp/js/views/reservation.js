@@ -626,9 +626,11 @@ var reservationView = {
             if(item.stateId==reservationState.reserved) {
                 $$("state").define("label", "<b style='color:blue;'>" + item.state.toString().toUpperCase() + "</b>");
             }else if(item.stateId==reservationState.running){
-                $$("state").define("label", "<b style='color:green;'>" + item.state.toString().toUpperCase() + "</b>");
-            }else{
+                $$("state").define("label", "<b style='color:chocolate;'>" + item.state.toString().toUpperCase() + "</b>");
+            }else if(item.stateId==reservationState.finished){
                 $$("state").define("label", "<b style='color:red;'>" + item.state.toString().toUpperCase() + "</b>");
+            }else{
+                $$("state").define("label", "<b style='color:green;'>" + item.state.toString().toUpperCase() + "</b>");
             }
             $$("fullName").define("label","Full name: <b>" + item.fullName+"</b>");
             $$("username").define("label","Username: <b>" + item.username+"</b>");

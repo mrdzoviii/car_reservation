@@ -162,7 +162,6 @@ var vehicleView = {
                                 var item=$$("vehicleDV").getSelectedItem();
                                 expenseView.selectPanel(item.id);
                                 break;
-
                         }
 
                     }

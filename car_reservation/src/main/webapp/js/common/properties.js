@@ -16,6 +16,12 @@ var reservationState={
     completed:4
 }
 
+var reportType={
+    weekly:1,
+    monthly:2,
+    yearly:3
+}
+
 var mapProperties={
     longitude:44.772337,
     latitude:17.1811044,

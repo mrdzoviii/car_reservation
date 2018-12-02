@@ -7,6 +7,8 @@ import ba.telegroup.car_reservation.model.Reservation;
 import ba.telegroup.car_reservation.model.modelCustom.ExpenseCarReservationUser;
 import ba.telegroup.car_reservation.repository.ExpenseRepository;
 import ba.telegroup.car_reservation.repository.ReservationRepository;
+import ba.telegroup.car_reservation.util.chart.ChartData;
+import ba.telegroup.car_reservation.util.chart.ChartInfo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Scope;
@@ -14,12 +16,13 @@ import org.springframework.http.HttpStatus;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 
-import java.sql.Time;
-import java.sql.Timestamp;
 import java.time.LocalDate;
 import java.time.ZoneId;
+import java.time.temporal.WeekFields;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Locale;
 
 
 @RestController
@@ -45,6 +48,21 @@ public class ExpenseController extends GenericDeletableController<Expense,Intege
     private String badRequestExpenseUpdate;
     @Value("${badRequest.expense.delete}")
     private String badRequestExpenseDelete;
+    @Value("${chart.type.weekly}")
+    private Integer reportWeekly;
+    @Value("${chart.type.monthly}")
+    private Integer reportMonthly;
+    @Value("${chart.type.yearly}")
+    private Integer reportYearly;
+    @Value("${badRequest.expense.chart}")
+    private String badRequestExpenseChart;
+    @Value("${cost.service}")
+    private Integer costService;
+    @Value("${cost.fuel}")
+    private Integer costFuel;
+    @Value("${cost.other}")
+    private Integer costOther;
+
     private ReservationRepository reservationRepository;
     @Autowired
     public ExpenseController(ExpenseRepository expenseRepository,ReservationRepository reservationRepository){
@@ -132,10 +150,76 @@ public class ExpenseController extends GenericDeletableController<Expense,Intege
     }
 
     private Boolean check(Date date,Date timeFrom,Date timeTo){
-        LocalDate localDate=LocalDate.ofInstant(date.toInstant(),ZoneId.of("Europe/Belgrade"));
-        LocalDate localDateFrom=LocalDate.ofInstant(timeFrom.toInstant(),ZoneId.of("Europe/Belgrade"));
-        LocalDate localDateTo=LocalDate.ofInstant(timeTo.toInstant(),ZoneId.of("Europe/Belgrade"));
+        if(date!=null && timeFrom!=null && timeTo!=null) {
+            LocalDate localDate = convertToLocalDate(date);
+            LocalDate localDateFrom = convertToLocalDate(timeFrom);
+            LocalDate localDateTo = convertToLocalDate(timeTo);
 
-        return (localDate.isAfter(localDateFrom) || localDate.isEqual(localDateFrom)) && (localDate.isBefore(localDateTo) || localDate.isEqual(localDateTo));
+            return (localDate.isAfter(localDateFrom) || localDate.isEqual(localDateFrom)) && (localDate.isBefore(localDateTo) || localDate.isEqual(localDateTo));
+        }
+        return false;
     }
+
+    private LocalDate convertToLocalDate(Date date){
+        if(date!=null) {
+            return LocalDate.ofInstant(date.toInstant(), ZoneId.of("Europe/Belgrade"));
+        }
+        return null;
+    }
+    //charts
+
+
+    @RequestMapping(value = "/chart",method = RequestMethod.POST)
+    public List<ChartData> getAllByChartInfo(@RequestBody ChartInfo chartInfo) throws BadRequestException {
+        if(chartInfo!=null && chartInfo.check()){
+            List<Expense> data=expenseRepository.getAllExpensesByCompanyIdAndDateBetween(chartInfo.getCompanyId(),chartInfo.getDateFrom().toString(),
+                    chartInfo.getDateTo().toString());
+            List<ChartData> chart=new ArrayList<>();
+            LocalDate start=chartInfo.getDateFrom();
+            while(start.compareTo(chartInfo.getDateTo())<=0){
+                final LocalDate date=start;
+                final ChartData point;
+                if(chartInfo.getChartType().equals(reportWeekly)) {
+                    String weekNumber = getWeekNumber(start);
+                    point =getPoint(chart,weekNumber);
+                }else if(chartInfo.getChartType().equals(reportMonthly)) {
+                    String monthNumber=start.getMonthValue()+"/"+start.getYear();
+                    point = getPoint(chart,monthNumber);
+                }else{
+                    String yearNumber=start.getYear()+"";
+                    point=getPoint(chart,yearNumber);
+                }
+                data.stream().filter(e -> convertToLocalDate(e.getDate()).isEqual(date)).
+                            forEach(r->{
+                                if (r.getCostId().equals(costFuel)){
+                                        point.addFuelCost(r.getPrice());
+                                }else if(r.getCostId().equals(costService)){
+                                    point.addServiceCost(r.getPrice());
+                                }
+                                else{
+                                    point.addOtherCost(r.getPrice());
+                                }
+                            });
+                start=start.plusDays(1);
+            }
+            return chart;
+        }
+        throw new BadRequestException(badRequestExpenseChart);
+    }
+
+    private String getWeekNumber(LocalDate date){
+        WeekFields weekFields = WeekFields.of(Locale.getDefault());
+        int weekNumber = date.get(weekFields.weekOfWeekBasedYear());
+        return weekNumber+"/"+date.getYear();
+    }
+
+    private ChartData getPoint(List<ChartData> data,String timeUnit){
+        ChartData point = data.stream().filter(c -> c.getTimeUnit().equals(timeUnit)).findFirst().orElse(null);
+        if (point == null) {
+            point = new ChartData(timeUnit);
+            data.add(point);
+        }
+        return point;
+    }
+
 }

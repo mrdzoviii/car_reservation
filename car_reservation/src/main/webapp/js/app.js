@@ -152,6 +152,11 @@ var mainMenuCompanyAdmin = [
         id: "logger",
         icon: "history",
         value: "User logs"
+    },
+    {
+        id: "chart",
+        value: "Reports",
+        icon: "bar-chart"
     }
 ];
 
@@ -190,9 +195,6 @@ var mainMenuActions = function (id) {
         case "vehicle":
             vehicleView.selectPanel();
             break;
-        case "dashboard":
-            locationView.selectPanel();
-            break;
         case "home":
             homeView.selectPanel();
             break;
@@ -201,6 +203,9 @@ var mainMenuActions = function (id) {
             break;
         case "reservation":
             reservationView.selectPanel();
+            break;
+        case "chart":
+            chartView.selectPanel();
             break;
     }
 };
