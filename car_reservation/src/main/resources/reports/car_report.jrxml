@@ -285,14 +285,14 @@ e.company_id=$P{companyIdTable} and e.car_id=$P{carIdTable} and year(date)=$P{ye
 			</componentElement>
 			<barChart>
 				<chart evaluationTime="Group" evaluationGroup="GroupMonth">
-					<reportElement x="120" y="100" width="320" height="200" uuid="d3c731de-3188-4883-bc80-f4a8e9321eb2"/>
+					<reportElement x="120" y="100" width="320" height="200" uuid="543605d1-3d4d-47e9-8249-cc9e0a1ea237"/>
 					<chartTitle/>
 					<chartSubtitle/>
 					<chartLegend/>
 				</chart>
 				<categoryDataset>
 					<dataset>
-						<datasetRun subDataset="DatasetChart" uuid="eae1f2dc-5072-4d9d-8613-eb061073e694">
+						<datasetRun subDataset="DatasetChart" uuid="e8e7f7c0-c64e-4e2b-91e9-19de23b4feb6">
 							<datasetParameter name="carIdChart">
 								<datasetParameterExpression><![CDATA[$P{carId}]]></datasetParameterExpression>
 							</datasetParameter>
@@ -310,7 +310,7 @@ e.company_id=$P{companyIdTable} and e.car_id=$P{carIdTable} and year(date)=$P{ye
 					</dataset>
 					<categorySeries>
 						<seriesExpression><![CDATA[$F{serie}]]></seriesExpression>
-						<categoryExpression><![CDATA[0]]></categoryExpression>
+						<categoryExpression><![CDATA[$F{category}]]></categoryExpression>
 						<valueExpression><![CDATA[$F{value}]]></valueExpression>
 						<labelExpression><![CDATA[$F{value}.setScale(2, RoundingMode.CEILING).toString()+" BAM"]]></labelExpression>
 					</categorySeries>

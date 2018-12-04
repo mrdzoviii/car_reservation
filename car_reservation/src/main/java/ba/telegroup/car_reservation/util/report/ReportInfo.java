@@ -1,19 +1,15 @@
 package ba.telegroup.car_reservation.util.report;
 
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.format.annotation.DateTimeFormat;
 
 import java.sql.Date;
 import java.time.LocalDate;
-import java.time.ZoneId;
 import java.util.HashMap;
 
 
 public class ReportInfo {
-    @Value("${report.type.all}")
-    private Integer typeAll;
-    @Value("${report.type.vehicle}")
-    private Integer typeVehicle;
+    private Integer typeAll=1;
+    private Integer typeVehicle=2;
 
 
     @DateTimeFormat(iso = DateTimeFormat.ISO.DATE)
@@ -115,6 +111,7 @@ public class ReportInfo {
             String period=from.getMonthValue()+"/"+from.getYear()+" - "+to.getMonthValue()+"/"+to.getYear();
             HashMap params = new HashMap();
             params.put("period",period);
+            System.out.println((type.equals(typeVehicle))+" type"+type+" "+typeVehicle);
             if (type.equals(typeVehicle)) {
                 params.put("companyId",companyId);
                 params.put("carId",carId);
