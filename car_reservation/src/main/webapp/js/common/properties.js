@@ -22,6 +22,17 @@ var reportType={
     yearly:3
 }
 
+var jasperType={
+    all:1,
+    vehicle:2
+}
+
+var reportFormat={
+    pdf:"PDF",
+    csv:"CSV",
+    xls:"XLS"
+}
+
 var mapProperties={
     longitude:44.772337,
     latitude:17.1811044,
