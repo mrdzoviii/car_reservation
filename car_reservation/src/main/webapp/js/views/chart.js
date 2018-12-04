@@ -208,7 +208,7 @@ var chartView = {
                         values: [
                             {text: "Service & Maintenance", color: "#58dccd"},
                             {text: "Fuel", color: "#a7ee70"},
-                            {text: "Other costs", color: "#36abee"}
+                            {text: "Other", color: "#36abee"}
                         ],
                         valign: "middle",
                         align: "right",

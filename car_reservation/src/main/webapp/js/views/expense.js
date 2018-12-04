@@ -309,6 +309,12 @@ var expenseView = {
                         },
                         {
                             view: "text",
+                            id: "companyId",
+                            name: "companyId",
+                            hidden:true
+                        },
+                        {
+                            view: "text",
                             id: "carId",
                             name: "carId",
                             hidden:true
@@ -392,7 +398,7 @@ var expenseView = {
                             var endDate = myFormat(new Date(selectedReservation.endTime));
                             myFormat = webix.Date.strToDate("%Y.%m.%d %H:%i");
                             var date = myFormat(value);
-                            if (!(startDate.getDate() <= date.getDate() && date.getDate() < endDate.getDate())) {
+                            if (!(startDate <= date && date <= endDate)) {
                                 $$('addExpenseForm').elements.date.config.invalidMessage = 'Date not within reservation period.';
                                 return false;
                             }
@@ -420,6 +426,7 @@ var expenseView = {
             form.elements.userId.setValue(selectedReservation.userId);
             form.elements.carId.setValue(selectedReservation.carId);
             form.elements.reservationId.setValue(selectedReservation.id);
+            form.elements.companyId.setValue(userData.companyId);
             form.elements.date.setValue(new Date(selectedReservation.startTime));
             dialog.show();
         }
@@ -490,6 +497,12 @@ var expenseView = {
                             view:"text",
                             id:"id",
                             name:"id",
+                            hidden:true
+                        },
+                        {
+                            view: "text",
+                            id: "companyId",
+                            name: "companyId",
                             hidden:true
                         },
                         {
@@ -590,7 +603,7 @@ var expenseView = {
                             var endDate = myFormat(new Date(selectedReservation.endTime));
                             myFormat = webix.Date.strToDate("%Y.%m.%d %H:%i");
                             var date = myFormat(value);
-                            if (!(startDate.getDate() <= date.getDate() && date.getDate() < endDate.getDate())) {
+                            if (!(startDate <= date && date < endDate)) {
                                 $$('editExpenseForm').elements.date.config.invalidMessage = 'Date not within reservation period.';
                                 return false;
                             }
@@ -622,6 +635,7 @@ var expenseView = {
             form.elements.id.setValue(selectedItem.id);
             form.elements.description.setValue((selectedItem.description==null?"":selectedItem.description));
             form.elements.date.setValue(new Date(selectedItem.date));
+            form.elements.companyId.setValue(userData.companyId);
             var price=webix.Number.format(selectedItem.price, {
                     decimalSize: 2, groupSize: 3,
                     decimalDelimiter: ".", groupDelimiter: ","
@@ -637,7 +651,6 @@ var expenseView = {
     saveChanges: function(){
         if ($$("editExpenseForm").validate()) {
             var item=$$("editExpenseForm").getValues();
-            console.log(item)
             webix.ajax().header({"Content-type": "application/json"})
                 .put("/api/expense/custom/"+item.id,item).then(function (data) {
                 if (data) {

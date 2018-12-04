@@ -144,7 +144,7 @@ public class ExpenseController extends GenericDeletableController<Expense,Intege
                     reservation!=null && reservation.getUserId().equals(expense.getUserId())
                     && userBean.getUser().getId().equals(expense.getUserId()) &&
                     check(expense.getDate(),reservation.getStartTime(),reservation.getEndTime())
-                    && reservation.getStateId().equals(stateFinished);
+                    && reservation.getStateId().equals(stateFinished) && expense.getCompanyId()!=null && userBean.getUser().getCompanyId().equals(expense.getCompanyId());
         }
         return false;
     }

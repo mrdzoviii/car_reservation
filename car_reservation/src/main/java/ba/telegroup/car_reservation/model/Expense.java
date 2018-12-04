@@ -19,7 +19,8 @@ import java.util.Objects;
         @ColumnResult(name="description",type=String.class),
         @ColumnResult(name="deleted",type=Byte.class),
         @ColumnResult(name="user_id",type=Integer.class),
-        @ColumnResult(name="reservation_id",type=Integer.class)
+        @ColumnResult(name="reservation_id",type=Integer.class),
+        @ColumnResult(name="company_id",type=Integer.class)
 }
 ))
 
@@ -37,6 +38,7 @@ public class Expense implements Deletable {
     private Byte deleted;
     private Integer userId;
     private Integer reservationId;
+    private Integer companyId;
 
 
 
@@ -59,6 +61,18 @@ public class Expense implements Deletable {
     public void setUserId(Integer userId) {
         this.userId = userId;
     }
+
+    @Column(name = "company_id")
+    public Integer getCompanyId() {
+        return companyId;
+    }
+
+    public void setCompanyId(Integer companyId) {
+        this.companyId = companyId;
+    }
+
+
+
 
     @Column(name = "reservation_id")
     public Integer getReservationId(){
@@ -147,7 +161,7 @@ public class Expense implements Deletable {
     public Expense() {
     }
 
-    public Expense(Integer id, Integer costId, Integer carId, Date date, BigDecimal price, String description, Byte deleted, Integer userId, Integer reservationId) {
+    public Expense(Integer id, Integer costId, Integer carId, Date date, BigDecimal price, String description, Byte deleted, Integer userId, Integer reservationId,Integer companyId) {
         this.id = id;
         this.costId = costId;
         this.carId = carId;
@@ -157,5 +171,6 @@ public class Expense implements Deletable {
         this.deleted = deleted;
         this.userId = userId;
         this.reservationId = reservationId;
+        this.companyId=companyId;
     }
 }

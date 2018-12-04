@@ -14,6 +14,7 @@ import java.util.Date;
                 @ColumnResult(name="id",type = Integer.class),
         @ColumnResult(name="cost_id",type=Integer.class),
         @ColumnResult(name="cost",type=String.class),
+        @ColumnResult(name="company_id",type=Integer.class),
         @ColumnResult(name="user_id",type=Integer.class),
         @ColumnResult(name="username",type=String.class),
         @ColumnResult(name="full_name",type=String.class),
@@ -35,10 +36,10 @@ public class ExpenseCarReservationUser extends Expense {
     private String cost;
     private String carModel;
 
-    public ExpenseCarReservationUser(Integer id,Integer costId,String cost,Integer userId,String username,
+    public ExpenseCarReservationUser(Integer id,Integer costId,String cost,Integer companyId,Integer userId,String username,
                                      String fullName,Integer reservationId,BigDecimal price,
                                      Date date,String description,Integer carId,String carModel,Byte deleted){
-        super(id,costId,carId,date,price,description,deleted,userId,reservationId);
+        super(id,costId,carId,date,price,description,deleted,userId,reservationId,companyId);
 
         this.cost = cost;
         this.username = username;
