@@ -54,16 +54,15 @@ public class ChartData {
     public void addServiceCost(BigDecimal serviceCost){
         this.serviceCost=this.serviceCost.add(serviceCost);
         this.serviceCost=this.serviceCost.setScale(2, RoundingMode.HALF_UP);
-        System.out.println(serviceCost);
     }
     public void addFuelCost(BigDecimal fuelCost){
         this.fuelCost=this.fuelCost.add(fuelCost);
         this.fuelCost=this.fuelCost.setScale(2, RoundingMode.HALF_UP);
-        System.out.println(fuelCost);
+
     }
     public void addOtherCost(BigDecimal otherCost){
         this.otherCost=this.otherCost.add(otherCost);
         this.otherCost=this.otherCost.setScale(2, RoundingMode.HALF_UP);
-        System.out.println(otherCost);
+       
     }
 }

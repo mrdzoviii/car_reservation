@@ -16,8 +16,17 @@ var chartView = {
                 cols: [
                     {
                         view: "label",
-                        width: 400,
+                        width: 120,
                         template: "<span class='fa fa-bar-chart'></span> Reports"
+                    },
+                    {
+                        id: "downloadMonthReportBtn",
+                        view: "button",
+                        type: "iconButton",
+                        label: "Get monthly report",
+                        icon: "download",
+                        click: 'chartView.showDownloadDialog',
+                        autowidth: true
                     },
                     {},
                     {
@@ -217,29 +226,6 @@ var chartView = {
                     },
                     data: []
                 }
-            },
-            {
-                view: "toolbar",
-                padding: 8,
-                css: "panelToolbar",
-                height: 50,
-                cols: [
-                    {
-                        view: "label",
-                        width: 500,
-                        template: "<span class='fa fa-download'></span> Download vehicle's monthly reports"
-                    },
-                    {},
-                    {
-                        id: "downloadMonthReportBtn",
-                        view: "button",
-                        type: "iconButton",
-                        label: "Download",
-                        icon: "download",
-                       // click: 'chartView.showDownloadDialog',
-                        autowidth: true
-                    }
-                ]
             }
         ]
     },
@@ -250,7 +236,6 @@ var chartView = {
         var panelCopy = webix.copy(this.panel);
         $$("main").addView(webix.copy(panelCopy));
     },
-    /*
     downloadDialog: {
         view: "popup",
         id: "downloadDialog",
@@ -264,7 +249,7 @@ var chartView = {
                     cols: [
                         {
                             view: "label",
-                            label: "<span class='webix_icon fa-download'></span> Preuzimanje mjesečnih izvještaja za troškove vozila",
+                            label: "<span class='webix_icon fa-download'></span> Get monthly report",
                             width: 400
                         },
                         {},
@@ -280,39 +265,39 @@ var chartView = {
                 {
                     view: "form",
                     id: "downloadForm",
-                    width: 700,
+                    width: 500,
                     elementsConfig: {
-                        labelWidth: 325,
+                        labelWidth: 150,
                         bottomPadding: 18
                     },
                     elements: [
                         {
-                            id: "monthReportType",
-                            name: "monthReportType",
+                            id: "type",
+                            name: "type",
                             view: "radio",
-                            label: "Vrsta mjesečnog izvještaja za troškove vozila:",
+                            label: "Report type:",
                             required: true,
                             value: 1,
-                            invalidMessage: "Molimo Vas da odaberete jednu opciju.",
+                            invalidMessage: "Choose your type.",
                             options: [
                                 {
                                     id: 1,
-                                    value: "Za sva vozila",
+                                    value: "All vehicle",
                                     newline: true
                                 },
                                 {
                                     id: 2,
-                                    value: "Za jedno vozilo",
+                                    value: "Single vehicle",
                                     newline: true
                                 }
                             ],
                             on: {
                                 onChange: function (newValue, oldvalue) {
                                     if (newValue == 1) {
-                                        $$("vehicleId").disable();
+                                        $$("carId").disable();
                                     }
                                     else {
-                                        $$("vehicleId").enable();
+                                        $$("carId").enable();
                                     }
                                 }
                             }
@@ -320,10 +305,9 @@ var chartView = {
                         {
                             id: "datePickerFilterDownloadFile",
                             view: "daterangepicker",
-                            name: "datePickerFilterDownloadFile",
-                            label: "Od - do:",
+                            label: "From - To:",
                             required: true,
-                            invalidMessage: "Molimo Vas da odaberete datume.",
+                            invalidMessage: "Please select report range.",
                             suggest: {
                                 view: "daterangesuggest",
                                 body: {
@@ -335,47 +319,45 @@ var chartView = {
                             on: {
                                 onChange: function (dates) {
                                     if (dates.start != null && dates.end != null) {
-                                        var myFormat = webix.Date.dateToStr("%d.%m.%Y");
+                                        var myFormat = webix.Date.dateToStr("%Y-%m-%d");
                                         startDate = myFormat(new Date(dates.start));
                                         endDate = myFormat(new Date(dates.end));
-
                                         $$("datePickerFilterDownloadFile").getPopup().hide();
                                     }
                                 }
                             }
                         },
                         {
-                            id: "fileFormat",
-                            name: "fileFormat",
-                            view: "select",
-                            value: 1,
-                            invalidMessage: "Molimo Vas da odaberete format.",
+                            id: "format",
+                            name: "format",
+                            view: "richselect",
+                            value: "PDF",
+                            invalidMessage: "Choose file format.",
                             required: true,
-                            label: "Format fajla:",
+                            label: "File format:",
                             options: [
                                 {
-                                    id: 1,
+                                    id: "PDF",
                                     value: "PDF",
                                 },
                                 {
-                                    id: 2,
+                                    id: "XLS",
                                     value: "XLS",
                                 },
                                 {
-                                    id: 3,
+                                    id: "CSV",
                                     value: "CSV",
                                 }
                             ]
                         },
                         {
-                            id: "vehicleId",
-                            name: "vehicleId",
-                            view: "select",
-                            value: firstVehicle,
-                            invalidMessage: "Molimo Vas da odaberete vozilo.",
+                            id: "carId",
+                            name: "carId",
+                            view: "richselect",
+                            invalidMessage: "Please choose vehicle.",
                             required: true,
                             disabled: true,
-                            label: "Vozilo:",
+                            label: "Vehicle:",
                             options: []
                         },
                         {
@@ -385,7 +367,7 @@ var chartView = {
                                 {
                                     id: "DownloadFile",
                                     view: "button",
-                                    value: "Preuzmite mjesečni izvještaj",
+                                    value: "Download",
                                     type: "form",
                                     click: "chartView.download",
                                     hotkey: "enter",
@@ -408,63 +390,43 @@ var chartView = {
 
     download: function () {
         if ($$("downloadForm").validate()) {
-            var monthReportType = $$("monthReportType").getValue();
-            var fileFormatId = $$("fileFormat").getValue();
-            var fileFormat;
-            if (fileFormatId == 1) {
-                fileFormat = "PDF";
-            }
-            else if (fileFormatId == 2) {
-                fileFormat = "XLS";
-            }
-            else {
-                fileFormat = "CSV";
-            }
-            if (monthReportType == 1) {
-                webix.ajax().header({"Content-type": "application/x-www-form-urlencoded"})
-                    .post("hub/vehicleMaintenance/report/all/month", "startDate=" + startDate + "&endDate=" + endDate + "&format=" + fileFormat).then(function (data) {
-                    var file = data.json();
-                    var blob = util.b64toBlob(file.content);
-                    saveFileAs(blob, file.name);
-                }).fail(function (error) {
-                    util.messages.showErrorMessage(error.responseText);
-                });
-            }
-            else {
-                var vehicleId = $$("vehicleId").getValue();
-                webix.ajax().header({"Content-type": "application/x-www-form-urlencoded"})
-                    .post("hub/vehicleMaintenance/report/vehicle/month", "startDate=" + startDate + "&endDate=" + endDate + "&format=" + fileFormat + "&vehicleId=" + vehicleId).then(function (data) {
-                    var file = data.json();
-                    var blob = util.b64toBlob(file.content);
-                    saveFileAs(blob, file.name);
-                }).fail(function (error) {
-                    util.messages.showErrorMessage(error.responseText);
-                });
-            }
+
+            var report = $$("downloadForm").getValues();
+            console.log(report);
+            report.dateFrom = startDate;
+            report.dateTo = endDate;
+            report.companyId = userData.companyId;
+
+            webix.ajax().header({"Content-type": "application/json"})
+                .post("api/expense/report/", report).then(function (data) {
+                var file = data.json();
+                var blob = util.b64toBlob(file.content);
+                saveFileAs(blob, file.name);
+            }).fail(function (error) {
+                util.messages.showErrorMessage(error.responseText);
+            });
         }
     },
 
     loadVehicle: function () {
-        webix.ajax().get("hub/vehicle").then(function (data) {
+        webix.ajax().get("api/car").then(function (data) {
             vehicles.length = 0;
             var vehiclesTemp = data.json();
             firstVehicle = vehiclesTemp[0].id;
             vehiclesTemp.forEach(function (obj) {
                 vehicles.push({
                     id: obj.id,
-                    value: obj.licensePlate + " - " + obj.manufacturerName + " " + obj.modelName,
-                    item: obj
+                    value: obj.plateNumber + "  " + obj.manufacturerName + " " + obj.model
                 });
             });
 
-            $$("vehicleId").define({
+            $$("carId").define({
                 options: vehicles,
                 value: firstVehicle
             });
-            $$("vehicleId").refresh();
+            $$("carId").refresh();
         }).fail(function (error) {
-            util.messages.showErrorMessage("Neuspješno dobavljanje podataka o vozilima.");
+            util.messages.showErrorMessage("Car load fail.");
         });
     }
-    */
 };

@@ -245,7 +245,7 @@ var vehicleView = {
                         ]
                     },
                     {
-                        key: "",
+                        key: "AIzaSyBpbWc3t35Tahjs45QIi7TnpvV6b_UQSNs",
                         view: "google-map",
                         id: "map",
                         zoom: 15,

@@ -3,8 +3,7 @@ package ba.telegroup.car_reservation.util.report;
 import org.springframework.format.annotation.DateTimeFormat;
 
 import java.sql.Date;
-import java.time.LocalDate;
-import java.util.HashMap;
+
 
 
 public class ReportInfo {
@@ -18,7 +17,6 @@ public class ReportInfo {
     private Date dateTo;
     private Integer companyId;
     private Integer carId;
-    private String period;
     private Integer type;
     private String format;
 
@@ -86,16 +84,10 @@ public class ReportInfo {
         this.companyId = companyId;
     }
 
-    public String getPeriod() {
-        return period;
-    }
 
-    public void setPeriod(String period) {
-        this.period = period;
-    }
 
     public Boolean check(){
-        if(dateFrom!=null && dateTo!=null && dateFrom.compareTo(dateTo)<=0 && companyId!=null && type!=null && period!=null && format!=null){
+        if(dateFrom!=null && dateTo!=null && dateFrom.compareTo(dateTo)<=0 && companyId!=null && type!=null && format!=null){
             if(type.equals(typeVehicle)){
                 return carId!=null;
             }
@@ -104,29 +96,5 @@ public class ReportInfo {
         return false;
     }
 
-    public HashMap getParams(){
-        if(check()) {
-            LocalDate from=dateToLocalDate(dateFrom);
-            LocalDate to=dateToLocalDate(dateTo);
-            String period=from.getMonthValue()+"/"+from.getYear()+" - "+to.getMonthValue()+"/"+to.getYear();
-            HashMap params = new HashMap();
-            params.put("period",period);
-            System.out.println((type.equals(typeVehicle))+" type"+type+" "+typeVehicle);
-            if (type.equals(typeVehicle)) {
-                params.put("companyId",companyId);
-                params.put("carId",carId);
-                params.put("dateFrom",dateFrom);
-                params.put("dateTo",dateTo);
-            }else{
-                params.put("companyIdIn",companyId);
-                params.put("startDateIn",dateFrom);
-                params.put("endDateIn",dateTo);
-            }
-            return params;
-        }
-        return null;
-    }
-    private LocalDate dateToLocalDate(Date date){
-        return date.toLocalDate();
-    }
+
 }

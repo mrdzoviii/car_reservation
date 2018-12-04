@@ -211,7 +211,7 @@ var locationView = {
                     ]
                 },
                 {
-                    key: "",
+                    key: "AIzaSyBpbWc3t35Tahjs45QIi7TnpvV6b_UQSNs",
                     view: "google-map",
                     id: "map",
                     zoom: 15,
@@ -376,7 +376,7 @@ var locationView = {
                             label:"Map:"
                         },
                         {
-                            key: "",
+                            key: "AIzaSyBpbWc3t35Tahjs45QIi7TnpvV6b_UQSNs",
                             view: "google-map",
                             id: "map",
                             label:"Map:",
@@ -556,7 +556,7 @@ var locationView = {
                             label:"Map:"
                         },
                         {
-                            key: "",
+                            key: "AIzaSyBpbWc3t35Tahjs45QIi7TnpvV6b_UQSNs",
                             view: "google-map",
                             id: "editMap",
                             zoom: 15,

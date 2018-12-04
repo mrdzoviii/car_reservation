@@ -27,11 +27,6 @@ var jasperType={
     vehicle:2
 }
 
-var reportFormat={
-    pdf:"PDF",
-    csv:"CSV",
-    xls:"XLS"
-}
 
 var mapProperties={
     longitude:44.772337,

@@ -33,10 +33,7 @@ import java.sql.SQLException;
 import java.time.LocalDate;
 import java.time.ZoneId;
 import java.time.temporal.WeekFields;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-import java.util.Locale;
+import java.util.*;
 
 
 @RestController
@@ -265,7 +262,7 @@ public class ExpenseController extends GenericDeletableController<Expense,Intege
             }
             JasperPrint jasperPrint = null;
             try {
-                jasperPrint = JasperFillManager.fillReport(getClass().getResource(name).getPath(),reportInfo.getParams(), jdbcTemplate.getDataSource().getConnection());
+                jasperPrint = JasperFillManager.fillReport(getClass().getResource(name).getPath(),getParams(reportInfo), jdbcTemplate.getDataSource().getConnection());
             } catch (JRException | SQLException e) {
                 e.printStackTrace();
                 throw new BadRequestException(badRequestExpenseReport);
@@ -354,6 +351,28 @@ public class ExpenseController extends GenericDeletableController<Expense,Intege
         } catch (JRException e) {
             e.printStackTrace();
         }
+    }
+
+    HashMap getParams(ReportInfo info){
+        if(info.check()) {
+            LocalDate from=info.getDateFrom().toLocalDate();
+            LocalDate to=info.getDateTo().toLocalDate();
+            String period=from.getMonthValue()+"/"+from.getYear()+" - "+to.getMonthValue()+"/"+to.getYear();
+            HashMap params = new HashMap();
+            params.put("period",period);
+            if (info.getType().equals(typeVehicle)) {
+                params.put("companyId",info.getCompanyId());
+                params.put("carId",info.getCarId());
+                params.put("dateFrom",info.getDateFrom());
+                params.put("dateTo",info.getDateTo());
+            }else{
+                params.put("companyIdIn",info.getCompanyId());
+                params.put("startDateIn",info.getDateFrom());
+                params.put("endDateIn",info.getDateTo());
+            }
+            return params;
+        }
+        return null;
     }
 
 }
