@@ -12,4 +12,5 @@ public interface ReservationRepositoryCustom {
     List getAllExtendedByCarId(Integer carId);
     Long deleteByCompanyId(Integer companyId);
     Long deleteByUserId(Integer userId);
+    Long deleteByCarId(Integer carId);
 }

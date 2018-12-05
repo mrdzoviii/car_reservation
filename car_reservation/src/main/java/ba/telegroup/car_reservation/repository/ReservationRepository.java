@@ -8,4 +8,5 @@ import org.springframework.data.jpa.repository.JpaRepository;
 public interface ReservationRepository extends JpaRepository<Reservation,Integer>, HasCompanyIdAndDeletableRepository<Reservation>, ReservationRepositoryCustom {
     Long countAllByCompanyIdAndDeleted(Integer companyId,Byte deleted);
     Long countAllByUserIdAndDeleted(Integer userId,Byte deleted);
+    Long countAllByCarIdAndDeleted(Integer carId,Byte deleted);
 }

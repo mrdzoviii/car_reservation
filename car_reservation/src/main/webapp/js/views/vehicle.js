@@ -128,13 +128,14 @@ var vehicleView = {
                 on: {
                     onItemClick: function (id) {
                         var context = this.getContext();
+                        var item = $$("vehicleDV").getSelectedItem();
                         switch (id) {
                             case "1":
                                 vehicleView.showEditDialog($$("vehicleDV").getSelectedItem());
                                 break;
                         case "2":
-                            var delBox = (webix.copy(commonViews.deleteConfirm("vehicle", "vehicle")));
-                            var item = $$("vehicleDV").getSelectedItem();
+                            var delBox = (webix.copy(commonViews.deleteConfirm(item.manufacturerName+' '+item.model+' - '+item.plateNumber, item.manufacturerName+' '+item.model+' - '+item.plateNumber)));
+
 
                             delBox.callback = function (result) {
                                 if (result == 1) {

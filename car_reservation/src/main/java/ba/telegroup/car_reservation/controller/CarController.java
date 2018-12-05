@@ -7,16 +7,13 @@ import ba.telegroup.car_reservation.model.Car;
 import ba.telegroup.car_reservation.model.Manufacturer;
 import ba.telegroup.car_reservation.model.Model;
 import ba.telegroup.car_reservation.model.modelCustom.CarManufacturerModelFuelLocationCompany;
-import ba.telegroup.car_reservation.repository.CarRepository;
-import ba.telegroup.car_reservation.repository.ManufacturerRepository;
-import ba.telegroup.car_reservation.repository.ModelRepository;
+import ba.telegroup.car_reservation.repository.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Scope;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 
-import javax.persistence.SqlResultSetMapping;
 import java.util.Arrays;
 import java.util.List;
 
@@ -32,20 +29,29 @@ public class CarController extends GenericDeletableController<Car,Integer> {
     private String badRequestUpdate;
     @Value("${action.success}")
     private String actionSuccess;
+    @Value("${badRequest.delete}")
+    private String badRequestDelete;
+    @Value("${deleted.yes}")
+    private Byte deleted;
     private CarRepository carRepository;
     private ManufacturerRepository manufacturerRepository;
     private ModelRepository modelRepository;
     private ModelController modelController;
     private ManufacturerController manufacturerController;
+    private ReservationRepository reservationRepository;
+    private ExpenseRepository expenseRepository;
     @Autowired
     public CarController(CarRepository carRepository, ManufacturerRepository manufacturerRepository,ModelRepository modelRepository,
-                         ManufacturerController manufacturerController,ModelController modelController){
+                         ManufacturerController manufacturerController,ModelController modelController,
+                         ExpenseRepository expenseRepository,ReservationRepository reservationRepository){
         super(carRepository);
         this.carRepository=carRepository;
         this.manufacturerRepository=manufacturerRepository;
         this.modelRepository=modelRepository;
         this.modelController=modelController;
         this.manufacturerController=manufacturerController;
+        this.expenseRepository=expenseRepository;
+        this.reservationRepository=reservationRepository;
     }
 
     @Override
@@ -170,5 +176,15 @@ public class CarController extends GenericDeletableController<Car,Integer> {
                 car.getLatitude() != null && car.getLongitude() != null && car.getLocationName() != null && car.getManufacturerName() != null &&
                 car.getModel() != null && car.getEngine() != null && car.getTransmission() != null && car.getDeleted() != null && car.getPlateNumber() != null &&
                 car.getYear() != null && car.getImage() != null && car.getFuelId() != null;
+    }
+
+    @Transactional(rollbackFor = Exception.class)
+    @Override
+    public String delete(@PathVariable Integer id) throws BadRequestException, ForbiddenException {
+        if(expenseRepository.deleteByCarId(id).equals(expenseRepository.countAllByCarIdAndDeleted(id,deleted)) &&
+            reservationRepository.deleteByCarId(id).equals(reservationRepository.countAllByCarIdAndDeleted(id,deleted))) {
+            return super.delete(id);
+        }
+        throw new BadRequestException(badRequestDelete);
     }
 }

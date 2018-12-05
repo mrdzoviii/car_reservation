@@ -23,6 +23,8 @@ public class ExpenseRepositoryImpl extends CustomRepositoryImpl implements Expen
 
     private final String SQL_DELETE_BY_USER="update expense u set u.deleted=1 where user_id=?";
 
+    private final String SQL_DELETE_BY_CAR="update expense u set u.deleted=1 where car_id=?";
+
     @Override
     public List getAllExtendedByReservationId(Integer reservationId) {
         return entityManager.createNativeQuery(SQL_GET_ALL_EXTENDED_BY_RESERVATION_ID,"ExpenseCarReservationUserMapping")
@@ -62,5 +64,10 @@ public class ExpenseRepositoryImpl extends CustomRepositoryImpl implements Expen
     @Override
     public Long deleteByUserId(Integer userId) {
         return Long.valueOf(entityManager.createNativeQuery(SQL_DELETE_BY_USER).setParameter(1,userId).executeUpdate());
+    }
+
+    @Override
+    public Long deleteByCarId(Integer carId) {
+        return Long.valueOf(entityManager.createNativeQuery(SQL_DELETE_BY_CAR).setParameter(1,carId).executeUpdate());
     }
 }

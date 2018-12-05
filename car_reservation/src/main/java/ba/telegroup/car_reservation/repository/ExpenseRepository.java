@@ -10,4 +10,5 @@ public interface ExpenseRepository extends JpaRepository<Expense,Integer>, Delet
     Long countExpenseByReservationIdAndDeleted(Integer reservationId,Byte deleted);
     Long countAllByCompanyIdAndDeleted(Integer companyId,Byte deleted);
     Long countAllByUserIdAndDeleted(Integer userId,Byte deleted);
+    Long countAllByCarIdAndDeleted(Integer carId,Byte deleted);
 }
