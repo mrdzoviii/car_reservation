@@ -34,6 +34,7 @@ public class CarRepositoryImpl extends CustomRepositoryImpl implements CarReposi
             "          (end_time between CAST(? as datetime) and cast(? as datetime)) or (start_time <= CAST(? as DATETIME) and end_time >= CAST(? as DATETIME))) and deleted=0 and state_id in (1,2)";
 
     private final String SQL_DELETE_BY_COMPANY="update car u set u.deleted=1 where company_id=?";
+    private final String SQL_DELETE_BY_LOCATION="update car u set u.deleted=1 where location_id=?";
     @Override
     public List getAllExtendedByCompanyId(Integer companyId) {
         return entityManager.createNativeQuery(SQL_GET_ALL_EXTENDED_BY_COMPANY,"CarManufacturerModelFuelLocationCompanyMapping")
@@ -62,5 +63,9 @@ public class CarRepositoryImpl extends CustomRepositoryImpl implements CarReposi
     @Override
     public Long deleteByCompanyId(Integer companyId) {
         return Long.valueOf(entityManager.createNativeQuery(SQL_DELETE_BY_COMPANY).setParameter(1,companyId).executeUpdate());
+    }
+    @Override
+    public Long deleteByLocationId(Integer locationId) {
+        return Long.valueOf(entityManager.createNativeQuery(SQL_DELETE_BY_LOCATION).setParameter(1,locationId).executeUpdate());
     }
 }

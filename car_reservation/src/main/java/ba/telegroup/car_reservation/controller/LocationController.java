@@ -37,14 +37,16 @@ public class LocationController extends GenericHasCompanyIdAndDeletableControlle
     private String success;
     private Boolean result;
     private LocationRepository locationRepository;
-    private CarController carController;
+    private ReservationRepository reservationRepository;
+    private ExpenseRepository expenseRepository;
     private CarRepository carRepository;
 
     @Autowired
-    public LocationController(LocationRepository locationRepository, CarController carController,CarRepository carRepository){
+    public LocationController(LocationRepository locationRepository,ExpenseRepository expenseRepository,ReservationRepository reservationRepository,CarRepository carRepository){
         super(locationRepository);
         this.locationRepository=locationRepository;
-        this.carController=carController;
+        this.reservationRepository=reservationRepository;
+        this.expenseRepository=expenseRepository;
         this.carRepository=carRepository;
     }
 
@@ -69,15 +71,14 @@ public class LocationController extends GenericHasCompanyIdAndDeletableControlle
         List<Car> cars=carRepository.getAllByLocationIdAndDeleted(id,notDeleted);
         result=true;
         cars.forEach(car -> {
-            try {
-                if(carController.delete(car.getId()).equals(success)){
+                if(reservationRepository.deleteByCarId(car.getId()).equals(reservationRepository.countAllByCarIdAndDeleted(car.getId(),deleted))
+                    && expenseRepository.deleteByCarId(car.getId()).equals(expenseRepository.countAllByCarIdAndDeleted(car.getId(),deleted))){
                     setResult(true);
+                    return;
                 }
-            } catch (BadRequestException | ForbiddenException e) {
-                setResult(false);
-            }
+                    setResult(false);
         });
-        if(result) {
+        if(result && carRepository.deleteByLocationId(id).equals(carRepository.countAllByLocationIdAndDeleted(id,deleted))) {
             return super.delete(id);
         }
         throw new BadRequestException(badRequestDelete);

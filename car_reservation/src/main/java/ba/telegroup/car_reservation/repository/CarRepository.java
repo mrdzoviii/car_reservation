@@ -10,4 +10,5 @@ import java.util.List;
 public interface CarRepository extends JpaRepository<Car,Integer>, HasCompanyIdAndDeletableRepository<Car> , CarRepositoryCustom {
     Long countAllByCompanyIdAndDeleted(Integer companyId,Byte deleted);
     List<Car> getAllByLocationIdAndDeleted(Integer locationId,Byte deleted);
+    Long countAllByLocationIdAndDeleted(Integer locationId,Byte deleted);
 }
