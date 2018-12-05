@@ -6,4 +6,5 @@ import java.util.List;
 
 public interface LocationRepositoryCustom {
     List<Location> getAllByCompanyId(Integer companyId);
+    Long deleteByCompanyId(Integer companyId);
 }

@@ -298,7 +298,8 @@ var companyView = {
                     var context = this.getContext();
                     switch(id){
                         case "delete":
-                            var delBox = (webix.copy(commonViews.deleteConfirm("company")));
+                            var item = $$("companyDT").getItem(context.id.row);
+                            var delBox = (webix.copy(commonViews.deleteConfirm(item.name,item.name)));
                             delBox.callback = function (result) {
                                 if (result) {
                                     var item = $$("companyDT").getItem(context.id.row);
@@ -350,9 +351,10 @@ var companyView = {
             on: {
                 onItemClick: function (id) {
                     var context = this.getContext();
+                    var item = $$("userDT").getItem(context.id.row);
                     switch (id) {
                         case "delete":
-                            var delBox = (webix.copy(commonViews.deleteConfirm("user", "user")));
+                            var delBox = (webix.copy(commonViews.deleteConfirm(item.username,item.username)));
                             delBox.callback = function (result) {
                                 if (result) {
                                     var item = $$("userDT").getItem(context.id.row);

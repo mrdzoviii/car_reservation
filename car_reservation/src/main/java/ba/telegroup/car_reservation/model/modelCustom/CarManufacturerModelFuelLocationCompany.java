@@ -67,7 +67,7 @@ public class CarManufacturerModelFuelLocationCompany extends Car implements Dele
                                                   String engine,String model,String transmission,String year,byte[] image,
                                                    String fuelName,Integer fuelId,Integer manufacturerId,String manufacturerName,String locationName,
                                                    BigDecimal longitude,BigDecimal latitude,String companyName,Integer companyId) {
-        super(id,modelId,locationId,plateNumber,deleted);
+        super(id,modelId,locationId,plateNumber,deleted,companyId);
         this.engine = engine;
         this.model = model;
         this.transmission = transmission;

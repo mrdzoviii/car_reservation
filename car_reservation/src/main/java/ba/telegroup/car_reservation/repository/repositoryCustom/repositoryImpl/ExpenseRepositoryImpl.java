@@ -19,6 +19,8 @@ public class ExpenseRepositoryImpl extends CustomRepositoryImpl implements Expen
     private String SQL_GET_ALL_BY_COMPANY_ID_AND_DATE_BETWEEN="select e.id,e.deleted,e.description,e.date,e.reservation_id,e.user_id,e.cost_id,e.car_id,e.price,e.company_id from expense e " +
             "where e.deleted=0 and e.company_id=? and e.date between cast(? as DATE ) and cast(? as DATE)";
 
+    private final String SQL_DELETE_BY_COMPANY="update expense u set u.deleted=1 where company_id=?";
+
     @Override
     public List getAllExtendedByReservationId(Integer reservationId) {
         return entityManager.createNativeQuery(SQL_GET_ALL_EXTENDED_BY_RESERVATION_ID,"ExpenseCarReservationUserMapping")
@@ -47,5 +49,10 @@ public class ExpenseRepositoryImpl extends CustomRepositoryImpl implements Expen
     public List<Expense> getAllExpensesByCompanyIdAndDateBetween(Integer companyId, String dateFrom, String dateTo) {
         return entityManager.createNativeQuery(SQL_GET_ALL_BY_COMPANY_ID_AND_DATE_BETWEEN,"ExpenseMapping")
                 .setParameter(1,companyId).setParameter(2,dateFrom).setParameter(3,dateTo).getResultList();
+    }
+
+    @Override
+    public Long deleteByCompanyId(Integer companyId) {
+        return Long.valueOf(entityManager.createNativeQuery(SQL_DELETE_BY_COMPANY).setParameter(1,companyId).executeUpdate());
     }
 }

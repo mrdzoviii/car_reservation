@@ -79,6 +79,7 @@ public class CarController extends GenericDeletableController<Car,Integer> {
             item.setPlateNumber(car.getPlateNumber());
             item.setLocationId(car.getLocationId());
             item.setDeleted(car.getDeleted());
+            item.setCompanyId(car.getCompanyId());
             item = insert(item);
             if (item != null) {
                         return carRepository.getExtendedById(item.getId());
@@ -88,7 +89,7 @@ public class CarController extends GenericDeletableController<Car,Integer> {
     }
     @RequestMapping(value = "/reservation/{startTime}/{endTime}",method = RequestMethod.GET)
     public List getFreeCars(@PathVariable("startTime") String startTime,@PathVariable("endTime") String endTime){
-        return carRepository.getAllExtendedByCompanyIdAndFreeBeetweenStartAndEndTime(userBean.getUser().getCompanyId(),startTime,endTime);
+        return carRepository.getAllExtendedByCompanyIdAndFreeBetweenStartAndEndTime(userBean.getUser().getCompanyId(),startTime,endTime);
     }
     @Transactional(rollbackFor = Exception.class)
     @RequestMapping(value = "/custom/{id}",method = RequestMethod.PUT)

@@ -13,6 +13,7 @@ public class Car implements Deletable {
     private Integer locationId;
     private String plateNumber;
     private Byte deleted;
+    private Integer companyId;
 
     @Id
     @Column(name = "id")
@@ -65,6 +66,16 @@ public class Car implements Deletable {
         this.deleted = deleted;
     }
 
+    @Basic
+    @Column(name="company_id")
+    public Integer getCompanyId() {
+        return companyId;
+    }
+
+    public void setCompanyId(Integer companyId) {
+        this.companyId = companyId;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
@@ -73,12 +84,13 @@ public class Car implements Deletable {
         return Objects.equals(id, car.id);
     }
 
-    public Car(Integer id, Integer modelId, Integer locationId, String plateNumber, Byte deleted) {
+    public Car(Integer id, Integer modelId, Integer locationId, String plateNumber, Byte deleted,Integer companyId) {
         this.id = id;
         this.modelId = modelId;
         this.locationId = locationId;
         this.plateNumber = plateNumber;
         this.deleted = deleted;
+        this.companyId=companyId;
     }
 
     public Car() {

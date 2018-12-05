@@ -6,4 +6,5 @@ import ba.telegroup.car_reservation.repository.repositoryCustom.CarRepositoryCus
 import org.springframework.data.jpa.repository.JpaRepository;
 
 public interface CarRepository extends JpaRepository<Car,Integer>, DeletableRepository<Car> , CarRepositoryCustom {
+    Long countAllByCompanyIdAndDeleted(Integer companyId,Byte deleted);
 }

@@ -27,6 +27,8 @@ public class ReservationRepositoryImpl extends CustomRepositoryImpl implements R
             " from reservation r inner join state s on r.state_id = s.id inner join user u on r.user_id = u.id inner join company c on r.company_id = c.id" +
             " inner join car v on r.car_id = v.id inner join model m on v.model_id = m.id inner join manufacturer m2 on m.manufacturer_id = m2.id inner join fuel f on m.fuel_id = f.id where r.car_id=? and r.deleted=0 order by r.start_time desc,r.end_time desc";
 
+    private final String SQL_DELETE_BY_COMPANY="update reservation u set u.deleted=1 where company_id=?";
+
     @Override
     public List getAllExtendedByCompanyId(Integer companyId) {
         return entityManager.createNativeQuery(SQL_GET_ALL_EXTENDED_BY_COMPANY,"ReservationStateCarCompanyUserMapping").
@@ -48,5 +50,10 @@ public class ReservationRepositoryImpl extends CustomRepositoryImpl implements R
     public List getAllExtendedByCarId(Integer carId){
         return entityManager.createNativeQuery(SQL_GET_ALL_EXTENDED_BY_CAR_ID,"ReservationStateCarCompanyUserMapping").
                 setParameter(1,carId).getResultList();
+    }
+
+    @Override
+    public Long deleteByCompanyId(Integer companyId) {
+        return Long.valueOf(entityManager.createNativeQuery(SQL_DELETE_BY_COMPANY).setParameter(1,companyId).executeUpdate());
     }
 }

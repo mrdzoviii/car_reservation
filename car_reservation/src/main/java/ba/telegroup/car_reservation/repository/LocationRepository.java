@@ -6,4 +6,5 @@ import ba.telegroup.car_reservation.repository.repositoryCustom.LocationReposito
 import org.springframework.data.jpa.repository.JpaRepository;
 
 public interface LocationRepository extends JpaRepository<Location,Integer>, HasCompanyIdAndDeletableRepository<Location>, LocationRepositoryCustom {
+    Long countAllByCompanyIdAndDeleted(Integer companyId,Byte deleted);
 }

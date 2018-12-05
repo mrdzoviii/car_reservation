@@ -8,5 +8,6 @@ public interface CarRepositoryCustom {
      List getAllExtendedByCompanyId(Integer companyId);
      List getAllExtendedByLocationId(Integer locationId);
      CarManufacturerModelFuelLocationCompany getExtendedById(Integer id);
-     List getAllExtendedByCompanyIdAndFreeBeetweenStartAndEndTime(Integer companyId,String startTime,String endTime);
+     List getAllExtendedByCompanyIdAndFreeBetweenStartAndEndTime(Integer companyId,String startTime,String endTime);
+     Long deleteByCompanyId(Integer companyId);
 }
