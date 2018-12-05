@@ -7,7 +7,9 @@ import ba.telegroup.car_reservation.model.LoginBean;
 import ba.telegroup.car_reservation.model.MailOption;
 import ba.telegroup.car_reservation.model.User;
 import ba.telegroup.car_reservation.model.modelCustom.UserLocationCompany;
+import ba.telegroup.car_reservation.repository.ExpenseRepository;
 import ba.telegroup.car_reservation.repository.MailOptionRepository;
+import ba.telegroup.car_reservation.repository.ReservationRepository;
 import ba.telegroup.car_reservation.repository.UserRepository;
 import ba.telegroup.car_reservation.util.Notification;
 import ba.telegroup.car_reservation.util.PasswordInfo;
@@ -32,6 +34,8 @@ import java.util.List;
 public class UserController extends GenericHasCompanyIdAndDeletableController<User,Integer> {
     @Value(value = "${forbidden.login}")
     private String forbiddenLogin;
+    @Value("${badRequest.delete}")
+    private String badRequestDelete;
     @Value("${status.active}")
     private Integer statusActive;
     @Value(value = "${logout.success}")
@@ -48,6 +52,8 @@ public class UserController extends GenericHasCompanyIdAndDeletableController<Us
     private Integer systemAdmin;
     @Value("${role.company_admin}")
     private Integer companyAdmin;
+    @Value("${role.user}")
+    private Integer companyUser;
     @Value("${status.inactive}")
     private Integer statusInactive;
     @Value("${token.length}")
@@ -69,21 +75,19 @@ public class UserController extends GenericHasCompanyIdAndDeletableController<Us
     private UserRepository userRepository;
     private Notification notification;
     private MailOptionRepository mailOptionRepository;
+    private ExpenseRepository expenseRepository;
+    private ReservationRepository reservationRepository;
     @Autowired
-    public UserController(UserRepository userRepository, Notification notification,MailOptionRepository mailOptionRepository){
+    public UserController(UserRepository userRepository, Notification notification,MailOptionRepository mailOptionRepository,
+                          ExpenseRepository expenseRepository,ReservationRepository reservationRepository){
         super(userRepository);
         this.userRepository=userRepository;
         this.notification = notification;
         this.mailOptionRepository=mailOptionRepository;
+        this.expenseRepository=expenseRepository;
+        this.reservationRepository=reservationRepository;
     }
 
-    @Override
-    public User findById(@PathVariable Integer id) {
-        User object=userRepository.getExtendedById(id);
-        if (object == null || object.getDeleted().equals(deleted) || (!userBean.getUser().getRoleId().equals(systemAdmin) && !userBean.getUser().getCompanyId().equals(object.getCompanyId())))
-            object = null;
-        return object;
-    }
 
     @Override
     public List getAll(){
@@ -257,4 +261,17 @@ public class UserController extends GenericHasCompanyIdAndDeletableController<Us
 
     }
 
+    @Transactional(rollbackFor = Exception.class)
+    @Override
+    public String delete(@PathVariable Integer id) throws BadRequestException, ForbiddenException {
+        User user=userRepository.findById(id).orElse(null);
+        if(user!=null && !user.getId().equals(userBean.getUser().getId())) {
+            if(user.getRoleId().equals(companyAdmin) || user.getRoleId().equals(systemAdmin) ||
+                    (user.getRoleId().equals(companyUser) && expenseRepository.deleteByUserId(id).equals(expenseRepository.countAllByUserIdAndDeleted(id,deleted)) &&
+                            reservationRepository.deleteByUserId(id).equals(reservationRepository.countAllByUserIdAndDeleted(id,deleted)))) {
+                return super.delete(id);
+            }
+        }
+        throw new BadRequestException(badRequestDelete);
+    }
 }

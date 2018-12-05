@@ -11,4 +11,5 @@ public interface ReservationRepositoryCustom {
     ReservationStateCarUserCompanyLocation getReservationInfoForNotification(Integer id);
     List getAllExtendedByCarId(Integer carId);
     Long deleteByCompanyId(Integer companyId);
+    Long deleteByUserId(Integer userId);
 }

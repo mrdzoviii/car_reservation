@@ -20,7 +20,6 @@ public class CompanyController extends GenericDeletableController<Company,Intege
     private String badRequestDelete;
     @Value("${deleted.yes}")
     private Byte deleted;
-    private final CompanyRepository companyRepository;
     private final UserRepository userRepository;
     private final LocationRepository locationRepository;
     private final CarRepository carRepository;
@@ -30,7 +29,6 @@ public class CompanyController extends GenericDeletableController<Company,Intege
     public CompanyController(CompanyRepository companyRepository,UserRepository userRepository,LocationRepository locationRepository,
                              CarRepository carRepository,ExpenseRepository expenseRepository,ReservationRepository reservationRepository){
         super(companyRepository);
-        this.companyRepository=companyRepository;
         this.userRepository=userRepository;
         this.locationRepository=locationRepository;
         this.carRepository=carRepository;

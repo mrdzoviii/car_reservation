@@ -29,6 +29,8 @@ public class ReservationRepositoryImpl extends CustomRepositoryImpl implements R
 
     private final String SQL_DELETE_BY_COMPANY="update reservation u set u.deleted=1 where company_id=?";
 
+    private final String SQL_DELETE_BY_USER="update reservation u set u.deleted=1 where user_id=?";
+
     @Override
     public List getAllExtendedByCompanyId(Integer companyId) {
         return entityManager.createNativeQuery(SQL_GET_ALL_EXTENDED_BY_COMPANY,"ReservationStateCarCompanyUserMapping").
@@ -55,5 +57,10 @@ public class ReservationRepositoryImpl extends CustomRepositoryImpl implements R
     @Override
     public Long deleteByCompanyId(Integer companyId) {
         return Long.valueOf(entityManager.createNativeQuery(SQL_DELETE_BY_COMPANY).setParameter(1,companyId).executeUpdate());
+    }
+
+    @Override
+    public Long deleteByUserId(Integer userId) {
+        return Long.valueOf(entityManager.createNativeQuery(SQL_DELETE_BY_USER).setParameter(1,userId).executeUpdate());
     }
 }

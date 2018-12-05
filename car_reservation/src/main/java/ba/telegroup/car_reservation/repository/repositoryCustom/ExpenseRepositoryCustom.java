@@ -12,4 +12,5 @@ public interface ExpenseRepositoryCustom {
     ExpenseCarReservationUser getExtendedById(Integer id);
     List<Expense> getAllExpensesByCompanyIdAndDateBetween(Integer companyId, String dateFrom, String dateTo);
     Long deleteByCompanyId(Integer companyId);
+    Long deleteByUserId(Integer userId);
 }
