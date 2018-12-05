@@ -13,7 +13,8 @@ var reservationState={
     reserved:1,
     running:2,
     finished:3,
-    completed:4
+    completed:4,
+    canceled:5
 }
 
 var reportType={

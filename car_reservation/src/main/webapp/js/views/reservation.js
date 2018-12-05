@@ -177,7 +177,7 @@ var reservationView = {
                                         icon: "info-circle"
                                     })
                             }
-                            if(selectedItem.stateId===reservationState.completed){
+                            if(selectedItem.stateId===reservationState.completed || selectedItem.stateId===reservationState.canceled){
                                 contextMenuData.push(
 
                                     {
@@ -202,6 +202,14 @@ var reservationView = {
                                     id: "3",
                                     value: "More details",
                                     icon: "info-circle"
+                                },
+                                {
+                                    $template: "Separator"
+                                },
+                                {
+                                    id: "8",
+                                    value: "Delete",
+                                    icon: "trash"
                                 })
                             $$("reservationContextMenu").clearAll();
                             $$("reservationContextMenu").define("data", contextMenuData);
@@ -386,21 +394,25 @@ var reservationView = {
                             reservationView.showEditDialog($$("reservationDT").getSelectedItem());
                             break;
                         case "2":
-                            var delBox = (webix.copy(commonViews.cancelConfirm("reservation","reservation")));
-                            delBox.callback = function (result) {
+                            var cancelBox = (webix.copy(commonViews.cancelConfirm("reservation","reservation")));
+                            cancelBox.callback = function (result) {
                                 if (result) {
-                                    var item = $$("reservationDT").getItem(context.id.row);
-                                    connection.sendAjax("DELETE", "api/reservation/" + item.id, function (text, data, xhr) {
-                                        if (text) {
-                                            $$("reservationDT").remove(context.id.row);
-                                            util.messages.showMessage("Reservation canceled");
+                                    var item = $$("reservationDT").getSelectedItem();
+                                    webix.ajax().header({"Content-type": "application/json"})
+                                        .put("api/reservation/cancel/" + item.id, item).then(function (data) {
+                                        if (data) {
+                                            var result=data.json();
+                                            $$("reservationDT").updateItem(result.id,result);
+                                            util.messages.showMessage("Reservation canceled.");
+                                        } else {
+                                            util.messages.showErrorMessage("Reservation not canceled.");
                                         }
-                                    }, function (text, data, xhr) {
-                                        util.messages.showErrorMessage("Reservation not canceled");
-                                    }, item);
+                                    }).fail(function (error) {
+                                        util.messages.showErrorMessage(error.responseText);
+                                    });
                                 }
                             };
-                            webix.confirm(delBox);
+                            webix.confirm(cancelBox);
                             break;
                         case "3":
                             reservationView.showDetailReservationDialog($$("reservationDT").getSelectedItem());
@@ -416,6 +428,23 @@ var reservationView = {
                             break;
                         case "7":
                             reservationView.complete();
+                            break;
+                        case "8":
+                            var delBox = (webix.copy(commonViews.deleteConfirm("reservation","reservation")));
+                            delBox.callback = function (result) {
+                                if (result) {
+                                    var item = $$("reservationDT").getItem(context.id.row);
+                                    connection.sendAjax("DELETE", "api/reservation/" + item.id, function (text, data, xhr) {
+                                        if (text) {
+                                            $$("reservationDT").remove(context.id.row);
+                                            util.messages.showMessage("Reservation deleted");
+                                        }
+                                    }, function (text, data, xhr) {
+                                        util.messages.showErrorMessage("Reservation not deleted");
+                                    }, item);
+                                }
+                            };
+                            webix.confirm(delBox);
                             break;
 
                     }
@@ -628,8 +657,11 @@ var reservationView = {
             }else if(item.stateId==reservationState.running){
                 $$("state").define("label", "<b style='color:chocolate;'>" + item.state.toString().toUpperCase() + "</b>");
             }else if(item.stateId==reservationState.finished){
+                $$("state").define("label", "<b style='color:yellow;'>" + item.state.toString().toUpperCase() + "</b>");
+            }else if(item.stateId==reservationState.canceled){
                 $$("state").define("label", "<b style='color:red;'>" + item.state.toString().toUpperCase() + "</b>");
-            }else{
+            }
+            else{
                 $$("state").define("label", "<b style='color:green;'>" + item.state.toString().toUpperCase() + "</b>");
             }
             $$("fullName").define("label","Full name: <b>" + item.fullName+"</b>");

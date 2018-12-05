@@ -14,4 +14,5 @@ public interface ExpenseRepositoryCustom {
     Long deleteByCompanyId(Integer companyId);
     Long deleteByUserId(Integer userId);
     Long deleteByCarId(Integer carId);
+    Long deleteByReservationId(Integer reservationId);
 }

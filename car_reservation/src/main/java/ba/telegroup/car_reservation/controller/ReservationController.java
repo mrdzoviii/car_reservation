@@ -43,6 +43,8 @@ public class ReservationController extends GenericHasCompanyIdAndDeletableContro
     private Integer stateFinished;
     @Value("${state.completed}")
     private Integer stateCompleted;
+    @Value("${state.canceled}")
+    private Integer stateCanceled;
     @Value("${action.success}")
     private String actionSuccess;
     @Value("${forbidden.action}")
@@ -57,6 +59,10 @@ public class ReservationController extends GenericHasCompanyIdAndDeletableContro
     private String badRequestReservationFinish;
     @Value("${badRequest.reservation.complete}")
     private String badRequestReservationComplete;
+    @Value("${badRequest.reservation.cancel}")
+    private String getBadRequestReservationCancel;
+    @Value("${deleted.yes}")
+    private Byte deleted;
     private ReservationRepository reservationRepository;
     private UserRepository userRepository;
     private Notification notification;
@@ -117,18 +123,28 @@ public class ReservationController extends GenericHasCompanyIdAndDeletableContro
     @Transactional(rollbackFor = Exception.class)
     @Override
     public String delete(@PathVariable  Integer id) throws BadRequestException, ForbiddenException {
+        if(expenseRepository.deleteByReservationId(id).equals(expenseRepository.countExpenseByReservationIdAndDeleted(id,deleted))){
+            return super.delete(id);
+        }
+        throw new BadRequestException(badRequestReservationDelete);
+    }
+
+    @RequestMapping(value = "/cancel/{id}",method = RequestMethod.PUT)
+    public ReservationStateCarCompanyUser cancelReservation(@PathVariable("id") Integer id) throws BadRequestException, ForbiddenException {
         Reservation reservation=reservationRepository.findById(id).orElse(null);
         Timestamp now=new Timestamp(System.currentTimeMillis());
         if(reservation!=null && reservation.getStateId().equals(stateReserved) && reservation.getUserId().equals(userBean.getUser().getId()) && reservation.getStartTime().after(now)) {
             ReservationStateCarUserCompanyLocation reservationInfo=reservationRepository.getReservationInfoForNotification(id);
-            if(super.delete(id).equals(actionSuccess)){
+            reservation.setStateId(stateCanceled);
+            if(super.update(id,reservation).equals(actionSuccess)){
                 List<User> users=userRepository.getAllByCompanyIdAndRoleIdAndDeleted(reservationInfo.getCompanyId(),roleUser,notDeleted);
                 notification.sendNotification(reservationInfo,true,users);
-                return actionSuccess;
+                return reservationRepository.getExtendedById(reservation.getId());
             }
         }
-        throw new BadRequestException(badRequestReservationDelete);
+        throw new BadRequestException(getBadRequestReservationCancel);
     }
+
 
     @RequestMapping(value = "/start/{id}/{startMileage}",method = RequestMethod.PUT)
     public ReservationStateCarCompanyUser runReservation(@PathVariable("id") Integer id,@PathVariable("startMileage") Integer startMileage) throws BadRequestException, ForbiddenException {
