@@ -1,13 +1,14 @@
 package ba.telegroup.car_reservation.model;
 
 import ba.telegroup.car_reservation.common.interfaces.Deletable;
+import ba.telegroup.car_reservation.common.interfaces.HasCompanyId;
 
 import javax.persistence.*;
 import java.util.Objects;
 
 @Entity
 @Inheritance(strategy = InheritanceType.JOINED)
-public class Car implements Deletable {
+public class Car implements Deletable, HasCompanyId {
     private Integer id;
     private Integer modelId;
     private Integer locationId;

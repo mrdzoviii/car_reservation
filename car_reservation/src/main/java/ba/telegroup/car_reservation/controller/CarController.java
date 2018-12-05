@@ -3,6 +3,7 @@ package ba.telegroup.car_reservation.controller;
 import ba.telegroup.car_reservation.common.exceptions.BadRequestException;
 import ba.telegroup.car_reservation.common.exceptions.ForbiddenException;
 import ba.telegroup.car_reservation.controller.genericController.GenericDeletableController;
+import ba.telegroup.car_reservation.controller.genericController.GenericHasCompanyIdAndDeletableController;
 import ba.telegroup.car_reservation.model.Car;
 import ba.telegroup.car_reservation.model.Manufacturer;
 import ba.telegroup.car_reservation.model.Model;
@@ -20,7 +21,7 @@ import java.util.List;
 @RestController
 @RequestMapping("api/car")
 @Scope("request")
-public class CarController extends GenericDeletableController<Car,Integer> {
+public class CarController extends GenericHasCompanyIdAndDeletableController<Car,Integer> {
     @Value("${car.location.all}")
     private Integer allLocations;
     @Value("${badRequest.car.insert}")

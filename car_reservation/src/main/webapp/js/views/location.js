@@ -131,20 +131,22 @@ var locationView = {
             on: {
                 onItemClick: function (id) {
                    var context = this.getContext();
+                    var item = $$("locationDT").getSelectedItem();
                     switch (id) {
                         case "1":
                             locationView.showChangeLocationDialog($$("locationDT").getSelectedItem());
                             break;
                         case "2":
-                            var delBox = (webix.copy(commonViews.deleteConfirm("location", "location")));
+                            var delBox = (webix.copy(commonViews.deleteConfirm(item.name, item.name)));
                             delBox.callback = function (result) {
                                 if (result) {
-                                    var item = $$("locationDT").getItem(context.id.row);
+
                                     $$("locationDT").detachEvent("onBeforeDelete");
                                     connection.sendAjax("DELETE", "api/location/" + item.id, function (text, data, xhr) {
                                         if (text) {
                                             $$("locationDT").remove(context.id.row);
                                             util.messages.showMessage("Location deleted");
+                                            vehicleView.preloadDependencies();
                                         }
                                     }, function (text, data, xhr) {
                                         util.messages.showErrorMessage(text);
@@ -436,6 +438,7 @@ var locationView = {
             if(location.longitude && location.latitude) {
                 $$("locationDT").add(location);
                 util.messages.showMessage("Location added successfully.");
+                vehicleView.preloadDependencies();
                 util.dismissDialog('addLocationDialog');
             }else{
                 util.messages.showErrorMessage("Location not found.Please enter valid address")

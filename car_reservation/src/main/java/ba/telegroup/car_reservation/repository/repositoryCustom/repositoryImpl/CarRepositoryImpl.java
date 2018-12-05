@@ -11,25 +11,25 @@ public class CarRepositoryImpl extends CustomRepositoryImpl implements CarReposi
             "                    inner join fuel g on m.fuel_id = g.id" +
             "                    inner join manufacturer p on m.manufacturer_id = p.id" +
             "                    inner join location l on c.location_id = l.id" +
-            "                    inner join company f on c.company_id = f.id where f.deleted=0 and c.company_id=?";
+            "                    inner join company f on c.company_id = f.id where c.deleted=0 and f.deleted=0 and l.deleted=0 and c.company_id=?";
 
     private final String SQL_GET_ALL_EXTENDED_BY_LOCATION="select c.id,c.model_id,c.location_id,c.plate_number,c.deleted,m.engine,m.model,m.transmission,m.year,m.image,g.fuel as fuel_name,m.fuel_id,m.manufacturer_id,p.name as manufacturer_name,l.name as location_name,l.longitude as longitude,l.latitude as latitude,f.name as company_name,c.company_id from car c inner join model m on c.model_id = m.id" +
             "                    inner join fuel g on m.fuel_id = g.id" +
             "                    inner join manufacturer p on m.manufacturer_id = p.id" +
             "                    inner join location l on c.location_id = l.id" +
-            "                    inner join company f on c.company_id = f.id where f.deleted=0 and c.location_id=?";
+            "                    inner join company f on c.company_id = f.id and c.deleted=0 where f.deleted=0 and l.deleted=0 and c.location_id=?";
 
     private final String SQL_GET_EXTENDED_BY_ID="select c.id,c.model_id,c.location_id,c.plate_number,c.deleted,m.engine,m.model,m.transmission,m.year,m.image,g.fuel as fuel_name,m.fuel_id,m.manufacturer_id,p.name as manufacturer_name,l.name as location_name,l.longitude as longitude,l.latitude as latitude,f.name as company_name,c.company_id from car c inner join model m on c.model_id = m.id" +
             "                    inner join fuel g on m.fuel_id = g.id" +
             "                    inner join manufacturer p on m.manufacturer_id = p.id" +
             "                    inner join location l on c.location_id = l.id" +
-            "                    inner join company f on c.company_id = f.id where f.deleted=0 and c.id=?";
+            "                    inner join company f on c.company_id = f.id where f.deleted=0 and c.deleted=0 and l.deleted=0 and c.id=?";
 
     private final String SQL_GET_EXTENDED_BY_START_AND_END_TIME="select c.id,c.model_id,c.location_id,c.plate_number,c.deleted,m.engine,m.model,m.transmission,m.year,m.image,g.fuel as fuel_name,m.fuel_id,m.manufacturer_id,p.name as manufacturer_name,l.name as location_name,l.longitude as longitude,l.latitude as latitude,f.name as company_name,c.company_id from car c inner join model m on c.model_id = m.id\n" +
             "                               inner join fuel g on m.fuel_id = g.id" +
             "                              inner join manufacturer p on m.manufacturer_id = p.id" +
             "                               inner join location l on c.location_id = l.id" +
-            "                             inner join company f on c.company_id = f.id  where f.deleted=0 and c.company_id=? and c.id" +
+            "                             inner join company f on c.company_id = f.id  where and c.deleted=0 and l.deletd=0 and f.deleted=0 and c.company_id=? and c.id" +
             "    not in(select car_id from reservation where ((start_time between CAST(? as datetime) and cast(? as datetime)) or" +
             "          (end_time between CAST(? as datetime) and cast(? as datetime)) or (start_time <= CAST(? as DATETIME) and end_time >= CAST(? as DATETIME))) and deleted=0 and state_id in (1,2)";
 
