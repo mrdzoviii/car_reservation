@@ -161,23 +161,37 @@ var userView={
             width: "200",
             data: [
                 {
+                    id:"edit",
+                    value:"Edit",
+                    icon:"pencil"
+                },
+                {
                     id: "delete",
                     value: "Delete",
                     icon: "trash"
                 }
+
             ],
             master: $$("userDT"),
             on: {
                 onItemClick: function (id) {
                     var context = this.getContext();
                     const user=$$("userDT").getSelectedItem();
-                    var delBox = (webix.copy(commonViews.deleteConfirm(user.username,user.username)));
-                    delBox.callback = function (result) {
-                        if (result) {
-                            $$("userDT").remove(context.id.row);
-                        }
-                    };
-                    webix.confirm(delBox);
+                    switch (id) {
+                        case "delete":
+                            var delBox = (webix.copy(commonViews.deleteConfirm(user.username,user.username)));
+                            delBox.callback = function (result) {
+                                if (result) {
+                                    $$("userDT").remove(context.id.row);
+                                }
+                            };
+                            webix.confirm(delBox);
+                            break;
+                        case "edit":
+                            userView.showChangeUserDialog(user);
+                            break;
+                    }
+
                 }
             }
         });
@@ -318,6 +332,186 @@ var userView={
                 util.messages.showErrorMessage(error.responseText);
             });
             util.dismissDialog('addUserDialog');
+        }
+    }
+    ,
+    changeUserDialog: {
+        view: "popup",
+        id: "changeUserDialog",
+        modal: true,
+        position: "center",
+        body: {
+            id: "changeUserInside",
+            rows: [{
+                view: "toolbar",
+                cols: [{
+                    view: "label",
+                    label: "<span class='webix_icon fa-briefcase'></span> Edit user",
+                    width: 400
+                }, {}, {
+                    hotkey: 'esc',
+                    view: "icon",
+                    icon: "close",
+                    align: "right",
+                    click: "util.dismissDialog('changeUserDialog');"
+                }]
+            }, {
+                view: "form",
+                id: "changeUserForm",
+                width: 600,
+                elementsConfig: {
+                    labelWidth: 200,
+                    bottomPadding: 18
+                },
+                elements: [
+                    {
+                        view: "text",
+                        id: "email",
+                        name: "email",
+                        label: "E-mail:",
+                        required: true,
+                        invalidMessage: "Please enter mail"
+                    },
+                    {
+                        view:"text",
+                        id:"roleId",
+                        name:"roleId",
+                        value:role.user,
+                        hidden:true
+                    },
+                    {
+                        view: "text",
+                        id: "id",
+                        name: "id",
+                        hidden: true
+                    },
+                    {
+                        view: "text",
+                        id: "deleted",
+                        name: "deleted",
+                        value: 0,
+                        hidden: true,
+                    },
+                    {
+                        view: "text",
+                        id: "mailOptionId",
+                        name: "mailOptionId",
+                        hidden: true,
+                    },
+                    {
+                        view: "richselect",
+                        id: "statusId",
+                        name: "statusId",
+                        label: "Status:",
+                        required: true,
+                        invalidMessage: "Status required!!!"
+                    },
+                    {
+                        view:"text",
+                        id:"companyId",
+                        name:"companyId",
+                        hidden:true
+                    },
+                    {
+                        view: "richselect",
+                        id: "locationId",
+                        name: "locationId",
+                        label: "Location:",
+                        required: true,
+                        invalidMessage: "Location required!!!"
+                    },
+                    {
+                        margin: 5,
+                        cols: [{}, {
+                            id: "changeUserBtn",
+                            view: "button",
+                            value: "Save",
+                            type: "form",
+                            click: "userView.changeUser",
+                            hotkey: "enter",
+                            width: 150
+                        }]
+                    }],
+                rules: {
+                    "email": function (value) {
+                        if (!value) {
+                            $$('changeUserForm').elements.email.config.invalidMessage = 'Enter email!';
+                            return false;
+                        }
+                        if (value.length > 100) {
+                            $$('changeUserForm').elements.email.config.invalidMessage = 'Maximum length 100';
+                            return false;
+                        }
+                        if (!webix.rules.isEmail(value)) {
+                            $$('changeUserForm').elements.email.config.invalidMessage = 'E-mail not valid.';
+                            return false;
+                        }
+
+                        return true;
+                    }
+                }
+            }]
+        }
+    },
+
+    showChangeUserDialog: function (user) {
+        if (util.popupIsntAlreadyOpened("changeUserDialog")) {
+            webix.ui(webix.copy(userView.changeUserDialog)).show();
+            webix.UIManager.setFocus("email");
+            var form=$$("changeUserForm");
+            var status=[];
+            dependency.status.forEach(function (obj) {
+                status.push({
+                    id: obj.id,
+                    value: obj.status
+                });
+            });
+            $$("statusId").define("options",status);
+            $$("statusId").define("value",user.statusId);
+            $$("statusId").refresh();
+            var locations=[];
+            webix.ajax().get("api/location/company/"+user.companyId).then(function (data) {
+                var array=data.json();
+                array.forEach(function (obj) {
+                    locations.push({
+                        id:obj.id,
+                        value:obj.name
+                    });
+
+                });
+                $$("locationId").define("options",locations);
+                $$("locationId").define("value",user.locationId);
+                $$("locationId").refresh();
+            });
+            form.elements.id.setValue(user.id);
+            form.elements.companyId.setValue(user.companyId);
+            form.elements.statusId.setValue(user.statusId);
+            form.elements.roleId.setValue(user.roleId);
+            form.elements.deleted.setValue(user.deleted);
+            form.elements.mailOptionId.setValue(user.mailOptionId);
+            form.elements.email.setValue(user.email);
+        }
+    },
+
+    changeUser:function () {
+        var form=$$("changeUserForm");
+        if (form.validate()){
+            var user=form.getValues();
+            const locationName=form.elements.locationId.getText();
+            connection.sendAjax("PUT", "api/user/" + user.id,
+                function (text, data, xhr) {
+                    if (text) {
+                        util.messages.showMessage("User updated successfully.");
+                        user.locationName=locationName;
+                        $$("userDT").updateItem(user.id, user);
+                    } else
+                        util.messages.showErrorMessage("User edit failed.");
+                }, function (text, data, xhr) {
+                    util.messages.showErrorMessage(text);
+                }, user);
+
+            util.dismissDialog('changeUserDialog');
+
         }
     }
 };
