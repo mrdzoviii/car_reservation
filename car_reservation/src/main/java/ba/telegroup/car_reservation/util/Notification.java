@@ -57,4 +57,9 @@ public class Notification {
         mail.setText(mailText);
         javaMailSender.send(mail);
     }
+    @Async
+    public void sendNewPassword(String mailTo,String newPassword){
+        String text="Your new password: "+newPassword+" .Please change it after first login";
+        sendMail(mailTo,text);
+    }
 }

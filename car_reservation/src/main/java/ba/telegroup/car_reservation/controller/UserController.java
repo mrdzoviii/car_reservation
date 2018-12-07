@@ -3,14 +3,13 @@ package ba.telegroup.car_reservation.controller;
 import ba.telegroup.car_reservation.common.exceptions.BadRequestException;
 import ba.telegroup.car_reservation.common.exceptions.ForbiddenException;
 import ba.telegroup.car_reservation.controller.genericController.GenericHasCompanyIdAndDeletableController;
+import ba.telegroup.car_reservation.model.Company;
 import ba.telegroup.car_reservation.model.LoginBean;
 import ba.telegroup.car_reservation.model.MailOption;
 import ba.telegroup.car_reservation.model.User;
 import ba.telegroup.car_reservation.model.modelCustom.UserLocationCompany;
-import ba.telegroup.car_reservation.repository.ExpenseRepository;
-import ba.telegroup.car_reservation.repository.MailOptionRepository;
-import ba.telegroup.car_reservation.repository.ReservationRepository;
-import ba.telegroup.car_reservation.repository.UserRepository;
+import ba.telegroup.car_reservation.repository.*;
+import ba.telegroup.car_reservation.util.LoginInfo;
 import ba.telegroup.car_reservation.util.Notification;
 import ba.telegroup.car_reservation.util.PasswordInfo;
 import org.apache.commons.codec.binary.Hex;
@@ -32,6 +31,8 @@ import java.util.List;
 @RestController
 @Scope("request")
 public class UserController extends GenericHasCompanyIdAndDeletableController<User,Integer> {
+    @Value("${reset.password.length}")
+    private Integer randomPasswordLength;
     @Value(value = "${forbidden.login}")
     private String forbiddenLogin;
     @Value("${badRequest.delete}")
@@ -77,15 +78,17 @@ public class UserController extends GenericHasCompanyIdAndDeletableController<Us
     private MailOptionRepository mailOptionRepository;
     private ExpenseRepository expenseRepository;
     private ReservationRepository reservationRepository;
+    private CompanyRepository companyRepository;
     @Autowired
     public UserController(UserRepository userRepository, Notification notification,MailOptionRepository mailOptionRepository,
-                          ExpenseRepository expenseRepository,ReservationRepository reservationRepository){
+                          ExpenseRepository expenseRepository,ReservationRepository reservationRepository,CompanyRepository companyRepository){
         super(userRepository);
         this.userRepository=userRepository;
         this.notification = notification;
         this.mailOptionRepository=mailOptionRepository;
         this.expenseRepository=expenseRepository;
         this.reservationRepository=reservationRepository;
+        this.companyRepository=companyRepository;
     }
 
 
@@ -248,6 +251,33 @@ public class UserController extends GenericHasCompanyIdAndDeletableController<Us
         throw new BadRequestException(badRequestMailOption);
     }
 
+    @RequestMapping(value = "/reset", method = RequestMethod.POST)
+    public @ResponseBody
+    String resetPassword(@RequestBody LoginInfo userInformation) throws BadRequestException {
+        User userTemp = userRepository.getByUsernameAndDeleted(userInformation.getUsername(),notDeleted);
+        if (userTemp != null) {
+            String companyName=null;
+            if(userTemp.getRoleId().equals(companyUser)) {
+                Company company = companyRepository.findById(userTemp.getCompanyId()).orElse(null);
+                if (company != null) {
+                    companyName = company.getName();
+                }
+            }
+            if (((userTemp.getRoleId().equals(companyUser) || userTemp.getRoleId().equals(companyAdmin)) && companyName != null && userInformation.getCompany() != null && companyName.equals(userInformation.getCompany().trim()))
+                 || userTemp.getRoleId().equals(systemAdmin)) {
+                User user = userRepository.findById(userTemp.getId()).orElse(null);
+                String newPassword = RandomStringUtils.randomAlphanumeric(randomPasswordLength);
+                user.setPassword(hashPassword(newPassword));
+                if(userRepository.saveAndFlush(user) != null){
+                    notification.sendNewPassword(user.getEmail(),newPassword);
+                    return "Success";
+                }
+                throw new BadRequestException(badRequestUsername);
+            }
+            throw new BadRequestException(badRequestUsername);
+        }
+        throw new BadRequestException(badRequestUsername);
+    }
 
     private String hashPassword( String plainText)  {
         MessageDigest digest= null;

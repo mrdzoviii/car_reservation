@@ -158,10 +158,25 @@ var loginLayout = {
                                     align: "right",
                                     hotkey: "enter",
                                     width: 150
+                                },
+                                {
+                                    margin: 5,
+                                    cols: [
+                                        {},
+                                        {
+                                            width: 160,
+                                            view: "button",
+                                            align: "right",
+                                            type:"icon",
+                                            label: "<b style='color:blue;'>Forgot my password</b>",
+                                            click:'showForgottenPasswordPopup'
+                                        }
+
+                                    ]
                                 }
                             ]
                         },
-                        {}
+
 
                     ]
                 },
@@ -382,71 +397,103 @@ var register = function () {
     }
 };
 
-var userView = {
-    panel: {
-        id: "userDialog",
-        view: "popup",
-        modal: true,
-        position: "center",
-        body: {
-            rows: [
-                {
-                    view: "toolbar",
-                    css: "panelToolbar",
-                    cols: []
-                },
-                {
-                    view: "form",
-                    id: "registrationForm",
-                    borderless: true,
-                    width: 400,
-                    elementsConfig: util.elementsConfig,
-                    elements: [
-                        {
-                            id: "id",
-                            name: "id",
-                            hidden: true
-                        },
-                        {
-                            id: "username",
-                            name: "username",
-                            view: "text",
-                            label: "Korisničko ime:",
-                            invalidMessage: "Korisničke ime je obavezno!",
-                            required: true
-                        },
-                        {
-                            id: "firstName",
-                            name: "firstName",
-                            view: "text",
-                            label: "Ime:",
-                            invalidMessage: "Ime je obavezno!",
-                            required: true
-                        },
-                        {
-                            id: "lastName",
-                            name: "lastName",
-                            view: "text",
-                            label: "Prezime:",
-                            invalidMessage: "Prezime je obavezno!",
-                            required: true
-                        },
-                        {
-                            view: "button",
-                            value: "Sačuvajte",
-                            type: "form",
-                            click: "userView.save",
-                            align: "right",
-                            hotkey: "enter",
-                            width: 150
-                        }
-                    ]
-                }
-            ]
-        }
 
+var showForgottenPasswordPopup = function () {
+    if (util.popupIsntAlreadyOpened("forgottenPasswordPopup")) {
+        webix.ui(webix.copy(forgottenPasswordPopup)).show();
+        $$("forgottenPasswordForm").focus();
     }
 };
+
+var forgottenPasswordPopup = {
+    view: "popup",
+    id: "forgottenPasswordPopup",
+    modal: true,
+    position: "center",
+    body: {
+        rows: [
+            {
+                view: "toolbar",
+                cols: [
+                    {
+                        view: "label",
+                        label: "Forgot my password",
+                        width: 400
+                    },
+                    {},
+                    {
+                        view: "icon",
+                        icon: "close",
+                        align: "right",
+                        hotkey: "esc",
+                        click: "util.dismissDialog('forgottenPasswordPopup');"
+                    }
+                ]
+            },
+            {
+                width: 400,
+                view: "form",
+                id: "forgottenPasswordForm",
+                elementsConfig: {
+                    labelWidth: 150,
+                    bottomPadding: 18
+                },
+                elements: [
+                    {
+
+                        view: "text",
+                        id: "username",
+                        name: "username",
+                        required: "true",
+                        label: "Username:",
+                        invalidMessage: "Username required!"
+                    },
+                    {
+
+                        view: "text",
+                        id: "company",
+                        name: "company",
+                        required: "true",
+                        label: "Company:",
+                        invalidMessage: "Company required!"
+                    },
+                    {
+                        cols: [
+                            {},
+                            {
+                                view: "button",
+                                value: "Reset my password",
+                                type: "form",
+                                click: "generatePassword",
+                                hotkey: "enter",
+                            }
+                        ]
+                    }
+                ]
+            }
+        ]
+    }
+};
+
+var generatePassword = function () {
+    var form = $$("forgottenPasswordForm");
+    if (form.validate()) {
+        var loginInformation = JSON.stringify(form.getValues());
+        webix.ajax().headers({
+            "Content-type": "application/json"
+        }).post("api/user/reset", loginInformation).then(function (result) {
+            if (result.text()) {
+                util.messages.showMessage("Reset password successful. Check your e-mail.");
+            } else {
+                util.messages.showErrorMessage("Reset password fail!");
+            }
+        }).fail(function (error) {
+            util.messages.showErrorMessage(error.responseText);
+        });
+        util.dismissDialog("forgottenPasswordPopup");
+    }
+};
+
 
 var logout = function () {
 
