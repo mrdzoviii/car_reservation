@@ -32,7 +32,8 @@ var jasperType={
 var mapProperties={
     longitude:44.772337,
     latitude:17.1811044,
-    zoom:13.5};
+    zoom:13.5,
+    key:"AIzaSyBijWBzuP8UvXEIwRiF7PXxRsXq9Kvysf0"};
 
 var dependencyMap = [];
 var dependency = [];

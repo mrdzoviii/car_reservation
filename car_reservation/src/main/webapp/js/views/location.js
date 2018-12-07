@@ -213,7 +213,7 @@ var locationView = {
                     ]
                 },
                 {
-                    key: "AIzaSyBpbWc3t35Tahjs45QIi7TnpvV6b_UQSNs",
+                    key: mapProperties.key,
                     view: "google-map",
                     id: "map",
                     zoom: 15,
@@ -318,7 +318,6 @@ var locationView = {
                             invalidMessage: "Address required.",
                             on:{
                                 onBlur:function (prev_view) {
-                                        console.log(prev_view);
                                         $$("map").getMap("waitMap").then(function (mapObj) {
                                             var geocoder = new google.maps.Geocoder();
                                             geocoder.geocode({'address': prev_view.data.value}, function (results, status) {
@@ -329,6 +328,8 @@ var locationView = {
                                                         map: mapObj,
                                                         position: results[0].geometry.location
                                                     });
+                                                    markerTmp.setMap(null);
+                                                    markerTmp=marker;
                                                     lat = results[0]['geometry']['location']['lat'];
                                                     lng = results[0]['geometry']['location']['lng'];
                                                     $$("latitude").define("value",lat());
@@ -378,7 +379,7 @@ var locationView = {
                             label:"Map:"
                         },
                         {
-                            key: "AIzaSyBpbWc3t35Tahjs45QIi7TnpvV6b_UQSNs",
+                            key: mapProperties.key,
                             view: "google-map",
                             id: "map",
                             label:"Map:",
@@ -559,7 +560,7 @@ var locationView = {
                             label:"Map:"
                         },
                         {
-                            key: "AIzaSyBpbWc3t35Tahjs45QIi7TnpvV6b_UQSNs",
+                            key: mapProperties.key,
                             view: "google-map",
                             id: "editMap",
                             zoom: 15,

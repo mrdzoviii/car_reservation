@@ -18,7 +18,7 @@ var homeView = {
                 ]
             },
             {
-                key: "AIzaSyBpbWc3t35Tahjs45QIi7TnpvV6b_UQSNs",
+                key: mapProperties.key,
                 view: "google-map",
                 id: "homeMap",
                 zoom: mapProperties.zoom,
