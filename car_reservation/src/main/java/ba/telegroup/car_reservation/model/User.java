@@ -5,6 +5,7 @@ import ba.telegroup.car_reservation.common.interfaces.HasCompanyId;
 import org.hibernate.annotations.Generated;
 
 import javax.persistence.*;
+import javax.validation.constraints.*;
 import java.sql.Timestamp;
 import java.util.Objects;
 
@@ -32,17 +33,40 @@ import java.util.Objects;
 @Inheritance(strategy = InheritanceType.JOINED)
 public class User implements HasCompanyId, Deletable {
     private Integer id;
+    @Email(message = "Must be well-formed mail!")
+    @Size(min = 10,max=100,message = "Email length must be between 10 and 100!")
     private String email;
+
+    @Size(max=80,min = 4,message = "Username length must be between 4 and 100!")
     private String username;
+
+    @Size(max=128,min=128)
     private String password;
+
+    @Size(min=5,max=255,message = "First name length must be between 5 and 255!")
     private String firstName;
+
+    @Size(min=5,max=255,message = "Last name length must be between 5 and 255!")
     private String lastName;
+
+    @PositiveOrZero(message = "Status must be integer!")
     private Integer statusId;
+
+    @PositiveOrZero(message = "Deleted must be integer!")
     private Byte deleted;
+
+    @Positive(message = "MailOptionID must be positive integer!")
     private Integer mailOptionId;
+
+    @Positive(message = "LocationID must be positive integer!")
     private Integer locationId;
+
+    @Positive(message = "CompanyID must be positive integer!")
     private Integer companyId;
+
+    @PositiveOrZero(message = "RoleID must be integer!")
     private Integer roleId;
+
     private String token;
     private byte[] avatar;
 

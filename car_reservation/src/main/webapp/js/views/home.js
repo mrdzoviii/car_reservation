@@ -70,7 +70,7 @@ var homeView = {
                             },
                             template: "<div><div style='height: 13px'></div><div align='center'><img src='data:image/png;base64, #image#' alt='No picture' width='300' height='300' align='center'/></div><br/>" +
                                 "<div style='height: 1px' align='center'>Manufacturer: #manufacturerName#</div><br/>" +
-                                "<div style='height: 1px' align='center'>Model: #modelName#</div><br/>" +
+                                "<div style='height: 1px' align='center'>Model: #model#</div><br/>" +
                                 "<div style='height: 1px' align='center'>Plate number: #plateNumber#</div><br/>" +
                                 "<div style='height: 1px' align='center'>Year: #year#</div><br/>" +
                                 "<div style='height: 1px' align='center'>Engine: #engine#</div><br/>" +

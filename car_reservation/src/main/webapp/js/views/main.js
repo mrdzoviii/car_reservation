@@ -332,23 +332,23 @@ var registrationLayout = {
                                     return true;
                                 },
                                 "username": function (value) {
-                                    if (value.length > 80) {
-                                        $$('registrationForm').elements.username.config.invalidMessage = 'Maximum length is 128.';
+                                    if (value.length > 80 || value.length<4) {
+                                        $$('registrationForm').elements.username.config.invalidMessage = 'Username length must be between 4 and 80.';
                                         return false;
                                     }
                                     return true;
                                 },
                                 "firstName": function (value) {
-                                    if (value.length > 255) {
-                                        $$('registrationForm').elements.firstName.config.invalidMessage = 'Maximum length is 128.';
+                                    if (value.length > 255 || value.length<5) {
+                                        $$('registrationForm').elements.firstName.config.invalidMessage = 'First name length must be between 5 and 255.';
                                         return false;
                                     }
 
                                     return true;
                                 },
                                 "lastName": function (value) {
-                                    if (value.length > 255) {
-                                        $$('registrationForm').elements.lastName.config.invalidMessage = 'Maximum length is 128.';
+                                    if (value.length > 255 || value.length<5) {
+                                        $$('registrationForm').elements.lastName.config.invalidMessage = 'Last name length must be between 5 and 255.';
                                         return false;
                                     }
                                     return true;

@@ -242,6 +242,13 @@ var userView={
                     },
                     {
                         view: "text",
+                        id: "mailOptionId",
+                        name: "mailOptionId",
+                        value: 3,
+                        hidden: true
+                    },
+                    {
+                        view: "text",
                         id: "deleted",
                         name: "deleted",
                         hidden:true,

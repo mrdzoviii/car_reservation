@@ -133,8 +133,8 @@ var profileView={
                             "firstName": function (value) {
                                 if (!value)
                                 {return false;}
-                                if (value.length > 100) {
-                                    $$('profileForm').elements.firstName.config.invalidMessage = 'Maximum length is 100!';
+                                if (value.length > 255 || value.length<5) {
+                                    $$('profileForm').elements.firstName.config.invalidMessage = 'First name length must be between 5 and 255.';
                                     return false;
                                 }
                                 return true;
@@ -142,8 +142,8 @@ var profileView={
                             "lastName": function (value) {
                                 if (!value)
                                 {return false;}
-                                if (value.length > 100) {
-                                    $$('profileForm').elements.lastName.config.invalidMessage = 'Maximum length is 100!';
+                                if (value.length > 255 || value.length<5) {
+                                    $$('profileForm').elements.lastName.config.invalidMessage = 'Last name length must be between 5 and 255';
                                     return false;
                                 }
                                 return true;
@@ -165,7 +165,9 @@ var profileView={
                         util.dismissDialog('changeProfileDialog');
                         util.messages.showMessage("User data changed.");
                         userData = newUser;
-                        $$("userAvatar").define("data", {avatar:userData.avatar});
+                        if(userData.avatar!=null) {
+                            $$("userAvatar").define("data", {avatar: userData.avatar});
+                        }
                         if (userData.roleId === role.systemAdministrator) {
                             $$("userLabel").setHTML("<p style='margin-top:2px;display: table-cell; line-height: 13px; vertical-align: text-top; horizontal-align:right;font-size: 14px; margin-left: auto;margin-right: 0;}'>" + userData.firstName + " " + userData.lastName + "<br> System admin</p>");
                             $$("userDT").updateItem(userData.id, userData);
