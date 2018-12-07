@@ -144,6 +144,11 @@ var mainMenuCompanyAdmin = [
         value:"Locations"
     },
     {
+        id:"users",
+        icon: "users",
+        value:"Users"
+    },
+    {
         id: "vehicle",
         icon: "car",
         value: "Vehicles"
@@ -206,6 +211,9 @@ var mainMenuActions = function (id) {
             break;
         case "chart":
             chartView.selectPanel();
+            break;
+        case "users":
+            userView.selectPanel();
             break;
     }
 };

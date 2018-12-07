@@ -284,7 +284,61 @@ var registrationLayout = {
                                     hotkey: "enter",
                                     width: 150
                                 }
-                            ]
+                            ],
+                            rules: {
+                                "password": function (value) {
+                                    var re1 = /[0-9]/;
+                                    var re2 = /[a-z]/;
+                                    var re3 = /[A-Z]/;
+                                    var re4 = /[@#$%^&+=]/;
+                                    if (!value)
+                                        return false;
+                                    if (value.length < 8) {
+                                        $$('registrationForm').elements.password.config.invalidMessage = 'Password must be at lease 8 characters!';
+                                        return false;
+                                    }
+                                    if (!re1.test(value)) {
+                                        $$('registrationForm').elements.password.config.invalidMessage = 'Password must contains digit!';
+                                        return false;
+                                    }
+                                    if (!re2.test(value)) {
+                                        $$('registrationForm').elements.password.config.invalidMessage = 'Password must contains lowercase letter!';
+                                        return false;
+                                    }
+                                    if (!re3.test(value)) {
+                                        $$('registrationForm').elements.password.config.invalidMessage = 'Password must contains uppercase letter!';
+                                        return false;
+                                    }
+                                    if (!re4.test(value)) {
+                                        $$('registrationForm').elements.password.config.invalidMessage = 'Password must contains special character: (@ # $ % ^ & + =) !';
+                                        return false;
+                                    }
+
+                                    return true;
+                                },
+                                "username": function (value) {
+                                    if (value.length > 80) {
+                                        $$('registrationForm').elements.username.config.invalidMessage = 'Maximum length is 128.';
+                                        return false;
+                                    }
+                                    return true;
+                                },
+                                "firstName": function (value) {
+                                    if (value.length > 255) {
+                                        $$('registrationForm').elements.firstName.config.invalidMessage = 'Maximum length is 128.';
+                                        return false;
+                                    }
+
+                                    return true;
+                                },
+                                "lastName": function (value) {
+                                    if (value.length > 255) {
+                                        $$('registrationForm').elements.lastName.config.invalidMessage = 'Maximum length is 128.';
+                                        return false;
+                                    }
+                                    return true;
+                                },
+                            }
                         },
                         {}
 

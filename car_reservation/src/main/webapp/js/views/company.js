@@ -986,7 +986,16 @@ var companyView = {
                 delete user.locationId;
             }
             onCompanyClick(user.companyId).then(function () {
-                $$("userDT").add(user);
+                webix.ajax().header({"Content-type": "application/json"})
+                    .post("/api/user/",user).then(function (data) {
+                    if (data) {
+                        util.messages.showMessage("Request sent on mail")
+                    } else {
+                        util.messages.showErrorMessage("Request not sent.");
+                    }
+                }).fail(function (error) {
+                    util.messages.showErrorMessage(error.responseText);
+                });
                 util.dismissDialog('addUserDialog');
             });
 

@@ -19,11 +19,11 @@ public class UserRepositoryImpl extends CustomRepositoryImpl implements UserRepo
 
     private final String SQL_GET_ALL_EXTENDED_BY_COMPANY_ID="select u.id,u.email,u.username,u.first_name,u.last_name,u.status_id,u.company_id,u.location_id,u.mail_option_id,u.avatar,u.role_id,u.deleted,c.logo as company_logo,c.name as company_name,ifnull(l.name,'') as location_name,l.address as location_address,l.latitude as location_latitude," +
             "l.longitude as location_longitude,concat(u.first_name,' ',u.last_name) as full_name  from user u inner join company c on u.company_id = c.id left join location l on u.location_id = l.id" +
-            " where u.company_id=? and u.deleted=0 and c.deleted=0";
+            " where u.company_id=? and u.deleted=0 and c.deleted=0 and u.username is not null";
 
     private final String SQL_GET_ALL_EXTENDED_SYSTEM_ADMINS="select u.id,u.email,u.username,u.first_name,u.last_name,u.status_id,u.company_id,u.location_id,u.mail_option_id,u.avatar,u.role_id,u.deleted,c.logo as company_logo,c.name as company_name,ifnull(l.name,'') as location_name,l.address as location_address,l.latitude as location_latitude," +
             "l.longitude as location_longitude ,concat(u.first_name,' ',u.last_name) as full_name  from user u left join company c on u.company_id = c.id left join location l on u.location_id = l.id" +
-            " where u.role_id=1 and u.deleted=0";
+            " where u.role_id=1 and u.deleted=0 and u.username is not null";
 
     private final String SQL_DELETE_BY_COMPANY="update user u set u.deleted=1 where company_id=?";
 
