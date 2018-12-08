@@ -10,6 +10,7 @@ import java.util.Objects;
 @Entity
 @Inheritance(strategy = InheritanceType.JOINED)
 public class Car implements Deletable, HasCompanyId {
+    @Positive(message = "Id must be positive integer!")
     private Integer id;
     @Positive(message = "Model id must be positive integer!")
     private Integer modelId;

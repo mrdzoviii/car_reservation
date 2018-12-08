@@ -32,6 +32,7 @@ import java.util.Objects;
 @Entity
 @Inheritance(strategy = InheritanceType.JOINED)
 public class User implements HasCompanyId, Deletable {
+    @Positive(message = "Id must be positive integer!")
     private Integer id;
     @Email(message = "Must be well-formed mail!")
     @Size(min = 10,max=100,message = "Email length must be between 10 and 100!")

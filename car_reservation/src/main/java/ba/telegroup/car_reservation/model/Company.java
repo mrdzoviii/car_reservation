@@ -3,15 +3,23 @@ package ba.telegroup.car_reservation.model;
 import ba.telegroup.car_reservation.common.interfaces.Deletable;
 
 import javax.persistence.*;
+import javax.validation.constraints.*;
 import java.util.Arrays;
 import java.util.Objects;
 
 @Entity
 @Inheritance(strategy = InheritanceType.JOINED)
 public class Company implements Deletable {
+    @Positive(message = "Id must be positive integer!")
     private Integer id;
+    @NotNull(message = "Company name must be not null!")
+    @Size(min=1,max=100,message = "Company name length must be between 1 and 100!")
     private String name;
+    @NotNull(message = "Company image must be not null!")
+    @Size(min=1,message = "Image size cannot be zero")
     private byte[] logo;
+    @NotNull(message = "Deleted must be not null!")
+    @PositiveOrZero(message = "Deleted must be positive integer or zero!")
     private Byte deleted;
 
     @Id

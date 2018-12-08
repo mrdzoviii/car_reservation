@@ -37,26 +37,27 @@ import java.math.BigDecimal;
 public class CarManufacturerModelFuelLocationCompany extends Car implements Deletable {
 
     @Column(name="engine")
-    @NotNull(message = "Engine must not be null!")
+    @NotNull(message = "Engine must  be not null!")
     @Size(max = 100,min=2,message = "Engine length must be between 2 and 100!")
     private String engine;
 
     @Column(name="model")
-    @NotNull(message = "Model must not be null!")
+    @NotNull(message = "Model must be not null!")
     @Size(max = 100,min=2,message = "Model length must be between 2 and 100!")
     private String model;
 
     @Column(name="transmission")
-    @NotNull(message = "Transmission must not be null!")
+    @NotNull(message = "Transmission must be not null!")
     @Size(max = 100,min=2,message = "Transmission length must be between 2 and 100!")
     private String transmission;
 
     @Column(name = "year")
-    @NotNull(message = "Year must not be null!")
+    @NotNull(message = "Year must be not null!")
     @Pattern(regexp = "\\d\\d\\d\\d",message = "Year must be in format 0000!" )
     private String year;
 
-    @NotNull(message = "Image must not be null!")
+    @NotNull(message = "Image must be not null!")
+    @Size(min=1,message = "Image size cannot be zero!")
     @Column(name="image")
     private byte[] image;
 
@@ -64,7 +65,7 @@ public class CarManufacturerModelFuelLocationCompany extends Car implements Dele
     private String fuelName;
 
     @Column(name = "fuel_id")
-    @NotNull(message = "Fuel id must not be null!")
+    @NotNull(message = "Fuel id must be not null!")
     @Positive(message = "Fuel id must be positive integer!")
     private Integer fuelId;
 
@@ -73,31 +74,31 @@ public class CarManufacturerModelFuelLocationCompany extends Car implements Dele
     private Integer manufacturerId;
 
     @Column(name="manufacturer_name")
-    @NotNull(message = "Manufacturer must not be null!")
+    @NotNull(message = "Manufacturer must be not null!")
     @Size(max = 100,min=2,message = "Manufacturer name length must be between 2 and 100!")
     private String manufacturerName;
 
     @Column(name = "location_name")
-    @NotNull(message = "Location name must not be null!")
+    @NotNull(message = "Location name must be not null!")
     @Size(max = 100,min=2,message = "Location name length must be between 2 and 100!")
     private String locationName;
 
-    @NotNull(message = "Company name must not be null!")
+    @NotNull(message = "Company name must be not null!")
     @Size(max = 100,min=2,message = "Company name length must be between 2 and 100!")
     @Column(name="company_name")
     private String companyName;
 
-    @NotNull(message = "Company id must not be null!")
+    @NotNull(message = "Company id must be not null!")
     @Positive(message = "Company id must be positive integer!")
     @Column(name="company_id")
     private Integer companyId;
 
-    @NotNull(message = "Longitude must not be null!")
+    @NotNull(message = "Longitude must be not null!")
     @Positive(message = "Longitude must be positive number")
     @Column(name="longitude")
     private BigDecimal longitude;
 
-    @NotNull(message = "Latitude must not be null!")
+    @NotNull(message = "Latitude must be not null!")
     @Positive(message = "Latitude must be positive number")
     @Column(name="latitude")
     private BigDecimal latitude;

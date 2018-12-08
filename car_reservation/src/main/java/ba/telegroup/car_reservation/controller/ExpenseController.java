@@ -96,23 +96,26 @@ public class ExpenseController extends GenericDeletableController<Expense,Intege
         this.jdbcTemplate=jdbcTemplate;
     }
 
+    //checked+
     @RequestMapping(value = "/custom",method = RequestMethod.GET)
     public List<ExpenseCarReservationUser> getAllExtended() {
         return expenseRepository.getAllExtended();
     }
-
+    //checked+
     @RequestMapping(value="/custom/reservation/{id}",method = RequestMethod.GET)
     public List<ExpenseCarReservationUser> getAllExtendedByReservationId(@PathVariable("id") Integer id){
         return expenseRepository.getAllExtendedByReservationId(id);
     }
 
+    //checked+
     @RequestMapping(value="/car/{id}",method = RequestMethod.GET)
     public List<ExpenseCarReservationUser> getAllExtendedByCarId(@PathVariable("id") Integer id){
         return expenseRepository.getAllExtendedByCarId(id);
     }
 
+    //checked+
     @Override
-    public String update(@PathVariable Integer integer,@RequestBody Expense object) throws BadRequestException, ForbiddenException {
+    public String update(@PathVariable Integer integer,@RequestBody Expense object) throws BadRequestException {
         throw new BadRequestException(badRequestUpdate);
     }
 
@@ -132,6 +135,7 @@ public class ExpenseController extends GenericDeletableController<Expense,Intege
         throw new BadRequestException(badRequestExpenseUpdate);
     }
 
+    //checked+
     @Override
     public String delete(@PathVariable Integer id) throws BadRequestException, ForbiddenException {
         Expense expense=expenseRepository.findById(id).orElse(null);
@@ -152,6 +156,7 @@ public class ExpenseController extends GenericDeletableController<Expense,Intege
     }
 
 
+    //checked+
     @Transactional(rollbackFor = Exception.class)
     @ResponseStatus(HttpStatus.CREATED)
     @Override
