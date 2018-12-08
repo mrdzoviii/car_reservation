@@ -89,6 +89,8 @@ public class ExpenseController extends GenericDeletableController<Expense,Intege
     private String noExpense;
     @Value("${badRequest.expense.noreservation}")
     private String noReservation;
+    @Value("${badRequest.expense.nodata}")
+    private String noData;
 
     private final JdbcTemplate jdbcTemplate;
     private Validator validator;
@@ -126,7 +128,7 @@ public class ExpenseController extends GenericDeletableController<Expense,Intege
         throw new BadRequestException(badRequestUpdate);
     }
 
-
+    //checked+
     @RequestMapping(value="/custom/{id}",method = RequestMethod.PUT)
     @Transactional(rollbackFor = Exception.class)
     public ExpenseCarReservationUser updateExtended(@PathVariable("id") Integer id,@RequestBody Expense expense) throws BadRequestException, ForbiddenException {
@@ -152,7 +154,7 @@ public class ExpenseController extends GenericDeletableController<Expense,Intege
         throw new BadRequestException(badRequestExpenseDelete);
     }
 
-
+    //checked+
     @RequestMapping(value="/custom",method = RequestMethod.POST)
     @Transactional(rollbackFor = Exception.class)
     @ResponseStatus(HttpStatus.CREATED)
@@ -178,91 +180,93 @@ public class ExpenseController extends GenericDeletableController<Expense,Intege
 
     @RequestMapping(value = "/chart",method = RequestMethod.POST)
     public List<ChartData> getAllByChartInfo(@RequestBody ChartInfo chartInfo) throws BadRequestException {
-        if(chartInfo!=null && chartInfo.check()){
-            List<Expense> data=expenseRepository.getAllExpensesByCompanyIdAndDateBetween(chartInfo.getCompanyId(),chartInfo.getDateFrom().toString(),
-                    chartInfo.getDateTo().toString());
-            List<ChartData> chart=new ArrayList<>();
-            LocalDate start=chartInfo.getDateFrom();
-            while(start.compareTo(chartInfo.getDateTo())<=0){
-                final LocalDate date=start;
-                final ChartData point;
-                if(chartInfo.getChartType().equals(reportWeekly)) {
-                    String weekNumber = CarReservationUtils.getWeekNumber(start);
-                    point =getPoint(chart,weekNumber);
-                }else if(chartInfo.getChartType().equals(reportMonthly)) {
-                    String monthNumber=start.getMonthValue()+"/"+start.getYear();
-                    point = getPoint(chart,monthNumber);
-                }else{
-                    String yearNumber=start.getYear()+"";
-                    point=getPoint(chart,yearNumber);
-                }
-                data.stream().filter(e -> CarReservationUtils.convertToLocalDate(e.getDate()).isEqual(date)).
-                            forEach(r->{
-                                if (r.getCostId().equals(costFuel)){
-                                        point.addFuelCost(r.getPrice());
-                                }else if(r.getCostId().equals(costService)){
+        if(chartInfo!=null){
+            CarReservationUtils.validate(chartInfo,validator);
+            if(chartInfo.checkDate()) {
+                List<Expense> data = expenseRepository.getAllExpensesByCompanyIdAndDateBetween(chartInfo.getCompanyId(), chartInfo.getDateFrom().toString(),
+                        chartInfo.getDateTo().toString());
+                List<ChartData> chart = new ArrayList<>();
+                LocalDate start = chartInfo.getDateFrom();
+                while (start.compareTo(chartInfo.getDateTo()) <= 0) {
+                    final LocalDate date = start;
+                    final ChartData point;
+                    if (chartInfo.getChartType().equals(reportWeekly)) {
+                        String weekNumber = CarReservationUtils.getWeekNumber(start);
+                        point = getPoint(chart, weekNumber);
+                    } else if (chartInfo.getChartType().equals(reportMonthly)) {
+                        String monthNumber = start.getMonthValue() + "/" + start.getYear();
+                        point = getPoint(chart, monthNumber);
+                    } else {
+                        String yearNumber = start.getYear() + "";
+                        point = getPoint(chart, yearNumber);
+                    }
+                    data.stream().filter(e -> CarReservationUtils.convertToLocalDate(e.getDate()).isEqual(date)).
+                            forEach(r -> {
+                                if (r.getCostId().equals(costFuel)) {
+                                    point.addFuelCost(r.getPrice());
+                                } else if (r.getCostId().equals(costService)) {
                                     point.addServiceCost(r.getPrice());
-                                }
-                                else{
+                                } else {
                                     point.addOtherCost(r.getPrice());
                                 }
                             });
-                start=start.plusDays(1);
+                    start = start.plusDays(1);
+                }
+                return chart;
             }
-            return chart;
+            throw new BadRequestException(badRequestExpenseChart);
         }
-        throw new BadRequestException(badRequestExpenseChart);
+        throw new BadRequestException(noData);
     }
 
     @RequestMapping(value = "/report",method = RequestMethod.POST)
     public ReportData getReport(@RequestBody ReportInfo reportInfo) throws BadRequestException {
-        if(reportInfo!=null && reportInfo.check()){
-            String name;
-            if(reportInfo.getType().equals(typeAll)){
-                name=jasperAll;
-            }
-            else if(reportInfo.getType().equals(typeVehicle)){
-                name=jasperVehicle;
-            }
-            else{
-                throw new BadRequestException(badRequestExpenseReport);
-            }
-            JasperPrint jasperPrint = null;
-            try {
-                jasperPrint = JasperFillManager.fillReport(getClass().getResource(name).getPath(),getParams(reportInfo), jdbcTemplate.getDataSource().getConnection());
-            } catch (JRException | SQLException e) {
-                e.printStackTrace();
-                throw new BadRequestException(badRequestExpenseReport);
-            }
-            String fileName;
-            if("PDF".equals(reportInfo.getFormat())){
-                fileName = "Report_" +(reportInfo.getType()==1?"all":"vehicle") + "_" +reportInfo.getDateFrom()+"_"+reportInfo.getDateTo() + ".pdf";
-                pdfExporterJR(jasperPrint, fileName);
-            }
-            else if("XLS".equals(reportInfo.getFormat())){
-                fileName = "Report_" +(reportInfo.getType()==1?"all":"vehicle") + "_" +reportInfo.getDateFrom()+"_"+reportInfo.getDateTo() + ".xls";
-                xlsExporterJR(jasperPrint, fileName);
-            }
-            else if("CSV".equals(reportInfo.getFormat())){
-                fileName = "Report_" +(reportInfo.getType()==1?"all":"vehicle") + "_" +reportInfo.getDateFrom()+"_"+reportInfo.getDateTo() + ".csv";
-                csvExporterJR(jasperPrint, fileName);
-            }
-            else{
-                throw new BadRequestException(badRequestExpenseReport);
-            }
+        if(reportInfo!=null){
+            CarReservationUtils.validate(reportInfo,validator);
+            if(reportInfo.checkReport()) {
+                String name;
+                if (reportInfo.getType().equals(typeAll)) {
+                    name = jasperAll;
+                } else if (reportInfo.getType().equals(typeVehicle)) {
+                    name = jasperVehicle;
+                } else {
+                    throw new BadRequestException(badRequestExpenseReport);
+                }
+                JasperPrint jasperPrint = null;
+                try {
+                    jasperPrint = JasperFillManager.fillReport(getClass().getResource(name).getPath(), getParams(reportInfo), jdbcTemplate.getDataSource().getConnection());
+                } catch (JRException | SQLException e) {
+                    e.printStackTrace();
+                    throw new BadRequestException(badRequestExpenseReport);
+                }
+                String fileName;
+                if ("PDF".equals(reportInfo.getFormat())) {
+                    fileName = "Report_" + (reportInfo.getType() == 1 ? "all" : "vehicle") + "_" + reportInfo.getDateFrom() + "_" + reportInfo.getDateTo() + ".pdf";
+                    pdfExporterJR(jasperPrint, fileName);
+                } else if ("XLS".equals(reportInfo.getFormat())) {
+                    fileName = "Report_" + (reportInfo.getType() == 1 ? "all" : "vehicle") + "_" + reportInfo.getDateFrom() + "_" + reportInfo.getDateTo() + ".xls";
+                    xlsExporterJR(jasperPrint, fileName);
+                } else if ("CSV".equals(reportInfo.getFormat())) {
+                    fileName = "Report_" + (reportInfo.getType() == 1 ? "all" : "vehicle") + "_" + reportInfo.getDateFrom() + "_" + reportInfo.getDateTo() + ".csv";
+                    csvExporterJR(jasperPrint, fileName);
+                } else {
+                    throw new BadRequestException(badRequestExpenseReport);
+                }
 
-            ReportData reportData = new ReportData();
-            reportData.setName(fileName);
-            try {
-                reportData.setContent(Files.readAllBytes(new File(fileName).toPath()));
-                Files.delete(new File(fileName).toPath());
-            } catch (IOException e) {
-                e.printStackTrace();
-                throw new BadRequestException(badRequestExpenseReport);
+                ReportData reportData = new ReportData();
+                reportData.setName(fileName);
+                try {
+                    reportData.setContent(Files.readAllBytes(new File(fileName).toPath()));
+                    Files.delete(new File(fileName).toPath());
+                } catch (IOException e) {
+                    e.printStackTrace();
+                    throw new BadRequestException(badRequestExpenseReport);
+                }
+                return reportData;
             }
-            return reportData;
+            throw new BadRequestException(badRequestExpenseReport);
         }
-        throw new BadRequestException(badRequestExpenseReport);
+        throw new BadRequestException(noData);
     }
 
 
@@ -332,8 +336,9 @@ public class ExpenseController extends GenericDeletableController<Expense,Intege
         }
     }
 
-    HashMap getParams(ReportInfo info){
-        if(info.check()) {
+    HashMap getParams(ReportInfo info) throws BadRequestException {
+        CarReservationUtils.validate(info,validator);
+        if(info.checkReport()) {
             LocalDate from=info.getDateFrom().toLocalDate();
             LocalDate to=info.getDateTo().toLocalDate();
             String period=from.getMonthValue()+"/"+from.getYear()+" - "+to.getMonthValue()+"/"+to.getYear();

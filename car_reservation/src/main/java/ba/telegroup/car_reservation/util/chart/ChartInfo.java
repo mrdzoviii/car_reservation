@@ -2,14 +2,23 @@ package ba.telegroup.car_reservation.util.chart;
 
 import org.springframework.format.annotation.DateTimeFormat;
 
+import javax.validation.Validator;
+import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Positive;
 import java.time.LocalDate;
 
 public class ChartInfo {
+    @NotNull(message = "Date from must be not null!")
     @DateTimeFormat(iso = DateTimeFormat.ISO.DATE)
     private LocalDate dateFrom;
+    @NotNull(message = "Date to must be not null!")
     @DateTimeFormat(iso= DateTimeFormat.ISO.DATE)
     private LocalDate dateTo;
+    @NotNull(message = "Company id must be not null!")
+    @Positive(message = "Company id must be positive integer!")
     private Integer companyId;
+    @NotNull(message = "Chart type must be not null!")
+    @Positive(message = "Chart type must be positive integer!")
     private Integer chartType;
 
     public LocalDate getDateFrom() {
@@ -47,7 +56,7 @@ public class ChartInfo {
         this.companyId = companyId;
     }
 
-    public Boolean check(){
-        return companyId!=null && dateFrom!=null && dateTo!=null && (dateFrom.isBefore(dateTo) || dateFrom.isEqual(dateTo)) && chartType!=null;
+    public Boolean checkDate(){
+        return  (dateFrom.isBefore(dateTo) || dateFrom.isEqual(dateTo));
     }
 }
