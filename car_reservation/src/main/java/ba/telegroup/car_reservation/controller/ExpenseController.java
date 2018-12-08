@@ -7,6 +7,7 @@ import ba.telegroup.car_reservation.model.Reservation;
 import ba.telegroup.car_reservation.model.modelCustom.ExpenseCarReservationUser;
 import ba.telegroup.car_reservation.repository.ExpenseRepository;
 import ba.telegroup.car_reservation.repository.ReservationRepository;
+import ba.telegroup.car_reservation.util.CarReservationUtils;
 import ba.telegroup.car_reservation.util.chart.ChartData;
 import ba.telegroup.car_reservation.util.chart.ChartInfo;
 import ba.telegroup.car_reservation.util.report.ReportData;
@@ -26,6 +27,7 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 
+import javax.validation.Validator;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
@@ -83,33 +85,38 @@ public class ExpenseController extends GenericDeletableController<Expense,Intege
     private String jasperVehicle;
     @Value("${jasper.all}")
     private String jasperAll;
+    @Value("${badRequest.expense.noexpense}")
+    private String noExpense;
+    @Value("${badRequest.expense.noreservation}")
+    private String noReservation;
 
     private final JdbcTemplate jdbcTemplate;
-
-
+    private Validator validator;
     private ReservationRepository reservationRepository;
     @Autowired
-    public ExpenseController(ExpenseRepository expenseRepository,ReservationRepository reservationRepository,JdbcTemplate jdbcTemplate){
+    public ExpenseController(ExpenseRepository expenseRepository,ReservationRepository reservationRepository,JdbcTemplate jdbcTemplate,
+                             Validator validator){
         super(expenseRepository);
         this.expenseRepository=expenseRepository;
         this.reservationRepository=reservationRepository;
         this.jdbcTemplate=jdbcTemplate;
+        this.validator=validator;
     }
 
     //checked+
     @RequestMapping(value = "/custom",method = RequestMethod.GET)
-    public List<ExpenseCarReservationUser> getAllExtended() {
+    public List getAllExtended() {
         return expenseRepository.getAllExtended();
     }
     //checked+
     @RequestMapping(value="/custom/reservation/{id}",method = RequestMethod.GET)
-    public List<ExpenseCarReservationUser> getAllExtendedByReservationId(@PathVariable("id") Integer id){
+    public List getAllExtendedByReservationId(@PathVariable("id") Integer id){
         return expenseRepository.getAllExtendedByReservationId(id);
     }
 
     //checked+
     @RequestMapping(value="/car/{id}",method = RequestMethod.GET)
-    public List<ExpenseCarReservationUser> getAllExtendedByCarId(@PathVariable("id") Integer id){
+    public List getAllExtendedByCarId(@PathVariable("id") Integer id){
         return expenseRepository.getAllExtendedByCarId(id);
     }
 
@@ -145,6 +152,7 @@ public class ExpenseController extends GenericDeletableController<Expense,Intege
         throw new BadRequestException(badRequestExpenseDelete);
     }
 
+
     @RequestMapping(value="/custom",method = RequestMethod.POST)
     @Transactional(rollbackFor = Exception.class)
     @ResponseStatus(HttpStatus.CREATED)
@@ -164,38 +172,7 @@ public class ExpenseController extends GenericDeletableController<Expense,Intege
         throw new BadRequestException(badRequestInsert);
     }
 
-    private Boolean checkExpense(Expense expense){
-        if(expense!=null && expense.getReservationId()!=null) {
-            Reservation reservation=reservationRepository.findById(expense.getReservationId()).orElse(null);
 
-            return expense != null && expense.getCarId() != null && expense.getCostId() != null && expense.getPrice() != null &&
-                    expense.getReservationId() != null && expense.getDate() != null && expense.getUserId() != null &&
-                    expense.getDeleted() != null && expense.getDeleted().equals(notDeleted) &&
-                    reservation!=null && reservation.getUserId().equals(expense.getUserId())
-                    && userBean.getUser().getId().equals(expense.getUserId()) &&
-                    check(expense.getDate(),reservation.getStartTime(),reservation.getEndTime())
-                    && reservation.getStateId().equals(stateFinished) && expense.getCompanyId()!=null && userBean.getUser().getCompanyId().equals(expense.getCompanyId());
-        }
-        return false;
-    }
-
-    private Boolean check(Date date,Date timeFrom,Date timeTo){
-        if(date!=null && timeFrom!=null && timeTo!=null) {
-            LocalDate localDate = convertToLocalDate(date);
-            LocalDate localDateFrom = convertToLocalDate(timeFrom);
-            LocalDate localDateTo = convertToLocalDate(timeTo);
-
-            return (localDate.isAfter(localDateFrom) || localDate.isEqual(localDateFrom)) && (localDate.isBefore(localDateTo) || localDate.isEqual(localDateTo));
-        }
-        return false;
-    }
-
-    private LocalDate convertToLocalDate(Date date){
-        if(date!=null) {
-            return LocalDate.ofInstant(date.toInstant(), ZoneId.of("Europe/Belgrade"));
-        }
-        return null;
-    }
     //charts
 
 
@@ -210,7 +187,7 @@ public class ExpenseController extends GenericDeletableController<Expense,Intege
                 final LocalDate date=start;
                 final ChartData point;
                 if(chartInfo.getChartType().equals(reportWeekly)) {
-                    String weekNumber = getWeekNumber(start);
+                    String weekNumber = CarReservationUtils.getWeekNumber(start);
                     point =getPoint(chart,weekNumber);
                 }else if(chartInfo.getChartType().equals(reportMonthly)) {
                     String monthNumber=start.getMonthValue()+"/"+start.getYear();
@@ -219,7 +196,7 @@ public class ExpenseController extends GenericDeletableController<Expense,Intege
                     String yearNumber=start.getYear()+"";
                     point=getPoint(chart,yearNumber);
                 }
-                data.stream().filter(e -> convertToLocalDate(e.getDate()).isEqual(date)).
+                data.stream().filter(e -> CarReservationUtils.convertToLocalDate(e.getDate()).isEqual(date)).
                             forEach(r->{
                                 if (r.getCostId().equals(costFuel)){
                                         point.addFuelCost(r.getPrice());
@@ -235,21 +212,6 @@ public class ExpenseController extends GenericDeletableController<Expense,Intege
             return chart;
         }
         throw new BadRequestException(badRequestExpenseChart);
-    }
-
-    private String getWeekNumber(LocalDate date){
-        WeekFields weekFields = WeekFields.of(Locale.getDefault());
-        int weekNumber = date.get(weekFields.weekOfWeekBasedYear());
-        return weekNumber+"/"+date.getYear();
-    }
-
-    private ChartData getPoint(List<ChartData> data,String timeUnit){
-        ChartData point = data.stream().filter(c -> c.getTimeUnit().equals(timeUnit)).findFirst().orElse(null);
-        if (point == null) {
-            point = new ChartData(timeUnit);
-            data.add(point);
-        }
-        return point;
     }
 
     @RequestMapping(value = "/report",method = RequestMethod.POST)
@@ -302,6 +264,18 @@ public class ExpenseController extends GenericDeletableController<Expense,Intege
         }
         throw new BadRequestException(badRequestExpenseReport);
     }
+
+
+
+    private ChartData getPoint(List<ChartData> data,String timeUnit){
+        ChartData point = data.stream().filter(c -> c.getTimeUnit().equals(timeUnit)).findFirst().orElse(null);
+        if (point == null) {
+            point = new ChartData(timeUnit);
+            data.add(point);
+        }
+        return point;
+    }
+
 
     private void pdfExporterJR(JasperPrint jasperPrint, String fileName){
         try {
@@ -378,6 +352,33 @@ public class ExpenseController extends GenericDeletableController<Expense,Intege
             return params;
         }
         return null;
+    }
+
+    private Boolean checkExpense(Expense expense) throws BadRequestException {
+        if(expense!=null) {
+            CarReservationUtils.validate(expense,validator);
+            Reservation reservation=reservationRepository.findById(expense.getReservationId()).orElse(null);
+            if(reservation!=null) {
+                return expense.getDeleted().equals(notDeleted) && reservation.getUserId().equals(expense.getUserId())
+                        && userBean.getUser().getId().equals(expense.getUserId()) &&
+                        checkTime(expense.getDate(), reservation.getStartTime(), reservation.getEndTime())
+                        && reservation.getStateId().equals(stateFinished) && userBean.getUser().getCompanyId().equals(expense.getCompanyId());
+            }
+            throw new BadRequestException(noReservation);
+        }
+        throw new BadRequestException(noExpense);
+
+    }
+
+    private Boolean checkTime(Date date,Date timeFrom,Date timeTo){
+        if(date!=null && timeFrom!=null && timeTo!=null) {
+            LocalDate localDate = CarReservationUtils.convertToLocalDate(date);
+            LocalDate localDateFrom = CarReservationUtils.convertToLocalDate(timeFrom);
+            LocalDate localDateTo = CarReservationUtils.convertToLocalDate(timeTo);
+
+            return (localDate.isAfter(localDateFrom) || localDate.isEqual(localDateFrom)) && (localDate.isBefore(localDateTo) || localDate.isEqual(localDateTo));
+        }
+        return false;
     }
 
 }

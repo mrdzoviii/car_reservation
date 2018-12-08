@@ -4,6 +4,10 @@ import ba.telegroup.car_reservation.common.interfaces.Deletable;
 import com.fasterxml.jackson.annotation.JsonFormat;
 
 import javax.persistence.*;
+import javax.validation.constraints.NotNull;
+import javax.validation.constraints.PastOrPresent;
+import javax.validation.constraints.Positive;
+import javax.validation.constraints.PositiveOrZero;
 import java.math.BigDecimal;
 import java.sql.Timestamp;
 import java.util.Date;
@@ -29,15 +33,32 @@ import java.util.Objects;
 @Entity
 @Inheritance(strategy = InheritanceType.JOINED)
 public class Expense implements Deletable {
+    @Positive(message = "Id must be positive integer!")
     private Integer id;
+    @NotNull(message = "Cost id must be not null!")
+    @Positive(message = "Cost id must be positive integer!")
     private Integer costId;
+    @NotNull(message = "Cost id must be not null!")
+    @Positive(message = "Cost id must be positive integer!")
     private Integer carId;
+    @NotNull(message = "Date must be not null!")
+    @PastOrPresent(message = "Date must be from past or present!")
     private Date date;
+    @NotNull(message = "Price cannot be null!")
+    @Positive(message = "Price must be positive!")
     private BigDecimal price;
     private String description;
+    @NotNull(message = "Deleted must be not null!")
+    @PositiveOrZero(message = "Deleted must be positive integer or zero!")
     private Byte deleted;
+    @NotNull(message = "User  id must be not null!")
+    @Positive(message = "User id must be positive integer!")
     private Integer userId;
+    @NotNull(message = "Reservation id must be not null!")
+    @Positive(message = "Reservation id must be positive integer!")
     private Integer reservationId;
+    @NotNull(message = "Company id must be not null!")
+    @Positive(message = "Company id must be positive integer!")
     private Integer companyId;
 
 
