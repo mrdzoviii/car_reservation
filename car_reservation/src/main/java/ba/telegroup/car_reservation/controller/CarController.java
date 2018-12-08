@@ -16,7 +16,6 @@ import org.springframework.context.annotation.Scope;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 
-
 import javax.validation.Validator;
 import java.util.Arrays;
 import java.util.List;
@@ -41,6 +40,8 @@ public class CarController extends GenericHasCompanyIdAndDeletableController<Car
     private String badRequestNoCar;
     @Value("${badRequest.insert}")
     private String badRequestInsertNotAllowed;
+    @Value("${badRequest.update}")
+    private String badRequestUpdateNotAllowed;
     private CarRepository carRepository;
     private ManufacturerRepository manufacturerRepository;
     private ModelRepository modelRepository;
@@ -68,6 +69,11 @@ public class CarController extends GenericHasCompanyIdAndDeletableController<Car
     @Override
     public Car insert(@RequestBody Car object) throws BadRequestException {
         throw new BadRequestException(badRequestInsertNotAllowed);
+    }
+
+    @Override
+    public String update(@PathVariable Integer integer,@RequestBody Car object) throws BadRequestException {
+        throw new BadRequestException(badRequestUpdateNotAllowed);
     }
 
     //checked+

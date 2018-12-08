@@ -26,7 +26,7 @@ public class RoleController extends ReadOnlyController<Role,Integer> {
     }
 
     @RequestMapping(value = "/user",method = RequestMethod.GET)
-    List<Role> getAllUserRoles(){
+    public List<Role> getAllUserRoles(){
         return roleRepository.getAllByIdNot(roleSystemAdmin);
     }
 }
