@@ -500,8 +500,9 @@ var vehicleView = {
                                 ],
                                 rules: {
                                     "plateNumber": function (value) {
-                                        if (value.length > 10) {
-                                            $$('addVehicleForm').elements.plateNumber.config.invalidMessage = 'Maximum length is 10.';
+                                        var plateRegex=/([AEJKMOT]\d\d-[AEJKMOT]-\d\d\d)|(\d\d\d-[AEJKMOT]-\d\d\d)/;
+                                        if (!plateRegex.test(value)) {
+                                            $$('addVehicleForm').elements.plateNumber.config.invalidMessage = 'Plate number format invalid!';
                                             return false;
                                         }
 
@@ -517,32 +518,32 @@ var vehicleView = {
                                         return true;
                                     },
                                     "engine": function (value) {
-                                        if (value.length > 100) {
-                                            $$('addVehicleForm').elements.engine.config.invalidMessage = 'Maximum length is 1000.';
+                                        if (value.length > 100 || value.length<2) {
+                                            $$('addVehicleForm').elements.engine.config.invalidMessage = 'Engine length must be between 2 and 100.';
                                             return false;
                                         }
 
                                         return true;
                                     },
                                     "transmission": function (value) {
-                                        if (value.length > 100) {
-                                            $$('addVehicleForm').elements.transmission.config.invalidMessage = 'Maximum length is 1000.';
+                                        if (value.length > 100 || value.length<2) {
+                                            $$('addVehicleForm').elements.transmission.config.invalidMessage = 'Transmission length must be between 2 and 100.';
                                             return false;
                                         }
 
                                         return true;
                                     },
                                     "manufacturerName": function (value) {
-                                        if (value.length > 100) {
-                                            $$('editVehicleForm').elements.manufacturerName.config.invalidMessage = 'Maximum length is 1000.';
+                                        if (value.length > 100  || value.length<2) {
+                                            $$('addVehicleForm').elements.manufacturerName.config.invalidMessage = 'Manufacturer name length must be between 2 and 100.';
                                             return false;
                                         }
 
                                         return true;
                                     },
                                     "model": function (value) {
-                                        if (value.length > 100) {
-                                            $$('editVehicleForm').elements.model.config.invalidMessage = 'Maximum length is 1000.';
+                                        if (value.length > 100 ||  value.length<2) {
+                                            $$('addVehicleForm').elements.model.config.invalidMessage = 'Model length must be between 2 and 100.';
                                             return false;
                                         }
 
@@ -843,8 +844,9 @@ var vehicleView = {
                                 ],
                                 rules: {
                                     "plateNumber": function (value) {
-                                        if (value.length > 10) {
-                                            $$('editVehicleForm').elements.plateNumber.config.invalidMessage = 'Maximum length is 10.';
+                                        var plateRegex=/([AEJKMOT]\d\d-[AEJKMOT]-\d\d\d)|(\d\d\d-[AEJKMOT]-\d\d\d)/;
+                                        if (!plateRegex.test(value)) {
+                                            $$('editVehicleForm').elements.plateNumber.config.invalidMessage = 'Plate number format invalid!';
                                             return false;
                                         }
 
@@ -860,32 +862,32 @@ var vehicleView = {
                                         return true;
                                     },
                                     "engine": function (value) {
-                                        if (value.length > 100) {
-                                            $$('editVehicleForm').elements.engine.config.invalidMessage = 'Maximum length is 1000.';
+                                        if (value.length > 100 || value.length<2) {
+                                            $$('editVehicleForm').elements.engine.config.invalidMessage = 'Engine length must be between 2 and 100.';
                                             return false;
                                         }
 
                                         return true;
                                     },
                                     "transmission": function (value) {
-                                        if (value.length > 100) {
-                                            $$('editVehicleForm').elements.transmission.config.invalidMessage = 'Maximum length is 1000.';
+                                        if (value.length > 100 || value.length<2) {
+                                            $$('editVehicleForm').elements.transmission.config.invalidMessage = 'Transmission length must be between 2 and 100.';
                                             return false;
                                         }
 
                                         return true;
                                     },
                                     "manufacturerName": function (value) {
-                                        if (value.length > 100) {
-                                            $$('editVehicleForm').elements.manufacturerName.config.invalidMessage = 'Maximum length is 1000.';
+                                        if (value.length > 100 || value.length<2) {
+                                            $$('editVehicleForm').elements.manufacturerName.config.invalidMessage = 'Manufacturer name length must be between 2 and 100.';
                                             return false;
                                         }
 
                                         return true;
                                     },
                                     "model": function (value) {
-                                        if (value.length > 100) {
-                                            $$('editVehicleForm').elements.model.config.invalidMessage = 'Maximum length is 1000.';
+                                        if (value.length > 100 || value.length<2) {
+                                            $$('editVehicleForm').elements.model.config.invalidMessage = 'Model length must be between 2 and 100.';
                                             return false;
                                         }
 

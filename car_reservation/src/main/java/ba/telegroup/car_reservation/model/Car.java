@@ -4,16 +4,27 @@ import ba.telegroup.car_reservation.common.interfaces.Deletable;
 import ba.telegroup.car_reservation.common.interfaces.HasCompanyId;
 
 import javax.persistence.*;
+import javax.validation.constraints.*;
 import java.util.Objects;
 
 @Entity
 @Inheritance(strategy = InheritanceType.JOINED)
 public class Car implements Deletable, HasCompanyId {
     private Integer id;
+    @Positive(message = "Model id must be positive integer!")
     private Integer modelId;
+    @NotNull(message = "Location id must be not null!")
+    @Positive(message = "Location id must be positive integer!")
     private Integer locationId;
+    @NotNull
+    @NotBlank
+    @Pattern(regexp = "([AEJKMOT]\\d\\d-[AEJKMOT]-\\d\\d\\d)|(\\d\\d\\d-[AEJKMOT]-\\d\\d\\d)",message = "Plate number must be in X00-X-000 or 000-X-000 format where X is any letter from group(A,E,J,K,M,O,T) and 0 is any digit!")
     private String plateNumber;
+    @NotNull(message = "Deleted must be not null!")
+    @PositiveOrZero(message = "Deleted must be 0 or positive integer!")
     private Byte deleted;
+    @NotNull(message = "Company id must be not null!")
+    @PositiveOrZero(message = "Company id must be positive integer!")
     private Integer companyId;
 
     @Id
