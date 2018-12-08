@@ -4,6 +4,7 @@ import ba.telegroup.car_reservation.common.interfaces.Deletable;
 import ba.telegroup.car_reservation.common.interfaces.HasCompanyId;
 
 import javax.persistence.*;
+import javax.validation.constraints.*;
 import java.math.BigDecimal;
 import java.util.Objects;
 
@@ -20,12 +21,26 @@ import java.util.Objects;
 
 @Entity
 public class Location implements HasCompanyId, Deletable {
+    @Positive(message = "Id must be positive integer!")
     private Integer id;
+    @NotNull(message = "Location name must be not null!")
+    @NotBlank(message="Location name must be not blank!")
+    @Size(max = 50,min = 1,message = "Location name length must be between 1 and 50!")
     private String name;
+    @NotNull(message = "Address must be not null!")
+    @NotBlank(message="Address must be not blank!")
     private String address;
+    @NotNull(message = "Company id must be not null!")
+    @Positive(message = "Company id must be positive integer!")
     private Integer companyId;
+    @NotNull(message = "Latitude must be not null!")
+    @Positive(message = "Latitude must be positive number!")
     private BigDecimal latitude;
+    @NotNull(message = "Longitude must be not null!")
+    @Positive(message = "Longitude must be positive number!")
     private BigDecimal longitude;
+    @NotNull(message = "Deleted must be not null!")
+    @PositiveOrZero(message = "Deleted must be positive integer or zero!")
     private Byte deleted;
 
     public Location(Integer id, String name, String address,  Integer companyId,BigDecimal latitude, BigDecimal longitude, Byte deleted) {

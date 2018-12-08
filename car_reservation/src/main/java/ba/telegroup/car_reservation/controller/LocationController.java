@@ -10,15 +10,16 @@ import ba.telegroup.car_reservation.repository.CarRepository;
 import ba.telegroup.car_reservation.repository.ExpenseRepository;
 import ba.telegroup.car_reservation.repository.LocationRepository;
 import ba.telegroup.car_reservation.repository.ReservationRepository;
+import ba.telegroup.car_reservation.util.CarReservationUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Scope;
+import org.springframework.http.HttpStatus;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
+import javax.validation.Validator;
+import javax.validation.constraints.Pattern;
 import java.util.List;
 
 @RestController
@@ -40,14 +41,17 @@ public class LocationController extends GenericHasCompanyIdAndDeletableControlle
     private ReservationRepository reservationRepository;
     private ExpenseRepository expenseRepository;
     private CarRepository carRepository;
+    private Validator validator;
 
     @Autowired
-    public LocationController(LocationRepository locationRepository,ExpenseRepository expenseRepository,ReservationRepository reservationRepository,CarRepository carRepository){
+    public LocationController(LocationRepository locationRepository,ExpenseRepository expenseRepository,
+                              ReservationRepository reservationRepository,CarRepository carRepository,Validator validator){
         super(locationRepository);
         this.locationRepository=locationRepository;
         this.reservationRepository=reservationRepository;
         this.expenseRepository=expenseRepository;
         this.carRepository=carRepository;
+        this.validator=validator;
     }
 
     @RequestMapping(path = "/company/{id}",method = RequestMethod.GET)
@@ -82,6 +86,21 @@ public class LocationController extends GenericHasCompanyIdAndDeletableControlle
             return super.delete(id);
         }
         throw new BadRequestException(badRequestDelete);
+    }
+
+    @Transactional(rollbackFor = Exception.class)
+    @ResponseStatus(HttpStatus.CREATED)
+    @Override
+    public Location insert(@RequestBody Location object) throws BadRequestException, ForbiddenException {
+        CarReservationUtils.validate(object,validator);
+        return super.insert(object);
+    }
+
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public String update(@PathVariable Integer integer,@RequestBody Location object) throws BadRequestException, ForbiddenException {
+        CarReservationUtils.validate(object,validator);
+        return super.update(integer, object);
     }
 
     private void setResult(Boolean bool){
