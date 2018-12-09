@@ -293,7 +293,6 @@ var vehicleView = {
                         data: models,
                         on: {
                             onValueSuggest: function (obj) {
-                                console.log(obj);
                                 $$("modelId").define("value", obj.id);
                                 $$("engine").define("value", obj.data.engine);
                                 $$("transmission").define("value", obj.data.transmission);
@@ -564,7 +563,7 @@ var vehicleView = {
                                         "view": "template",
                                         borderless: true,
                                         height: 50,
-                                        "template": "<p>Photo</p>"
+                                        "template": "<p>Photo:<b style='color: red'>*</b></p>"
                                     },
                                     {
                                         view: "template",
@@ -583,6 +582,16 @@ var vehicleView = {
                                     },
                                     {
                                         height: 90,
+                                        view:"label",
+                                        template:"<span  style='color:#fd595f;font-size: 13px;'>Image not added</span>",
+                                        name:"imageLabel",
+                                        id:"imageLabel",
+                                        hidden:true
+
+                                    },
+                                    {
+                                        height:90,
+                                        id:"spacer"
                                     },
                                     {
                                         marginTop: 20,
@@ -634,12 +643,13 @@ var vehicleView = {
                 $$("companyId").refresh();
                 $$("fuelId").refresh();
                 $$("image").refresh();
+                $$("imageLabel").hide();
             }
         },
 
 
         save: function () {
-            if ($$("addVehicleForm").validate()) {
+            if (vehicleView.validateForm($$("addVehicleForm"))) {
                 var newCar = $$("addVehicleForm").getValues();
                 newCar.image = $$("image").getValues()["src"].split("base64,")[1];
                 console.log(newCar);
@@ -655,6 +665,17 @@ var vehicleView = {
                 });
                 util.dismissDialog('addVehicleDialog');
             }
+        },
+        validateForm:function(form){
+            var res=form.validate();
+            $$("imageLabel").hide();
+            $$("spacer").show();
+            if($$("image").getValues()["src"].split("base64,")[1]===undefined){
+                $$("imageLabel").show();
+                $$("spacer").hide();
+                return false && res;
+            }
+            return true && res;
         },
         editVehicleDialog: {
             view: "popup",

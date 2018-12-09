@@ -29,9 +29,9 @@ public class CarRepositoryImpl extends CustomRepositoryImpl implements CarReposi
             "                               inner join fuel g on m.fuel_id = g.id" +
             "                              inner join manufacturer p on m.manufacturer_id = p.id" +
             "                               inner join location l on c.location_id = l.id" +
-            "                             inner join company f on c.company_id = f.id  where and c.deleted=0 and l.deletd=0 and f.deleted=0 and c.company_id=? and c.id" +
+            "                             inner join company f on c.company_id = f.id  where c.deleted=0 and l.deleted=0 and f.deleted=0 and c.company_id=? and c.id" +
             "    not in(select car_id from reservation where ((start_time between CAST(? as datetime) and cast(? as datetime)) or" +
-            "          (end_time between CAST(? as datetime) and cast(? as datetime)) or (start_time <= CAST(? as DATETIME) and end_time >= CAST(? as DATETIME))) and deleted=0 and state_id in (1,2)";
+            "          (end_time between CAST(? as datetime) and cast(? as datetime)) or (start_time <= CAST(? as DATETIME) and end_time >= CAST(? as DATETIME))) and deleted=0 and state_id in (1,2))";
 
     private final String SQL_DELETE_BY_COMPANY="update car u set u.deleted=1 where company_id=?";
     private final String SQL_DELETE_BY_LOCATION="update car u set u.deleted=1 where location_id=?";

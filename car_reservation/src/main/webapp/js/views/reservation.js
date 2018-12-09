@@ -897,7 +897,7 @@ var reservationView = {
                                             name: "endTime",
                                             view: "datepicker",
                                             stringResult: true,
-                                            label: "End time:",
+                                            label: "To:",
                                             disabled: true,
                                             timepicker: true,
                                             type: "date",
@@ -1028,7 +1028,7 @@ var reservationView = {
                 companyId: userData.companyId
             };
             webix.ajax().header({"Content-type": "application/json"})
-                .post("api/reservation", newItem).then(function (data) {
+                .post("api/reservation/custom", newItem).then(function (data) {
                 $$("reservationDT").add(data.json());
                 util.messages.showMessage("Reservation successfully made.");
             }).fail(function (error) {
@@ -1222,7 +1222,7 @@ var reservationView = {
                                             name: "endTime",
                                             view: "datepicker",
                                             stringResult: true,
-                                            label: "End time:",
+                                            label: "To:",
                                             timepicker: true,
                                             type: "date",
                                             required: true,
