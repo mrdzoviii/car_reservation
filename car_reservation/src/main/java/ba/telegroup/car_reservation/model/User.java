@@ -261,7 +261,6 @@ public class User implements HasCompanyId, Deletable {
                 ", companyId=" + companyId +
                 ", roleId=" + roleId +
                 ", token='" + token + '\'' +
-                ", avatar=" + Arrays.toString(avatar) +
                 '}';
     }
 }

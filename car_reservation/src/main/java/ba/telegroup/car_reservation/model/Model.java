@@ -135,7 +135,6 @@ public class Model {
                 ", transmission='" + transmission + '\'' +
                 ", year='" + year + '\'' +
                 ", fuelId=" + fuelId +
-                ", image=" + Arrays.toString(image) +
                 '}';
     }
 }

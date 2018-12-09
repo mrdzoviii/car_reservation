@@ -32,7 +32,7 @@ public class Notification {
     }
     @Async
     public void sendLink(String mailTo,String token){
-        sendMail(mailTo,"Registration form available on link: \n http://localhost:8100/?q=reg&t="+token);
+        sendMail(mailTo,"Registration form available on link: \n https://localhost:8443/?q=reg&t="+token);
     }
     @Async
     public void sendNotification(ReservationStateCarUserCompanyLocation reservationInfo,Boolean canceled,List<User> users){

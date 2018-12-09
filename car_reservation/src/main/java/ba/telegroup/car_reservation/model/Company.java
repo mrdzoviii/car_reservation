@@ -81,7 +81,6 @@ public class Company implements Deletable {
         return "Company{" +
                 "id=" + id +
                 ", name='" + name + '\'' +
-                ", logo=" + Arrays.toString(logo) +
                 ", deleted=" + deleted +
                 '}';
     }
