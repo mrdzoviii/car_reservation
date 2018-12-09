@@ -222,4 +222,22 @@ public class Reservation implements Deletable, HasCompanyId {
         this.deleted = deleted;
         this.companyId = companyId;
     }
+
+    @Override
+    public String toString() {
+        return "Reservation{" +
+                "id=" + id +
+                ", createdTime=" + createdTime +
+                ", userId=" + userId +
+                ", carId=" + carId +
+                ", startMileage=" + startMileage +
+                ", finishMileage=" + finishMileage +
+                ", direction='" + direction + '\'' +
+                ", startTime=" + startTime +
+                ", endTime=" + endTime +
+                ", stateId=" + stateId +
+                ", deleted=" + deleted +
+                ", companyId=" + companyId +
+                '}';
+    }
 }

@@ -1,6 +1,7 @@
 package ba.telegroup.car_reservation.model;
 
 import javax.persistence.*;
+import java.util.Arrays;
 import java.util.Objects;
 
 @Entity
@@ -124,5 +125,17 @@ public class Model {
                 Objects.equals(getFuelId(), model.getFuelId());
     }
 
-
+    @Override
+    public String toString() {
+        return "Model{" +
+                "id=" + id +
+                ", manufacturerId=" + manufacturerId +
+                ", model='" + model + '\'' +
+                ", engine='" + engine + '\'' +
+                ", transmission='" + transmission + '\'' +
+                ", year='" + year + '\'' +
+                ", fuelId=" + fuelId +
+                ", image=" + Arrays.toString(image) +
+                '}';
+    }
 }

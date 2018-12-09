@@ -113,4 +113,16 @@ public class Car implements Deletable, HasCompanyId {
     public int hashCode() {
         return Objects.hash(id);
     }
+
+    @Override
+    public String toString() {
+        return "Car{" +
+                "id=" + id +
+                ", modelId=" + modelId +
+                ", locationId=" + locationId +
+                ", plateNumber='" + plateNumber + '\'' +
+                ", deleted=" + deleted +
+                ", companyId=" + companyId +
+                '}';
+    }
 }

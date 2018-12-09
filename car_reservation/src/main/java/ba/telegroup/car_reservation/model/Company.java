@@ -75,4 +75,14 @@ public class Company implements Deletable {
     public int hashCode() {
         return Objects.hash(id);
     }
+
+    @Override
+    public String toString() {
+        return "Company{" +
+                "id=" + id +
+                ", name='" + name + '\'' +
+                ", logo=" + Arrays.toString(logo) +
+                ", deleted=" + deleted +
+                '}';
+    }
 }

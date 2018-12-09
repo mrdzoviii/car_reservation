@@ -218,6 +218,7 @@ public class ReservationController extends GenericHasCompanyIdAndDeletableContro
             Reservation oldObject=cloner.deepClone(reservation);
             reservation.setStartMileage(startMileage);
             reservation.setStateId(stateRunning);
+            CarReservationUtils.validate(reservation, validator);
             if (updateReservation(reservation, oldObject))
                 return reservationRepository.getExtendedById(reservation.getId());
         }
@@ -235,6 +236,7 @@ public class ReservationController extends GenericHasCompanyIdAndDeletableContro
             reservation.setFinishMileage(finishMileage);
             reservation.setStateId(stateFinished);
             reservation.setEndTime(now);
+            CarReservationUtils.validate(reservation, validator);
             if (updateReservation(reservation, oldObject))
                 return reservationRepository.getExtendedById(reservation.getId());
         }
@@ -248,6 +250,7 @@ public class ReservationController extends GenericHasCompanyIdAndDeletableContro
         && expenseRepository.countExpenseByReservationIdAndDeleted(reservation.getId(),notDeleted)>0){
             Reservation oldObject=cloner.deepClone(reservation);
             reservation.setStateId(stateCompleted);
+            CarReservationUtils.validate(reservation, validator);
             if (updateReservation(reservation, oldObject))
                 return reservationRepository.getExtendedById(reservation.getId());
 

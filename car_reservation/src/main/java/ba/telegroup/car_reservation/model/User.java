@@ -7,6 +7,7 @@ import org.hibernate.annotations.Generated;
 import javax.persistence.*;
 import javax.validation.constraints.*;
 import java.sql.Timestamp;
+import java.util.Arrays;
 import java.util.Objects;
 
 @SqlResultSetMapping(
@@ -242,5 +243,25 @@ public class User implements HasCompanyId, Deletable {
     @Override
     public int hashCode() {
         return Objects.hash(id);
+    }
+
+    @Override
+    public String toString() {
+        return "User{" +
+                "id=" + id +
+                ", email='" + email + '\'' +
+                ", username='" + username + '\'' +
+                ", password='" + password + '\'' +
+                ", firstName='" + firstName + '\'' +
+                ", lastName='" + lastName + '\'' +
+                ", statusId=" + statusId +
+                ", deleted=" + deleted +
+                ", mailOptionId=" + mailOptionId +
+                ", locationId=" + locationId +
+                ", companyId=" + companyId +
+                ", roleId=" + roleId +
+                ", token='" + token + '\'' +
+                ", avatar=" + Arrays.toString(avatar) +
+                '}';
     }
 }

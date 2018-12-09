@@ -11,6 +11,8 @@ public class State {
     private Integer id;
     private String state;
 
+
+
     @Id
     @Column(name = "id")
     public Integer getId() {
@@ -37,6 +39,14 @@ public class State {
         if (o == null || getClass() != o.getClass()) return false;
         State state = (State) o;
         return getId().equals(state.getId());
+    }
+
+    @Override
+    public String toString() {
+        return "State{" +
+                "id=" + id +
+                ", state='" + state + '\'' +
+                '}';
     }
 
     @Override

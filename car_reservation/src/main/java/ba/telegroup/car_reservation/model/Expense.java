@@ -194,4 +194,20 @@ public class Expense implements Deletable {
         this.reservationId = reservationId;
         this.companyId=companyId;
     }
+
+    @Override
+    public String toString() {
+        return "Expense{" +
+                "id=" + id +
+                ", costId=" + costId +
+                ", carId=" + carId +
+                ", date=" + date +
+                ", price=" + price +
+                ", description='" + description + '\'' +
+                ", deleted=" + deleted +
+                ", userId=" + userId +
+                ", reservationId=" + reservationId +
+                ", companyId=" + companyId +
+                '}';
+    }
 }

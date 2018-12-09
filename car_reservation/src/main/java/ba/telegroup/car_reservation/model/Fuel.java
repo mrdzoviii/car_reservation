@@ -43,4 +43,12 @@ public class Fuel {
     public int hashCode() {
         return Objects.hash(id);
     }
+
+    @Override
+    public String toString() {
+        return "Fuel{" +
+                "id=" + id +
+                ", fuel='" + fuel + '\'' +
+                '}';
+    }
 }
