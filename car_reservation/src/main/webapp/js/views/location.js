@@ -328,7 +328,9 @@ var locationView = {
                                                         map: mapObj,
                                                         position: results[0].geometry.location
                                                     });
-                                                    markerTmp.setMap(null);
+                                                    if(markerTmp!==undefined) {
+                                                        markerTmp.setMap(null);
+                                                    }
                                                     markerTmp=marker;
                                                     lat = results[0]['geometry']['location']['lat'];
                                                     lng = results[0]['geometry']['location']['lng'];
@@ -535,7 +537,9 @@ var locationView = {
                                                     map: mapObj,
                                                     position: results[0].geometry.location
                                                 });
-                                                markerTmp.setMap(null);
+                                                if(markerTmp!==undefined) {
+                                                    markerTmp.setMap(null);
+                                                }
                                                 markerTmp=marker;
                                                 lat = results[0]['geometry']['location']['lat'];
                                                 lng = results[0]['geometry']['location']['lng'];

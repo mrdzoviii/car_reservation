@@ -118,6 +118,12 @@ public class CarController extends GenericHasCompanyIdAndDeletableController<Car
     public List getFreeCars(@PathVariable("startTime") String startTime,@PathVariable("endTime") String endTime){
         return carRepository.getAllExtendedByCompanyIdAndFreeBetweenStartAndEndTime(userBean.getUser().getCompanyId(),startTime,endTime);
     }
+
+    @RequestMapping(value = "/reservation/{startTime}/{endTime}/{id}",method = RequestMethod.GET)
+    public List getFreeCarsByReservation(@PathVariable("startTime") String startTime,@PathVariable("endTime") String endTime,
+                                         @PathVariable("id") Integer id){
+        return carRepository.getAllExtendedByCompanyIdAndFreeBetweenStartAndEndTimeAndReservation(userBean.getUser().getCompanyId(),startTime,endTime,id);
+    }
     //checked+
     @Transactional(rollbackFor = Exception.class)
     @RequestMapping(value = "/custom/{id}",method = RequestMethod.PUT)

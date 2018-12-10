@@ -98,9 +98,9 @@ public class LocationController extends GenericHasCompanyIdAndDeletableControlle
 
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public String update(@PathVariable Integer integer,@RequestBody Location object) throws BadRequestException, ForbiddenException {
+    public String update(@PathVariable Integer id,@RequestBody Location object) throws BadRequestException, ForbiddenException {
         CarReservationUtils.validate(object,validator);
-        return super.update(integer, object);
+        return super.update(id, object);
     }
 
     private void setResult(Boolean bool){

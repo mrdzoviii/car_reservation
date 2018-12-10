@@ -711,6 +711,46 @@ var reservationView = {
             util.messages.showErrorMessage("Load free vehicles failed.");
         });
     },
+    loadFreeVehicleByReservation: function (startTime, endTime,reservation) {
+        webix.ajax().get("api/car/reservation/" + startTime + "/" + endTime+"/"+reservation.id).then(function (data) {
+            freeVehicles.length = 0;
+            var freeVehiclesTemp = data.json();
+            firstFreeVehicle = freeVehiclesTemp.find(x=>x.id===reservation.carId);
+            freeVehiclesTemp.forEach(function (obj) {
+                freeVehicles.push({
+                    id: obj.id,
+                    value: obj.plateNumber + " - " + obj.manufacturerName + " " + obj.model,
+                    item: obj
+                });
+            });
+            var item=freeVehiclesTemp[0];
+            $$("carId").define("options",freeVehicles);
+            $$("carId").define("value",firstFreeVehicle);
+            $$("carId").refresh();
+            $$("image").setValues({
+                src: item.image
+            });
+            $$("manufacturer").define("label", "Manufacturer: <b>" + item.manufacturerName+"</b>");
+            $$("model").define("label","Model: <b>" + item.model+"</b>");
+            $$("plateNumber").define("label","Plate number: <b>" + item.plateNumber+"</b>");
+            $$("year").define("label","Year: <b>" + item.year+"</b>");
+            $$("engine").define("label","Engine: <b>" + item.engine+"</b>");
+            $$("transmission").define("label","Transmission: <b>" + item.transmission+"</b>");
+            $$("fuelName").define("label","Fuel: <b>" + item.fuelName+"</b>");
+            $$("carDetails").show();
+            $$("image").refresh();
+            $$("carPhoto").show();
+            $$("manufacturer").refresh();
+            $$("model").refresh();
+            $$("plateNumber").refresh();
+            $$("year").refresh();
+            $$("engine").refresh();
+            $$("fuelName").refresh();
+            $$("transmission").refresh();
+        }).fail(function (error) {
+            util.messages.showErrorMessage("Load free vehicles failed.");
+        });
+    },
     addReservationDialog: {
         view: "popup",
         id: "addReservationDialog",
@@ -1241,7 +1281,7 @@ var reservationView = {
                                                     $$("carId").define("disabled", false);
                                                     var startTime = webix.i18n.parseFormatStr($$("startTime").getValue()) + ":00";
                                                     var endTime = webix.i18n.parseFormatStr(newValue) + ":00";
-                                                    reservationView.loadFreeVehicle(startTime, endTime);
+                                                    reservationView.loadFreeVehicleByReservation(startTime, endTime,$$("reservationDT").getSelectedItem());
 
                                                 }
                                             }

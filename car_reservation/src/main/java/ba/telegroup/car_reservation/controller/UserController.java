@@ -258,7 +258,7 @@ public class UserController extends GenericHasCompanyIdAndDeletableController<Us
         User user=userRepository.findById(userBean.getUser().getId()).orElse(null);
         if(user!=null && passwordInfo !=null) {
             CarReservationUtils.validate(passwordInfo,validator);
-            if(passwordInfo.getOldPassword()!=null &&user.getPassword().toLowerCase().equals(CarReservationUtils.hashPassword(passwordInfo.getOldPassword().trim().toLowerCase()))){
+            if(passwordInfo.getOldPassword()!=null && user.getPassword().toLowerCase().equals(CarReservationUtils.hashPassword(passwordInfo.getOldPassword().trim()).toLowerCase())){
                 if(passwordInfo.getNewPassword()!=null && passwordInfo.getNewPasswordRepeated()!=null
                         && passwordInfo.getNewPassword().trim().equals(passwordInfo.getNewPasswordRepeated().trim())){
                     user.setPassword(CarReservationUtils.hashPassword(passwordInfo.getNewPassword()));
